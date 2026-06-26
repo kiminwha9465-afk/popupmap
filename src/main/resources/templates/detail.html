@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${store.name} + ' - 팝업맵'">팝업스토어 상세</title>
+    <link rel="stylesheet" href="/css/style.css?v=2"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+<body>
+
+<header class="header">
+    <a href="/" class="header-brand">
+        <span class="brand-icon">📍</span>
+        <span class="brand-text">팝업맵</span>
+    </a>
+    <nav class="header-nav">
+        <a href="/stores" class="nav-link">전체보기</a>
+        <a href="/stores?category=패션" class="nav-link">패션</a>
+        <a href="/stores?category=뷰티" class="nav-link">뷰티</a>
+        <a href="/stores?category=식음료" class="nav-link">식음료</a>
+        <a href="/stores?category=라이프스타일" class="nav-link">라이프스타일</a>
+        <a href="/stores?category=아트/문화" class="nav-link">아트/문화</a>
+        <a href="/stores?category=엔터테인먼트" class="nav-link">엔터테인먼트</a>
+        <a href="/stores?category=테크" class="nav-link">테크</a>
+    </nav>
+    <div class="header-right">
+        <a href="/" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            목록으로
+        </a>
+    </div>
+</header>
+
+<div class="detail-container">
+    <div class="detail-hero" style="margin-top:0">
+        <img th:src="${store.imageUrl}" th:alt="${store.name}" class="detail-hero-img"/>
+        <div class="detail-hero-overlay">
+            <span class="card-category" th:text="${store.category}"></span>
+            <span class="card-status"
+                  th:text="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
+                  th:classappend="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
+            </span>
+        </div>
+    </div>
+
+    <div class="detail-content">
+        <div class="detail-main">
+            <div class="detail-brand" th:text="${store.brand}"></div>
+            <h1 class="detail-name" th:text="${store.name}"></h1>
+            <p class="detail-description" th:text="${store.description}"></p>
+
+            <div class="detail-info-grid">
+                <div class="info-item">
+                    <div class="info-icon">📅</div>
+                    <div>
+                        <div class="info-label">운영 기간</div>
+                        <div class="info-value" th:text="${store.startDate} + ' ~ ' + ${store.endDate}"></div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🕐</div>
+                    <div>
+                        <div class="info-label">운영 시간</div>
+                        <div class="info-value" th:text="${store.hours}"></div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📍</div>
+                    <div>
+                        <div class="info-label">위치</div>
+                        <div class="info-value" th:text="${store.address}"></div>
+                    </div>
+                </div>
+                <div class="info-item" th:if="${store.website != null}">
+                    <div class="info-icon">🔗</div>
+                    <div>
+                        <div class="info-label">웹사이트</div>
+                        <a th:href="${store.website}" th:text="${store.website}"
+                           class="info-link" target="_blank" rel="noopener noreferrer"></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-actions">
+                <a th:href="${store.website}" target="_blank" rel="noopener noreferrer"
+                   th:if="${store.website != null}" class="btn-primary">
+                    공식 사이트 방문
+                </a>
+                <button class="btn-bookmark" id="detailBmBtn" th:data-id="${store.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" id="detailBmSvg">
+                        <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+                    </svg>
+                    <span id="detailBmText">북마크</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="detail-map-wrap">
+            <h2 class="detail-map-title">위치</h2>
+            <div id="detail-map"></div>
+            <p class="detail-address-text" th:text="${store.address}"></p>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script th:inline="javascript">
+    const storeDetail = {
+        lat: /*[[${store.latitude}]]*/ 37.5665,
+        lng: /*[[${store.longitude}]]*/ 126.9780,
+        name: /*[[${store.name}]]*/ '',
+        address: /*[[${store.address}]]*/ ''
+    };
+</script>
+<script src="/js/detail-map.js"></script>
+<script th:inline="javascript">
+(function() {
+    const BKEY = 'popupmap-bookmarks';
+    const btn  = document.getElementById('detailBmBtn');
+    const svg  = document.getElementById('detailBmSvg');
+    const txt  = document.getElementById('detailBmText');
+    const id   = String(/*[[${store.id}]]*/ 0);
+
+    function load() {
+        try { return JSON.parse(localStorage.getItem(BKEY) || '[]'); } catch { return []; }
+    }
+
+    function update() {
+        const marked = load().includes(id);
+        btn.classList.toggle('bookmarked', marked);
+        svg.setAttribute('fill', marked ? 'currentColor' : 'none');
+        txt.textContent = marked ? '북마크됨' : '북마크';
+    }
+
+    btn.addEventListener('click', () => {
+        const bm  = load();
+        const idx = bm.indexOf(id);
+        if (idx >= 0) bm.splice(idx, 1); else bm.push(id);
+        localStorage.setItem(BKEY, JSON.stringify(bm));
+        update();
+    });
+
+    update();
+})();
+</script>
+</body>
+</html>

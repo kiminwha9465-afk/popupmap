@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="(${selectedCategory} ?: '전체') + ' 팝업스토어 - 팝업맵'">팝업스토어 목록</title>
+    <link rel="stylesheet" href="/css/style.css?v=2"/>
+</head>
+<body>
+
+<!-- ── 헤더 ──────────────────────────────────────────── -->
+<header class="header">
+    <a href="/" class="header-brand">
+        <span class="brand-icon">📍</span>
+        <span class="brand-text">팝업맵</span>
+    </a>
+    <nav class="header-nav">
+        <a href="/" class="nav-link">홈</a>
+        <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+           th:href="@{/stores(category=${cat})}"
+           th:text="${cat}"
+           th:classappend="${selectedCategory == cat ? ' active' : ''}"
+           class="nav-link">카테고리</a>
+    </nav>
+    <div class="header-right">
+        <form th:action="@{/stores}" method="get" class="search-form">
+            <input th:if="${selectedCategory != null}" type="hidden" name="category" th:value="${selectedCategory}"/>
+            <input type="text" name="keyword" class="search-input" placeholder="팝업스토어 검색..."
+                   th:value="${keyword}"/>
+            <button type="submit" class="search-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+</header>
+
+<div class="stores-container">
+
+    <!-- ── 페이지 헤더 ────────────────────────────────── -->
+    <div class="stores-page-header">
+        <div class="stores-page-title">
+            <h1 class="stores-title">
+                <span th:text="${selectedCategory} ?: '전체 팝업스토어'"></span>
+            </h1>
+            <span class="stores-count" th:text="${stores.size()} + '개'"></span>
+        </div>
+        <p class="stores-subtitle" th:if="${keyword != null and !keyword.isBlank()}"
+           th:text="'&quot;' + ${keyword} + '&quot; 검색 결과'"></p>
+    </div>
+
+    <!-- ── 카테고리 탭 ────────────────────────────────── -->
+    <div class="stores-cats">
+        <a href="/stores"
+           th:classappend="${selectedCategory == null and keyword == null ? ' active' : ''}"
+           class="stores-cat-tab">전체</a>
+        <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+           th:href="@{/stores(category=${cat})}"
+           th:text="${cat}"
+           th:classappend="${selectedCategory == cat ? ' active' : ''}"
+           class="stores-cat-tab">카테고리</a>
+    </div>
+
+    <!-- ── 지역 필터 + 정렬 ──────────────────────────── -->
+    <div class="stores-toolbar">
+        <div class="stores-regions">
+            <a th:href="@{/stores(category=${selectedCategory})}"
+               th:classappend="${selectedRegion == null ? ' active' : ''}"
+               class="region-chip">전국</a>
+            <a th:each="reg : ${ {'서울','경기','부산','인천','대구','광주','대전','제주'} }"
+               th:href="@{/stores(category=${selectedCategory}, region=${reg})}"
+               th:text="${reg}"
+               th:classappend="${selectedRegion == reg ? ' active' : ''}"
+               class="region-chip">지역</a>
+        </div>
+    </div>
+
+    <!-- ── 카드 그리드 ───────────────────────────────── -->
+    <div class="stores-grid" th:if="${!stores.isEmpty()}">
+        <a th:each="store : ${stores}"
+           th:href="@{/store/{id}(id=${store.id})}"
+           class="store-card">
+            <div class="card-image">
+                <img th:src="${store.imageUrl}" th:alt="${store.name}" loading="lazy"/>
+                <span class="card-category" th:text="${store.category}"></span>
+                <span class="card-status"
+                      th:text="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
+                      th:classappend="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="card-brand" th:text="${store.brand}"></div>
+                <h3 class="card-name" th:text="${store.name}"></h3>
+                <p class="card-address">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <span th:text="${store.address}"></span>
+                </p>
+                <p class="card-dates">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2">
+                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                        <line x1="16" x2="16" y1="2" y2="6"/>
+                        <line x1="8" x2="8" y1="2" y2="6"/>
+                        <line x1="3" x2="21" y1="10" y2="10"/>
+                    </svg>
+                    <span th:text="${store.startDate} + ' ~ ' + ${store.endDate}"></span>
+                </p>
+            </div>
+        </a>
+    </div>
+
+    <!-- ── 빈 상태 ───────────────────────────────────── -->
+    <div class="stores-empty" th:if="${stores.isEmpty()}">
+        <div class="stores-empty-icon">🔍</div>
+        <p class="stores-empty-title">팝업스토어가 없습니다</p>
+        <p class="stores-empty-desc"
+           th:text="${selectedCategory != null ? selectedCategory + ' 카테고리에 ' : ''} + '현재 진행 중인 팝업스토어가 없습니다.'">
+        </p>
+        <a href="/stores" class="btn-primary" style="margin-top:20px;display:inline-block;">전체 보기</a>
+    </div>
+
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <span class="footer-logo">📍 팝업맵</span>
+        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+    </div>
+</footer>
+
+</body>
+</html>
