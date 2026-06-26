@@ -131,20 +131,8 @@
     }
 
     function _syncIndicator() {
-        const bar  = document.getElementById('filterBar');
-        const text = document.getElementById('filterBarText');
-        if (!bar || !text) return;
-
-        const parts = [];
-        if (_bmMode)    parts.push('내 북마크 ' + _load().length + '개');
-        if (_category)  parts.push(_category);
-
-        if (parts.length > 0) {
-            text.textContent = parts.join(' · ');
-            bar.hidden = false;
-        } else {
-            bar.hidden = true;
-        }
+        const btn = document.getElementById('filterClear');
+        if (btn) btn.classList.toggle('active', _bmMode || !!_category);
     }
 
     /* ── Bookmark panel ─────────────────────────────── */

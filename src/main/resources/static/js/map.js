@@ -12,8 +12,22 @@ window.PopupMap = (() => {
     }).addTo(map);
 
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    let _markers = [];
-    let _openPopup = null;
+
+    /* 클러스터 그룹 — 겹치는 마커를 숫자 배지로 묶음 */
+    const _cluster = L.markerClusterGroup({
+        maxClusterRadius: 50,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        iconCreateFunction(c) {
+            const n = c.getChildCount();
+            return L.divIcon({
+                html: `<div class="mc-icon">${n}</div>`,
+                className: 'mc-wrap',
+                iconSize: [36, 36]
+            });
+        }
+    });
+    map.addLayer(_cluster);
 
     function _parse(str) {
         if (!str) return null;
@@ -21,71 +35,96 @@ window.PopupMap = (() => {
         return new Date(y, m - 1, d);
     }
 
-    function _icon(upcoming) {
-        const color = upcoming ? '#F59E0B' : '#FF4B4B';
-        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='38' viewBox='0 0 28 38'>
-            <path d='M14 0C6.268 0 0 6.268 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.268 21.732 0 14 0z' fill='${color}'/>
-            <circle cx='14' cy='14' r='5.5' fill='white'/>
-        </svg>`;
+    function _pinIcon(upcoming) {
+        const bg = upcoming ? '#F59E0B' : '#FF4B4B';
+        const shadow = upcoming ? 'rgba(245,158,11,.45)' : 'rgba(255,75,75,.45)';
         return L.divIcon({
-            html: svg,
-            className: '',
-            iconSize: [28, 38],
-            iconAnchor: [14, 38],
-            popupAnchor: [0, -38]
+            html: `<div class="mc-icon" style="background:${bg};box-shadow:0 2px 8px ${shadow};">1</div>`,
+            className: 'mc-wrap',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -20]
         });
     }
 
-    function _clearMarkers() {
-        _markers.forEach(m => map.removeLayer(m));
-        _markers = [];
-    }
-
     function _addMarkers(list) {
+        _cluster.clearLayers();
         const bounds = [];
 
         list.forEach(store => {
             if (!store.latitude || !store.longitude) return;
             const upcoming = _parse(store.startDate) > today;
-            const marker = L.marker([store.latitude, store.longitude], { icon: _icon(upcoming) });
+            const marker   = L.marker([store.latitude, store.longitude], { icon: _pinIcon(upcoming) });
 
-            const sd = (store.startDate || '').replace(/-/g, '.');
-            const ed = (store.endDate   || '').replace(/-/g, '.');
+            const sd  = (store.startDate || '').replace(/-/g, '.');
+            const ed  = (store.endDate   || '').replace(/-/g, '.');
             const sBg = upcoming ? '#FEF3C7' : '#DCFCE7';
             const sC  = upcoming ? '#D97706' : '#16A34A';
             const sTx = upcoming ? '오픈예정' : '진행중';
+            const img = store.imageUrl
+                ? `<img src="${store.imageUrl}" alt="${store.name}"
+                        style="width:100%;height:90px;object-fit:cover;border-radius:6px;margin-bottom:8px;display:block;"
+                        onerror="this.style.display='none'"/>`
+                : '';
 
-            marker.bindPopup(`<div style="padding:4px 2px;min-width:190px;font-family:-apple-system,sans-serif;line-height:1.5;">
-                <span style="display:inline-block;margin-bottom:6px;padding:2px 8px;border-radius:10px;
-                             font-size:11px;font-weight:700;background:${sBg};color:${sC};">${sTx}</span>
-                <div style="font-size:14px;font-weight:700;color:#1A1A1A;margin-bottom:4px;">${store.name}</div>
-                <div style="font-size:12px;color:#6E6E73;margin-bottom:2px;">${store.address || ''}</div>
-                <div style="font-size:12px;color:#6E6E73;margin-bottom:10px;">${sd} ~ ${ed}</div>
-                <a href="/store/${store.id}" style="font-size:12px;color:#FF4B4B;font-weight:700;text-decoration:none;">자세히 보기 →</a>
-            </div>`, { maxWidth: 240 });
+            marker.bindPopup(`
+                <div style="padding:4px 2px;min-width:200px;font-family:-apple-system,sans-serif;line-height:1.5;">
+                    ${img}
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
+                        <span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${sBg};color:${sC};">${sTx}</span>
+                        ${store.category ? `<span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:#F3F4F6;color:#374151;">${store.category}</span>` : ''}
+                    </div>
+                    <div style="font-size:14px;font-weight:700;color:#1A1A1A;margin-bottom:4px;">${store.name}</div>
+                    <div style="font-size:12px;color:#6E6E73;margin-bottom:2px;">${store.address || ''}</div>
+                    <div style="font-size:12px;color:#6E6E73;margin-bottom:10px;">${sd} ~ ${ed}</div>
+                    <a href="/store/${store.id}" style="font-size:12px;color:#FF4B4B;font-weight:700;text-decoration:none;">자세히 보기 →</a>
+                </div>`, { maxWidth: 260 });
 
-            marker.addTo(map);
-            _markers.push(marker);
+            _cluster.addLayer(marker);
             bounds.push([store.latitude, store.longitude]);
         });
 
         if (bounds.length > 0) {
             try {
-                if (bounds.length === 1) {
-                    map.setView(bounds[0], 14);
-                } else {
-                    map.fitBounds(bounds, { padding: [40, 40] });
-                }
+                bounds.length === 1
+                    ? map.setView(bounds[0], 14)
+                    : map.fitBounds(bounds, { padding: [40, 40] });
             } catch (e) {}
         }
     }
 
-    function setStores(list) {
-        _clearMarkers();
-        _addMarkers(list);
-    }
+    function setStores(list) { _addMarkers(list); }
 
     _addMarkers(window.storesData || []);
+
+    /* ── 현위치 버튼 ── */
+    const locateBtn = document.getElementById('mapLocate');
+    let _locationMarker = null;
+
+    locateBtn?.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+            alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
+            return;
+        }
+        locateBtn.classList.add('locating');
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                locateBtn.classList.remove('locating');
+                const { latitude: lat, longitude: lng } = pos.coords;
+                if (_locationMarker) map.removeLayer(_locationMarker);
+                _locationMarker = L.circleMarker([lat, lng], {
+                    radius: 8, fillColor: '#3B82F6', fillOpacity: 1,
+                    color: 'white', weight: 2
+                }).addTo(map).bindPopup('현재 위치').openPopup();
+                map.setView([lat, lng], 14);
+            },
+            () => {
+                locateBtn.classList.remove('locating');
+                alert('위치 정보를 가져올 수 없습니다.\n브라우저 위치 권한을 확인해주세요.');
+            },
+            { timeout: 8000 }
+        );
+    });
 
     return { setStores };
 })();

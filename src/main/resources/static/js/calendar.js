@@ -8,9 +8,10 @@ window.PopupCalendar = (() => {
     if (!gridEl) return null;
 
     const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
-    let _stores = (window.storesData || []).slice();
-    let _year   = new Date().getFullYear();
-    let _month  = new Date().getMonth();
+    let _stores     = (window.storesData || []).slice();
+    let _year       = new Date().getFullYear();
+    let _month      = new Date().getMonth();
+    let _selectedDay = null;
 
     function _parse(str) {
         if (!str) return null;
@@ -39,6 +40,63 @@ window.PopupCalendar = (() => {
             const st = _parse(s.startDate);
             const en = _parse(s.endDate);
             return st && en && st <= t && t <= en;
+        });
+    }
+
+    /* 날짜 미선택 시 전체 진행중·예정 팝업 목록 표시 */
+    function _renderAll() {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const active = _stores
+            .filter(s => { const en = _parse(s.endDate); return en && en >= today; })
+            .sort((a, b) => (_parse(a.startDate) || 0) - (_parse(b.startDate) || 0));
+
+        eventsEl.innerHTML = '';
+        if (active.length === 0) {
+            eventsEl.innerHTML = '<p class="cal-events-hint">현재 진행 중인 팝업이 없습니다.</p>';
+            return;
+        }
+        active.forEach(s => {
+            const st = _parse(s.startDate);
+            const today2 = new Date(); today2.setHours(0, 0, 0, 0);
+            const upcoming = st && st > today2;
+            const statusBg = upcoming ? '#FEF3C7' : '#DCFCE7';
+            const statusC  = upcoming ? '#D97706' : '#16A34A';
+            const statusTx = upcoming ? '예정' : '진행중';
+            const a = document.createElement('a');
+            a.href      = `/store/${s.id}`;
+            a.className = 'cal-event-item';
+            a.innerHTML = `
+                <img src="${s.imageUrl}" alt="${s.name}" class="cal-event-thumb"
+                     onerror="this.style.background='#eee';this.removeAttribute('src')"/>
+                <div style="min-width:0;">
+                    <p class="cal-event-name">${s.name}</p>
+                    <p class="cal-event-date">${(s.startDate||'').replace(/-/g,'.')} ~ ${(s.endDate||'').replace(/-/g,'.')}</p>
+                    <span style="display:inline-block;margin-top:3px;padding:1px 7px;border-radius:8px;
+                                 font-size:10px;font-weight:700;background:${statusBg};color:${statusC};">${statusTx}</span>
+                </div>`;
+            eventsEl.appendChild(a);
+        });
+    }
+
+    function _renderEvents(day) {
+        const stores = _storesOnDate(day);
+        eventsEl.innerHTML = '';
+        if (stores.length === 0) {
+            eventsEl.innerHTML = `<p class="cal-events-hint">${_month + 1}월 ${day}일에 진행 중인 팝업이 없습니다.</p>`;
+            return;
+        }
+        stores.forEach(s => {
+            const a = document.createElement('a');
+            a.href      = `/store/${s.id}`;
+            a.className = 'cal-event-item';
+            a.innerHTML = `
+                <img src="${s.imageUrl}" alt="${s.name}" class="cal-event-thumb"
+                     onerror="this.style.background='#eee';this.removeAttribute('src')"/>
+                <div style="min-width:0;">
+                    <p class="cal-event-name">${s.name}</p>
+                    <p class="cal-event-date">${(s.startDate||'').replace(/-/g,'.')} ~ ${(s.endDate||'').replace(/-/g,'.')}</p>
+                </div>`;
+            eventsEl.appendChild(a);
         });
     }
 
@@ -71,11 +129,15 @@ window.PopupCalendar = (() => {
             el.className = 'cal-day';
             el.textContent = d;
             const isToday = today.getFullYear() === _year && today.getMonth() === _month && today.getDate() === d;
-            if (isToday)       el.classList.add('today');
+            if (isToday) el.classList.add('today');
             if (evDays.has(d)) el.classList.add('has-event');
+            if (_selectedDay === d && today.getFullYear() === _year && today.getMonth() === _month) {
+                el.classList.add('selected');
+            }
             el.addEventListener('click', () => {
                 gridEl.querySelectorAll('.cal-day.selected').forEach(x => x.classList.remove('selected'));
                 el.classList.add('selected');
+                _selectedDay = d;
                 _renderEvents(d);
             });
             gridEl.appendChild(el);
@@ -91,46 +153,42 @@ window.PopupCalendar = (() => {
         }
     }
 
-    function _renderEvents(day) {
-        const stores = _storesOnDate(day);
-        eventsEl.innerHTML = '';
-        if (stores.length === 0) {
-            eventsEl.innerHTML = `<p class="cal-events-hint">${_month + 1}월 ${day}일에 진행 중인 팝업이 없습니다.</p>`;
-            return;
-        }
-        stores.forEach(s => {
-            const a = document.createElement('a');
-            a.href      = `/store/${s.id}`;
-            a.className = 'cal-event-item';
-            a.innerHTML = `
-                <img src="${s.imageUrl}" alt="${s.name}" class="cal-event-thumb"/>
-                <div>
-                    <p class="cal-event-name">${s.name}</p>
-                    <p class="cal-event-date">${(s.startDate||'').replace(/-/g,'.')} ~ ${(s.endDate||'').replace(/-/g,'.')}</p>
-                </div>`;
-            eventsEl.appendChild(a);
-        });
-    }
-
-    function _resetEvents() {
-        eventsEl.innerHTML = '<p class="cal-events-hint">날짜를 선택하면 팝업스토어 일정을 확인할 수 있어요.</p>';
-    }
-
     function setStores(list) {
         _stores = list.slice();
         _renderCal();
-        _resetEvents();
+        if (_selectedDay) _renderEvents(_selectedDay);
+        else _renderAll();
     }
 
     prevBtn?.addEventListener('click', () => {
         if (--_month < 0) { _month = 11; _year--; }
-        _renderCal(); _resetEvents();
+        _selectedDay = null;
+        _renderCal();
+        _renderAll();
     });
     nextBtn?.addEventListener('click', () => {
         if (++_month > 11) { _month = 0; _year++; }
-        _renderCal(); _resetEvents();
+        _selectedDay = null;
+        _renderCal();
+        _renderAll();
+    });
+
+    document.getElementById('calToday')?.addEventListener('click', () => {
+        const now = new Date();
+        _year  = now.getFullYear();
+        _month = now.getMonth();
+        _selectedDay = now.getDate();
+        _renderCal();
+        _renderEvents(_selectedDay);
+        // 오늘 셀 선택 표시
+        gridEl.querySelectorAll('.cal-day').forEach(el => {
+            if (Number(el.textContent) === _selectedDay && !el.classList.contains('other-month')) {
+                el.classList.add('selected');
+            }
+        });
     });
 
     _renderCal();
+    _renderAll();
     return { setStores };
 })();

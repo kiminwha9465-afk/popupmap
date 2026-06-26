@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>팝업맵 - 전국 팝업스토어 일정 & 위치</title>
-    <link rel="stylesheet" href="/css/style.css?v=2"/>
+    <link rel="stylesheet" href="/css/style.css?v=4"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
 </head>
 <body>
 
@@ -23,7 +25,7 @@
     </nav>
 
     <div class="header-right">
-        <form th:action="@{/}" method="get" class="search-form">
+        <form th:action="@{/stores}" method="get" class="search-form">
             <input type="text" name="keyword" class="search-input" placeholder="팝업스토어 검색..."
                    th:value="${keyword}"/>
             <button type="submit" class="search-btn">
@@ -85,24 +87,17 @@
                 <button th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
                         class="mid-cat-btn" th:data-mid-cat="${cat}" th:text="${cat}">카테고리</button>
             </div>
-            <button id="bmToggle" class="bm-toggle" title="내 북마크">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
-                </svg>
-                내 북마크
-                <span id="bmBadge" class="bm-badge" hidden>0</span>
-            </button>
-        </div>
-
-        <!-- 활성 필터 표시 -->
-        <div id="filterBar" class="filter-active-bar" hidden>
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-            </svg>
-            <span id="filterBarText"></span>
-            <button id="filterClear" class="filter-clear-btn">초기화</button>
+            <div class="mid-filter-right">
+                <button id="bmToggle" class="bm-toggle" title="내 북마크">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+                    </svg>
+                    내 북마크
+                    <span id="bmBadge" class="bm-badge" hidden>0</span>
+                </button>
+                <button id="filterClear" class="filter-clear-btn">초기화</button>
+            </div>
         </div>
 
         <!-- 북마크 패널 -->
@@ -130,6 +125,7 @@
                     <button class="cal-arrow" id="calPrev">&#8249;</button>
                     <span class="cal-month" id="calMonth"></span>
                     <button class="cal-arrow" id="calNext">&#8250;</button>
+                    <button class="cal-today-btn" id="calToday">오늘</button>
                 </div>
                 <div class="cal-grid" id="calGrid"></div>
                 <div class="cal-events" id="calEvents">
@@ -147,6 +143,14 @@
                 </div>
                 <div class="map-container">
                     <div id="map"></div>
+                    <button class="map-locate-btn" id="mapLocate" title="현재 위치로 이동">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2.2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                            <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" stroke="none" fill="currentColor" opacity=".15"/>
+                        </svg>
+                    </button>
                 </div>
                 <div class="map-legend">
                     <span class="legend-dot ongoing-dot"></span>진행중
@@ -263,8 +267,9 @@
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script th:inline="javascript">
-    const storesData = /*[[${stores}]]*/ [];
+    window.storesData = /*[[${stores}]]*/ [];
 </script>
 <script src="/js/filter.js"></script>
 <script src="/js/banner.js"></script>
