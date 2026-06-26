@@ -7,8 +7,11 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface PopupStoreRepository extends JpaRepository<PopupStore, Long> {
+
+    Optional<PopupStore> findByPopgaId(Long popgaId);
 
     List<PopupStore> findByCategory(String category);
 

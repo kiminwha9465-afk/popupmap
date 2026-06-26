@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - 팝업맵</title>
+    <link rel="stylesheet" href="/css/style.css?v=4"/>
+    <style>
+        .auth-wrap { min-height: calc(100vh - 56px); display: flex; align-items: center; justify-content: center; padding: 40px 16px; background: var(--bg); }
+        .auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 40px 36px; width: 100%; max-width: 400px; }
+        .auth-logo { text-align: center; margin-bottom: 28px; }
+        .auth-logo a { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; }
+        .auth-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 24px; }
+        .auth-field { margin-bottom: 16px; }
+        .auth-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+        .auth-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; outline: none; transition: border-color .15s; background: var(--bg); }
+        .auth-input:focus { border-color: var(--primary); background: white; }
+        .auth-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: opacity .15s; }
+        .auth-btn:hover { opacity: .88; }
+        .auth-msg { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 16px; }
+        .auth-msg.error { background: #FFF0F0; color: var(--primary); border: 1px solid #FFD9D9; }
+        .auth-msg.success { background: #F0FFF4; color: #16A34A; border: 1px solid #BBF7D0; }
+        .auth-footer { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-sub); }
+        .auth-footer a { color: var(--primary); font-weight: 600; }
+    </style>
+</head>
+<body>
+<header class="header">
+    <a href="/" class="header-brand">
+        <span class="brand-icon">📍</span>
+        <span class="brand-text">팝업맵</span>
+    </a>
+</header>
+
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-logo"><a href="/">📍 팝업맵</a></div>
+        <h1 class="auth-title">로그인</h1>
+
+        <div th:if="${error}" class="auth-msg error" th:text="${error}"></div>
+        <div th:if="${success}" class="auth-msg success" th:text="${success}"></div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="auth-field">
+                <label class="auth-label">아이디</label>
+                <input type="text" name="username" class="auth-input" placeholder="아이디 입력" required autofocus/>
+            </div>
+            <div class="auth-field">
+                <label class="auth-label">비밀번호</label>
+                <input type="password" name="password" class="auth-input" placeholder="비밀번호 입력" required/>
+            </div>
+            <button type="submit" class="auth-btn">로그인</button>
+        </form>
+
+        <p class="auth-footer">
+            아직 계정이 없으신가요? <a href="/signup">회원가입</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

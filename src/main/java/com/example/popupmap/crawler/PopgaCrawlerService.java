@@ -3,7 +3,9 @@ package com.example.popupmap.crawler;
 import com.example.popupmap.domain.PopupStore;
 import com.example.popupmap.repository.PopupStoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -11,6 +13,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PopgaCrawlerService {
@@ -20,6 +23,17 @@ public class PopgaCrawlerService {
     private static final String API_URL =
         "https://api.popga.co.kr/user/v2/home-sections/40/items" +
         "?periodTypes%5B0%5D=IN_PROGRESS&periodTypes%5B1%5D=READY&recommendationType=HOTTEST";
+
+    /** 서버 시작 1시간 후부터 1시간마다 자동 실행 */
+    @Scheduled(initialDelay = 3_600_000, fixedDelay = 3_600_000)
+    public void scheduledCrawl() {
+        try {
+            int count = crawlAndSave();
+            log.info("[스케줄] 팝가 크롤링 완료: {}개 처리", count);
+        } catch (Exception e) {
+            log.warn("[스케줄] 팝가 크롤링 실패: {}", e.getMessage());
+        }
+    }
 
     public int crawlAndSave() {
         RestTemplate restTemplate = new RestTemplate();
@@ -35,29 +49,37 @@ public class PopgaCrawlerService {
 
         if (response.getBody() == null || response.getBody().getData() == null) return 0;
 
-        List<PopupStore> stores = response.getBody().getData().stream()
-            .map(this::toPopupStore)
-            .toList();
-
-        repository.saveAll(stores);
-        return stores.size();
+        List<PopgaApiResponse.PopgaItem> items = response.getBody().getData();
+        int count = 0;
+        for (PopgaApiResponse.PopgaItem item : items) {
+            upsert(item);
+            count++;
+        }
+        return count;
     }
 
-    private PopupStore toPopupStore(PopgaApiResponse.PopgaItem item) {
-        return PopupStore.builder()
-            .name(item.getTitle())
-            .brand(extractBrand(item.getTitle()))
-            .description(item.getTitle())
-            .category(mapCategory(item.getCategoryName()))
-            .region(mapRegion(item.getArea()))
-            .address(mapAddress(item.getArea()))
-            .latitude(mapLat(item.getArea()))
-            .longitude(mapLng(item.getArea()))
-            .startDate(LocalDate.parse(item.getOpenDate()))
-            .endDate(LocalDate.parse(item.getCloseDate()))
-            .imageUrl(item.getImagePath())
-            .hours("매일 10:00~20:00")
-            .build();
+    /** popgaId 기준으로 이미 있으면 업데이트, 없으면 신규 저장 */
+    private void upsert(PopgaApiResponse.PopgaItem item) {
+        PopupStore store = repository.findByPopgaId(item.getId())
+                .orElse(PopupStore.builder().popgaId(item.getId()).build());
+
+        store.setName(item.getTitle());
+        store.setBrand(extractBrand(item.getTitle()));
+        store.setDescription(item.getTitle());
+        store.setCategory(mapCategory(item.getCategoryName()));
+        store.setRegion(mapRegion(item.getArea()));
+        store.setAddress(mapAddress(item.getArea()));
+        store.setLatitude(mapLat(item.getArea()));
+        store.setLongitude(mapLng(item.getArea()));
+        store.setImageUrl(item.getImagePath());
+        store.setHours("매일 10:00~20:00");
+
+        try {
+            store.setStartDate(LocalDate.parse(item.getOpenDate()));
+            store.setEndDate(LocalDate.parse(item.getCloseDate()));
+        } catch (Exception ignored) {}
+
+        repository.save(store);
     }
 
     private String extractBrand(String title) {
@@ -70,16 +92,15 @@ public class PopgaCrawlerService {
     private String mapCategory(String cat) {
         if (cat == null) return "라이프스타일";
         return switch (cat) {
-            case "패션"          -> "패션";
-            case "뷰티"          -> "뷰티";
-            case "F&B"          -> "식음료";
-            case "라이프스타일"   -> "라이프스타일";
-            case "애니/캐릭터",
-                 "연예인/셀럽",
-                 "엔터테인먼트"   -> "엔터테인먼트";
-            case "전시", "아트"  -> "아트/문화";
-            case "테크"          -> "테크";
-            default             -> "라이프스타일";
+            case "패션"                      -> "패션";
+            case "뷰티"                      -> "뷰티";
+            case "F&B"                      -> "식음료";
+            case "라이프스타일"               -> "라이프스타일";
+            case "애니/캐릭터", "연예인/셀럽",
+                 "엔터테인먼트"               -> "엔터테인먼트";
+            case "전시", "아트"              -> "아트/문화";
+            case "테크"                      -> "테크";
+            default                         -> "라이프스타일";
         };
     }
 

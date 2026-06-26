@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,6 +35,20 @@
                 </svg>
             </button>
         </form>
+        <div class="header-auth">
+            <span sec:authorize="isAuthenticated()" class="header-user">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+                <span sec:authentication="name"></span>
+            </span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="auth-link-btn">로그아웃</button>
+            </form>
+            <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
+            <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+        </div>
     </div>
 </header>
 

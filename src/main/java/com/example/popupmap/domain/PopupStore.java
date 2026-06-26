@@ -16,6 +16,9 @@ public class PopupStore {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private Long popgaId;
+
     private String name;
 
     @Column(length = 1000)

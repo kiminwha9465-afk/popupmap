@@ -192,6 +192,21 @@ button { cursor: pointer; border: none; background: none; }
     flex-shrink: 0; padding-left: 20px;
     border-left: 1px solid var(--border);
 }
+.header-auth { display: flex; align-items: center; gap: 6px; }
+.header-user {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 13px; font-weight: 600; color: var(--text-sub);
+}
+.auth-link-btn {
+    font-size: 13px; font-weight: 600; color: var(--text-sub);
+    padding: 5px 12px; border-radius: 14px;
+    border: 1px solid var(--border); background: var(--bg);
+    cursor: pointer; transition: all .15s; white-space: nowrap;
+    text-decoration: none; display: inline-flex; align-items: center;
+}
+.auth-link-btn:hover { border-color: var(--primary); color: var(--primary); }
+.auth-link-btn.signup { background: var(--primary); border-color: var(--primary); color: white; }
+.auth-link-btn.signup:hover { opacity: .88; }
 .region-select {
     height: 34px; padding: 0 10px;
     border: 1px solid var(--border); border-radius: 8px;
