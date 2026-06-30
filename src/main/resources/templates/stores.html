@@ -5,27 +5,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="(${selectedCategory} ?: '전체') + ' 팝업스토어 - 팝업맵'">팝업스토어 목록</title>
-    <link rel="stylesheet" href="/css/style.css?v=4"/>
+    <link rel="stylesheet" href="/css/style.css?v=5"/>
 </head>
 <body>
 
 <!-- ── 헤더 ──────────────────────────────────────────── -->
 <header class="header">
-    <a href="/" class="header-brand">
-        <span class="brand-icon">📍</span>
-        <span class="brand-text">팝업맵</span>
-    </a>
-    <nav class="header-nav">
-        <a href="/" class="nav-link">홈</a>
-        <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
-           th:href="@{/stores(category=${cat})}"
-           th:text="${cat}"
-           th:classappend="${selectedCategory == cat ? ' active' : ''}"
-           class="nav-link">카테고리</a>
-    </nav>
-    <div class="header-right">
-        <form th:action="@{/stores}" method="get" class="search-form">
-            <input th:if="${selectedCategory != null}" type="hidden" name="category" th:value="${selectedCategory}"/>
+<div class="header-inner">
+
+    <!-- 1행: 로고 / 검색 / 인증 -->
+    <div class="header-top">
+        <a href="/" class="header-brand">
+            <span class="brand-icon">📍</span>
+            <span class="brand-text">팝업맵</span>
+        </a>
+        <div class="header-top-right">
+            <button id="searchToggle" class="search-toggle-btn active" title="검색">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+            </button>
+            <div class="header-right">
+                <div class="header-auth">
+                    <span sec:authorize="isAuthenticated()" class="header-user">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                        </svg>
+                        <span sec:authentication="name"></span>
+                    </span>
+                    <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                    </form>
+                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
+                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2행: 네비게이션 (항상 표시, 모바일에서 가로 스크롤) -->
+    <div class="header-nav-row">
+        <nav class="header-nav">
+            <span class="nav-group-label">팝업</span>
+            <a href="/stores" class="nav-link">전체보기</a>
+            <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+               th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${cat},keyword=${keyword})} : @{/stores(category=${cat})}"
+               th:text="${cat}"
+               th:classappend="${selectedCategory == cat} ? ' active' : ''"
+               class="nav-link nav-cat-item">카테고리</a>
+            <details class="nav-dropdown">
+                <summary th:classappend="${selectedCategory != null} ? ' active' : ''">
+                    <span th:text="${selectedCategory} ?: '카테고리'">카테고리</span>
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+                       th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${cat},keyword=${keyword})} : @{/stores(category=${cat})}"
+                       th:text="${cat}"
+                       th:classappend="${selectedCategory == cat} ? ' active' : ''"
+                       class="nav-dropdown-item">카테고리</a>
+                </div>
+            </details>
+            <span class="nav-sep"></span>
+            <span class="nav-group-label">소식</span>
+            <a href="/news" class="nav-link nav-news-item">전체</a>
+            <a href="/news?tag=공지" class="nav-link nav-news-item">공지</a>
+            <a href="/news?tag=소식" class="nav-link nav-news-item">소식</a>
+            <a href="/news?tag=트렌드" class="nav-link nav-news-item">트렌드</a>
+            <a href="/news?tag=후기" class="nav-link nav-news-item">후기</a>
+            <details class="nav-dropdown">
+                <summary>
+                    소식
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/news" class="nav-dropdown-item">전체</a>
+                    <a href="/news?tag=공지" class="nav-dropdown-item">공지</a>
+                    <a href="/news?tag=소식" class="nav-dropdown-item">소식</a>
+                    <a href="/news?tag=트렌드" class="nav-dropdown-item">트렌드</a>
+                    <a href="/news?tag=후기" class="nav-dropdown-item">후기</a>
+                </div>
+            </details>
+        </nav>
+    </div>
+
+    <!-- 3행: 검색 (stores 페이지는 기본으로 열림) -->
+    <div class="header-search-row" id="searchRow">
+        <form th:action="@{/stores}" method="get" class="header-search-form">
+            <select name="category" class="search-cat-select">
+                <option value="" th:selected="${selectedCategory == null or selectedCategory == ''}">전체</option>
+                <option th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+                        th:value="${cat}" th:text="${cat}"
+                        th:selected="${cat == selectedCategory}">카테고리</option>
+            </select>
+            <span class="search-divider"></span>
             <input type="text" name="keyword" class="search-input" placeholder="팝업스토어 검색..."
                    th:value="${keyword}"/>
             <button type="submit" class="search-btn">
@@ -35,21 +112,15 @@
                 </svg>
             </button>
         </form>
-        <div class="header-auth">
-            <span sec:authorize="isAuthenticated()" class="header-user">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                </svg>
-                <span sec:authentication="name"></span>
-            </span>
-            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
-                <button type="submit" class="auth-link-btn">로그아웃</button>
-            </form>
-            <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
-            <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
-        </div>
+        <button id="searchClose" class="search-close-btn" title="닫기">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+        </button>
     </div>
+
+</div>
 </header>
 
 <div class="stores-container">
@@ -63,16 +134,16 @@
             <span class="stores-count" th:text="${stores.size()} + '개'"></span>
         </div>
         <p class="stores-subtitle" th:if="${keyword != null and !keyword.isBlank()}"
-           th:text="'&quot;' + ${keyword} + '&quot; 검색 결과'"></p>
+           th:text="'&quot;' + ${keyword} + '&quot; 검색 결과' + (${selectedCategory} != null ? ' · ' + ${selectedCategory} : '')"></p>
     </div>
 
     <!-- ── 카테고리 탭 ────────────────────────────────── -->
     <div class="stores-cats">
-        <a href="/stores"
-           th:classappend="${selectedCategory == null and keyword == null ? ' active' : ''}"
+        <a th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(keyword=${keyword})} : @{/stores}"
+           th:classappend="${selectedCategory == null ? ' active' : ''}"
            class="stores-cat-tab">전체</a>
         <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
-           th:href="@{/stores(category=${cat})}"
+           th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${cat},keyword=${keyword})} : @{/stores(category=${cat})}"
            th:text="${cat}"
            th:classappend="${selectedCategory == cat ? ' active' : ''}"
            class="stores-cat-tab">카테고리</a>
@@ -81,11 +152,11 @@
     <!-- ── 지역 필터 + 정렬 ──────────────────────────── -->
     <div class="stores-toolbar">
         <div class="stores-regions">
-            <a th:href="@{/stores(category=${selectedCategory})}"
+            <a th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${selectedCategory},keyword=${keyword})} : @{/stores(category=${selectedCategory})}"
                th:classappend="${selectedRegion == null ? ' active' : ''}"
                class="region-chip">전국</a>
             <a th:each="reg : ${ {'서울','경기','부산','인천','대구','광주','대전','제주'} }"
-               th:href="@{/stores(category=${selectedCategory}, region=${reg})}"
+               th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${selectedCategory},region=${reg},keyword=${keyword})} : @{/stores(category=${selectedCategory},region=${reg})}"
                th:text="${reg}"
                th:classappend="${selectedRegion == reg ? ' active' : ''}"
                class="region-chip">지역</a>
@@ -130,12 +201,12 @@
         </a>
     </div>
 
-    <!-- ── 빈 상태 ───────────────────────────────────── -->
+    <!-- ── 빈 상태 ──────────────────────────────────────── -->
     <div class="stores-empty" th:if="${stores.isEmpty()}">
-        <div class="stores-empty-icon">🔍</div>
+        <div class="stores-empty-icon">📍</div>
         <p class="stores-empty-title">팝업스토어가 없습니다</p>
         <p class="stores-empty-desc"
-           th:text="${selectedCategory != null ? selectedCategory + ' 카테고리에 ' : ''} + '현재 진행 중인 팝업스토어가 없습니다.'">
+           th:text="${selectedCategory != null ? selectedCategory + ' 카테고리의 ' : ''} + '현재 진행 중인 팝업스토어가 없습니다.'">
         </p>
         <a href="/stores" class="btn-primary" style="margin-top:20px;display:inline-block;">전체 보기</a>
     </div>
@@ -149,5 +220,20 @@
     </div>
 </footer>
 
+<script src="/js/nav.js"></script>
+<script>
+(function () {
+    const toggle = document.getElementById('searchToggle');
+    const row    = document.getElementById('searchRow');
+    const close  = document.getElementById('searchClose');
+    if (!toggle || !row) return;
+
+    function openSearch()  { row.removeAttribute('hidden'); toggle.classList.add('active'); }
+    function closeSearch() { row.setAttribute('hidden', ''); toggle.classList.remove('active'); }
+
+    toggle.addEventListener('click', () => row.hasAttribute('hidden') ? openSearch() : closeSearch());
+    close?.addEventListener('click', closeSearch);
+})();
+</script>
 </body>
 </html>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>팝업맵 - 전국 팝업스토어 일정 & 위치</title>
-    <link rel="stylesheet" href="/css/style.css?v=4"/>
+    <link rel="stylesheet" href="/css/style.css?v=5"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
@@ -14,19 +14,110 @@
 
 <!-- ── 헤더 ──────────────────────────────────────────── -->
 <header class="header">
-    <a href="/" class="header-brand">
-        <span class="brand-icon">📍</span>
-        <span class="brand-text">팝업맵</span>
-    </a>
+<div class="header-inner">
 
-    <nav class="header-nav">
-        <a href="/stores" class="nav-link">전체보기</a>
-        <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
-           th:href="@{/stores(category=${cat})}" th:text="${cat}" class="nav-link">카테고리</a>
-    </nav>
+    <!-- 1행: 로고 / 검색 / 인증 -->
+    <div class="header-top">
+        <a href="/" class="header-brand">
+            <span class="brand-icon">📍</span>
+            <span class="brand-text">팝업맵</span>
+        </a>
+        <div class="header-top-right">
+            <button id="searchToggle" class="search-toggle-btn" title="검색">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+            </button>
+            <div class="header-right">
+                <div class="header-auth">
+                    <span sec:authorize="isAuthenticated()" class="header-user">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                        </svg>
+                        <span sec:authentication="name"></span>
+                    </span>
+                    <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                    </form>
+                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
+                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="header-right">
-        <form th:action="@{/stores}" method="get" class="search-form">
+    <!-- 2행: 네비게이션 (항상 표시, 모바일에서 가로 스크롤) -->
+    <div class="header-nav-row">
+        <nav class="header-nav">
+            <span class="nav-group-label">팝업</span>
+            <a href="/stores" class="nav-link">전체보기</a>
+            <a href="/stores?category=패션" class="nav-link nav-cat-item">패션</a>
+            <a href="/stores?category=뷰티" class="nav-link nav-cat-item">뷰티</a>
+            <a href="/stores?category=식음료" class="nav-link nav-cat-item">식음료</a>
+            <a href="/stores?category=라이프스타일" class="nav-link nav-cat-item">라이프스타일</a>
+            <a href="/stores?category=아트/문화" class="nav-link nav-cat-item">아트/문화</a>
+            <a href="/stores?category=엔터테인먼트" class="nav-link nav-cat-item">엔터테인먼트</a>
+            <a href="/stores?category=테크" class="nav-link nav-cat-item">테크</a>
+            <details class="nav-dropdown">
+                <summary>
+                    카테고리
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/stores?category=패션" class="nav-dropdown-item">패션</a>
+                    <a href="/stores?category=뷰티" class="nav-dropdown-item">뷰티</a>
+                    <a href="/stores?category=식음료" class="nav-dropdown-item">식음료</a>
+                    <a href="/stores?category=라이프스타일" class="nav-dropdown-item">라이프스타일</a>
+                    <a href="/stores?category=아트/문화" class="nav-dropdown-item">아트/문화</a>
+                    <a href="/stores?category=엔터테인먼트" class="nav-dropdown-item">엔터테인먼트</a>
+                    <a href="/stores?category=테크" class="nav-dropdown-item">테크</a>
+                </div>
+            </details>
+            <button id="headerBmToggle" class="nav-bm-btn" title="내 북마크">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+                </svg>
+                북마크
+                <span id="headerBmBadge" class="bm-badge" hidden>0</span>
+            </button>
+            <span class="nav-sep"></span>
+            <span class="nav-group-label">소식</span>
+            <a href="/news" class="nav-link nav-news-item">전체</a>
+            <a href="/news?tag=공지" class="nav-link nav-news-item">공지</a>
+            <a href="/news?tag=소식" class="nav-link nav-news-item">소식</a>
+            <a href="/news?tag=트렌드" class="nav-link nav-news-item">트렌드</a>
+            <a href="/news?tag=후기" class="nav-link nav-news-item">후기</a>
+            <details class="nav-dropdown">
+                <summary>
+                    소식
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/news" class="nav-dropdown-item">전체</a>
+                    <a href="/news?tag=공지" class="nav-dropdown-item">공지</a>
+                    <a href="/news?tag=소식" class="nav-dropdown-item">소식</a>
+                    <a href="/news?tag=트렌드" class="nav-dropdown-item">트렌드</a>
+                    <a href="/news?tag=후기" class="nav-dropdown-item">후기</a>
+                </div>
+            </details>
+        </nav>
+    </div>
+
+    <!-- 3행: 검색 (기본 숨김, 돋보기 클릭 시 표시) -->
+    <div class="header-search-row" id="searchRow" hidden>
+        <form th:action="@{/stores}" method="get" class="header-search-form">
+            <select name="category" class="search-cat-select">
+                <option value="" th:selected="${selectedCategory == null or selectedCategory == ''}">전체</option>
+                <option th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+                        th:value="${cat}" th:text="${cat}"
+                        th:selected="${cat == selectedCategory}">카테고리</option>
+            </select>
+            <span class="search-divider"></span>
             <input type="text" name="keyword" class="search-input" placeholder="팝업스토어 검색..."
                    th:value="${keyword}"/>
             <button type="submit" class="search-btn">
@@ -36,21 +127,15 @@
                 </svg>
             </button>
         </form>
-        <div class="header-auth">
-            <span sec:authorize="isAuthenticated()" class="header-user">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                </svg>
-                <span sec:authentication="name"></span>
-            </span>
-            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
-                <button type="submit" class="auth-link-btn">로그아웃</button>
-            </form>
-            <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
-            <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
-        </div>
+        <button id="searchClose" class="search-close-btn" title="닫기">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+        </button>
     </div>
+
+</div>
 </header>
 
 <main class="page-main">
@@ -119,11 +204,11 @@
         <div id="bmPanel" class="bookmark-panel" hidden>
             <div class="bm-panel-header">
                 <h3 class="bm-panel-title">내 북마크</h3>
-                <p class="bm-panel-desc">북마크한 팝업만 달력과 지도에 표시됩니다.</p>
+                <p class="bm-panel-desc">북마크한 팝업을 달력과 지도에 표시합니다.</p>
             </div>
             <div id="bmList" class="bm-list">
                 <div class="bm-empty">
-                    <div class="bm-empty-icon">🔖</div>
+                    <div class="bm-empty-icon">📍</div>
                     <p>북마크한 팝업이 없습니다.<br/>카드의 북마크 아이콘을 눌러 추가해보세요.</p>
                 </div>
             </div>
@@ -176,7 +261,7 @@
         </div>
     </section>
 
-    <!-- ── 하단 섹션 ─────────────────────────────────── -->
+    <!-- ── 하단 섹션 ────────────────────────────────────── -->
     <section class="bottom-section">
         <div class="bottom-inner">
 
@@ -184,12 +269,14 @@
             <div class="bottom-panel">
                 <div class="panel-header">
                     <h3 class="panel-title">🔥 인기 팝업</h3>
-                    <a href="/" class="panel-more">전체보기</a>
+                    <a href="/stores" class="panel-more">전체보기</a>
                 </div>
                 <ol class="ranking-list">
-                    <li th:each="store,i : ${stores}" th:if="${i.index < 5}" class="ranking-item">
+                    <a th:each="store,i : ${stores}" th:if="${i.index < 5}"
+                       th:href="@{/store/{id}(id=${store.id})}" class="ranking-item">
                         <span class="rank-num" th:text="${i.index + 1}"></span>
-                        <img th:src="${store.imageUrl}" th:alt="${store.name}" class="rank-thumb"/>
+                        <img th:src="${store.imageUrl}" th:alt="${store.name}" class="rank-thumb"
+                             onerror="this.onerror=null;this.src='/img/no-image.svg';"/>
                         <div class="rank-info">
                             <p class="rank-name" th:text="${store.name}"></p>
                             <p class="rank-region" th:text="${store.region} + ' · ' + ${store.category}"></p>
@@ -198,13 +285,14 @@
                               th:text="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? 'D-' + T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), store.startDate) : '진행중'}"
                               th:classappend="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
                         </span>
-                        <button class="bm-btn rank-bm" th:data-id="${store.id}" title="북마크 추가">
+                        <button class="bm-btn rank-bm" th:data-id="${store.id}" title="북마크 추가"
+                                onclick="event.preventDefault(); event.stopPropagation();">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
                             </svg>
                         </button>
-                    </li>
+                    </a>
                 </ol>
             </div>
 
@@ -212,48 +300,35 @@
             <div class="bottom-panel">
                 <div class="panel-header">
                     <h3 class="panel-title">📢 팝업 소식</h3>
-                    <a href="#" class="panel-more">더보기</a>
+                    <a href="/news" class="panel-more">더보기</a>
                 </div>
-                <ul class="news-list">
-                    <li class="news-item">
-                        <span class="news-tag new">NEW</span>
-                        <a href="#" class="news-title">서울 성수동 팝업스토어 밀집 지역 완벽 가이드</a>
-                        <span class="news-date">2026.06.24</span>
-                    </li>
-                    <li class="news-item">
-                        <span class="news-tag">소식</span>
-                        <a href="#" class="news-title">이번 주말 놓치면 안 될 팝업스토어 TOP 5</a>
-                        <span class="news-date">2026.06.22</span>
-                    </li>
-                    <li class="news-item">
-                        <span class="news-tag">트렌드</span>
-                        <a href="#" class="news-title">2026 상반기 팝업스토어 트렌드 분석</a>
-                        <span class="news-date">2026.06.20</span>
-                    </li>
-                    <li class="news-item">
-                        <span class="news-tag">소식</span>
-                        <a href="#" class="news-title">팝업스토어 예약 꿀팁 및 웨이팅 줄이는 방법</a>
-                        <span class="news-date">2026.06.18</span>
-                    </li>
-                    <li class="news-item">
-                        <span class="news-tag">소식</span>
-                        <a href="#" class="news-title">7월 오픈 예정 팝업스토어 미리보기</a>
-                        <span class="news-date">2026.06.15</span>
+                <ul class="news-list" th:if="${not #lists.isEmpty(recentNews)}">
+                    <li th:each="n : ${recentNews}" class="news-item">
+                        <span class="news-tag" th:text="${n.tag}"
+                              th:classappend="${n.tag == 'NEW'} ? ' new' : ''"></span>
+                        <a th:href="@{/news/{id}(id=${n.id})}" th:text="${n.title}" class="news-title"></a>
+                        <span class="news-date"
+                              th:text="${#temporals.format(n.publishedAt, 'yyyy.MM.dd')}"></span>
                     </li>
                 </ul>
+                <div th:if="${#lists.isEmpty(recentNews)}" class="news-empty">
+                    <p>등록된 소식이 없습니다.</p>
+                    <a href="/news/write" class="news-write-link">첫 소식 작성하기 →</a>
+                </div>
             </div>
 
             <!-- 추천 팝업 -->
             <div class="bottom-panel">
                 <div class="panel-header">
-                    <h3 class="panel-title">✨ 추천 팝업</h3>
-                    <a href="/" class="panel-more">전체보기</a>
+                    <h3 class="panel-title">🎪 추천 팝업</h3>
+                    <a href="/stores" class="panel-more">전체보기</a>
                 </div>
                 <div class="recommend-grid">
                     <a th:each="store,i : ${stores}" th:if="${i.index >= 5 and i.index < 9}"
                        th:href="@{/store/{id}(id=${store.id})}" class="rec-card">
                         <div class="rec-img-wrap">
-                            <img th:src="${store.imageUrl}" th:alt="${store.name}" class="rec-img"/>
+                            <img th:src="${store.imageUrl}" th:alt="${store.name}" class="rec-img"
+                             onerror="this.onerror=null;this.src='/img/no-image.svg';"/>
                             <span class="rec-cat" th:text="${store.category}"></span>
                             <button class="bm-btn rec-bm" th:data-id="${store.id}" title="북마크 추가"
                                     onclick="event.preventDefault(); PopupFilter.toggleBookmark(this.dataset.id);">
@@ -286,6 +361,7 @@
 <script th:inline="javascript">
     window.storesData = /*[[${stores}]]*/ [];
 </script>
+<script src="/js/nav.js"></script>
 <script src="/js/filter.js"></script>
 <script src="/js/banner.js"></script>
 <script src="/js/calendar.js"></script>

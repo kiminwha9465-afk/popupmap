@@ -31,8 +31,12 @@ public interface PopupStoreRepository extends JpaRepository<PopupStore, Long> {
             @Param("today") LocalDate today);
 
     @Query("SELECT p FROM PopupStore p WHERE " +
+           "(:category IS NULL OR p.category = :category) AND " +
+           "(:region IS NULL OR p.region = :region) AND (" +
            "LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<PopupStore> searchByKeyword(@Param("keyword") String keyword);
+           "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    List<PopupStore> searchByKeyword(@Param("keyword") String keyword,
+                                     @Param("category") String category,
+                                     @Param("region") String region);
 }

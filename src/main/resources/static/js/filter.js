@@ -117,22 +117,25 @@
     }
 
     function _syncBadge() {
-        const n     = _load().length;
-        const badge = document.getElementById('bmBadge');
-        if (!badge) return;
-        badge.textContent = n;
-        badge.hidden = n === 0;
+        const n = _load().length;
+        ['bmBadge', 'headerBmBadge'].forEach(id => {
+            const badge = document.getElementById(id);
+            if (!badge) return;
+            badge.textContent = n;
+            badge.hidden = n === 0;
+        });
     }
 
     function _syncBmMode() {
         document.getElementById('bmToggle')?.classList.toggle('active', _bmMode);
+        document.getElementById('headerBmToggle')?.classList.toggle('active', _bmMode);
         const panel = document.getElementById('bmPanel');
         if (panel) panel.hidden = !_bmMode;
     }
 
     function _syncIndicator() {
-        const btn = document.getElementById('filterClear');
-        if (btn) btn.classList.toggle('active', _bmMode || !!_category);
+        const active = _bmMode || !!_category;
+        document.getElementById('filterClear')?.classList.toggle('active', active);
     }
 
     /* ── Bookmark panel ─────────────────────────────── */
@@ -188,13 +191,32 @@
             btn.addEventListener('click', () => setCategory(btn.dataset.midCat || null));
         });
 
-        // 북마크 토글
-        document.getElementById('bmToggle')?.addEventListener('click', () => {
-            setBookmarkMode(!_bmMode);
-        });
+        // 북마크 토글 (mid-section + 헤더)
+        document.getElementById('bmToggle')?.addEventListener('click', () => setBookmarkMode(!_bmMode));
+        document.getElementById('headerBmToggle')?.addEventListener('click', () => setBookmarkMode(!_bmMode));
 
         // 필터 초기화
         document.getElementById('filterClear')?.addEventListener('click', clearAll);
+
+        // 검색 토글
+        const searchToggle = document.getElementById('searchToggle');
+        const searchRow    = document.getElementById('searchRow');
+        const searchClose  = document.getElementById('searchClose');
+
+        function openSearch() {
+            searchRow.removeAttribute('hidden');
+            searchToggle.classList.add('active');
+            searchRow.querySelector('.search-input')?.focus();
+        }
+        function closeSearch() {
+            searchRow.setAttribute('hidden', '');
+            searchToggle.classList.remove('active');
+        }
+
+        searchToggle?.addEventListener('click', () => {
+            searchRow.hasAttribute('hidden') ? openSearch() : closeSearch();
+        });
+        searchClose?.addEventListener('click', closeSearch);
 
         // 배너 북마크 버튼 (onclick 미사용 버전)
         document.querySelectorAll('.banner-bm').forEach(btn => {

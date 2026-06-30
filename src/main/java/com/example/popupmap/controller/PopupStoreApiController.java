@@ -21,7 +21,7 @@ public class PopupStoreApiController {
             @RequestParam(required = false) String keyword) {
 
         if (keyword != null && !keyword.isBlank()) {
-            return service.search(keyword);
+            return service.search(keyword, category, region);
         }
         return service.getByFilter(category, region);
     }

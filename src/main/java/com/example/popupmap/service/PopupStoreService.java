@@ -29,8 +29,10 @@ public class PopupStoreService {
         return repository.findByFilter(cat, reg, LocalDate.now());
     }
 
-    public List<PopupStore> search(String keyword) {
-        return repository.searchByKeyword(keyword);
+    public List<PopupStore> search(String keyword, String category, String region) {
+        String cat = (category != null && category.isBlank()) ? null : category;
+        String reg = (region   != null && region.isBlank())   ? null : region;
+        return repository.searchByKeyword(keyword, cat, reg);
     }
 
     public Optional<PopupStore> getById(Long id) {

@@ -27,16 +27,25 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public void register(String username, String email, String rawPassword) {
+    public void register(String username, String nickname, String email, String rawPassword) {
         if (userRepository.existsByUsername(username))
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+        if (userRepository.existsByNickname(nickname))
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         if (userRepository.existsByEmail(email))
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
 
         userRepository.save(User.builder()
                 .username(username)
+                .nickname(nickname)
                 .email(email)
                 .password(passwordEncoder.encode(rawPassword))
                 .build());
+    }
+
+    public String getNicknameByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(User::getNickname)
+                .orElse(username);
     }
 }

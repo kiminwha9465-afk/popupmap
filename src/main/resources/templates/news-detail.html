@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${news.title} + ' - 팝업맵'">팝업 소식</title>
+    <link rel="stylesheet" href="/css/style.css?v=6"/>
+</head>
+<body>
+
+<header class="header">
+<div class="header-inner">
+    <!-- 1행: 로고 / 인증 -->
+    <div class="header-top">
+        <a href="/" class="header-brand">
+            <span class="brand-icon">📍</span>
+            <span class="brand-text">팝업맵</span>
+        </a>
+        <div class="header-top-right">
+            <div class="header-right">
+                <div class="header-auth">
+                    <span sec:authorize="isAuthenticated()" class="header-user">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                        </svg>
+                        <span sec:authentication="name"></span>
+                    </span>
+                    <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                    </form>
+                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
+                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 2행: 네비게이션 (항상 표시, 모바일에서 가로 스크롤) -->
+    <div class="header-nav-row">
+        <nav class="header-nav">
+            <span class="nav-group-label">팝업</span>
+            <a href="/stores" class="nav-link">전체보기</a>
+            <a href="/stores?category=패션" class="nav-link nav-cat-item">패션</a>
+            <a href="/stores?category=뷰티" class="nav-link nav-cat-item">뷰티</a>
+            <a href="/stores?category=식음료" class="nav-link nav-cat-item">식음료</a>
+            <a href="/stores?category=라이프스타일" class="nav-link nav-cat-item">라이프스타일</a>
+            <a href="/stores?category=아트/문화" class="nav-link nav-cat-item">아트/문화</a>
+            <a href="/stores?category=엔터테인먼트" class="nav-link nav-cat-item">엔터테인먼트</a>
+            <a href="/stores?category=테크" class="nav-link nav-cat-item">테크</a>
+            <details class="nav-dropdown">
+                <summary>
+                    카테고리
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/stores?category=패션" class="nav-dropdown-item">패션</a>
+                    <a href="/stores?category=뷰티" class="nav-dropdown-item">뷰티</a>
+                    <a href="/stores?category=식음료" class="nav-dropdown-item">식음료</a>
+                    <a href="/stores?category=라이프스타일" class="nav-dropdown-item">라이프스타일</a>
+                    <a href="/stores?category=아트/문화" class="nav-dropdown-item">아트/문화</a>
+                    <a href="/stores?category=엔터테인먼트" class="nav-dropdown-item">엔터테인먼트</a>
+                    <a href="/stores?category=테크" class="nav-dropdown-item">테크</a>
+                </div>
+            </details>
+            <span class="nav-sep"></span>
+            <span class="nav-group-label">소식</span>
+            <a href="/news" class="nav-link nav-news-item">전체</a>
+            <a href="/news?tag=공지" class="nav-link nav-news-item">공지</a>
+            <a href="/news?tag=소식" class="nav-link nav-news-item">소식</a>
+            <a href="/news?tag=트렌드" class="nav-link nav-news-item">트렌드</a>
+            <a href="/news?tag=후기" class="nav-link nav-news-item">후기</a>
+            <details class="nav-dropdown">
+                <summary>
+                    소식
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/news" class="nav-dropdown-item">전체</a>
+                    <a href="/news?tag=공지" class="nav-dropdown-item">공지</a>
+                    <a href="/news?tag=소식" class="nav-dropdown-item">소식</a>
+                    <a href="/news?tag=트렌드" class="nav-dropdown-item">트렌드</a>
+                    <a href="/news?tag=후기" class="nav-dropdown-item">후기</a>
+                </div>
+            </details>
+        </nav>
+    </div>
+</div>
+</header>
+
+<div class="news-detail-page">
+    <div class="news-detail-inner">
+
+        <a th:href="${backUrl}" class="news-detail-back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            목록으로
+        </a>
+
+        <div class="news-detail-header">
+            <span class="news-tag nd-tag" th:text="${news.tag}"></span>
+            <h1 class="news-detail-title" th:text="${news.title}"></h1>
+            <a th:if="${linkedStore != null}" th:href="@{/store/{id}(id=${linkedStore.id})}" class="news-linked-store">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span th:text="${linkedStore.name}"></span>
+            </a>
+            <div class="news-detail-meta">
+                <span class="news-detail-author">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                    </svg>
+                    <span th:text="${news.author} ?: '알 수 없음'"></span>
+                </span>
+                <span class="meta-dot">·</span>
+                <span th:text="${#temporals.format(news.publishedAt, 'yyyy.MM.dd')}"></span>
+                <span class="meta-dot">·</span>
+                <span>조회 <span th:text="${news.viewCount}"></span></span>
+            </div>
+        </div>
+
+        <div class="news-detail-divider"></div>
+
+        <img th:if="${news.thumbnailUrl != null and !#strings.isEmpty(news.thumbnailUrl)}"
+             th:src="${news.thumbnailUrl}" th:alt="${news.title}" class="news-detail-thumb"
+             onerror="this.onerror=null;this.src='/img/no-image.svg';"/>
+
+        <div class="news-detail-content" th:text="${news.content}"></div>
+
+        <div class="news-detail-footer">
+            <form th:action="@{/news/{id}/like(id=${news.id})}" method="post">
+                <button type="submit" class="like-btn" th:classappend="${liked} ? ' liked' : ''">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                         th:attr="fill=${liked} ? 'currentColor' : 'none'"
+                         stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <span th:text="${likeCount}">0</span>
+                </button>
+            </form>
+            <div th:if="${isAuthor}">
+                <form th:action="@{/news/{id}/delete(id=${news.id})}" method="post"
+                      onsubmit="return confirm('정말 삭제하시겠습니까?')">
+                    <button type="submit" class="news-delete-btn">삭제</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <span class="footer-logo">📍 팝업맵</span>
+        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+    </div>
+</footer>
+
+<script src="/js/nav.js"></script>
+</body>
+</html>

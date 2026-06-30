@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팝업 소식 - 팝업맵</title>
+    <link rel="stylesheet" href="/css/style.css?v=5"/>
+</head>
+<body>
+
+<header class="header">
+<div class="header-inner">
+    <!-- 1행: 로고 / 인증 -->
+    <div class="header-top">
+        <a href="/" class="header-brand">
+            <span class="brand-icon">📍</span>
+            <span class="brand-text">팝업맵</span>
+        </a>
+        <div class="header-top-right">
+            <div class="header-right">
+                <div class="header-auth">
+                    <span sec:authorize="isAuthenticated()" class="header-user">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                        </svg>
+                        <span sec:authentication="name"></span>
+                    </span>
+                    <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                    </form>
+                    <a sec:authorize="isAuthenticated()" href="/news/write" class="auth-link-btn signup">글쓰기</a>
+                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
+                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 2행: 네비게이션 (항상 표시, 모바일에서 가로 스크롤) -->
+    <div class="header-nav-row">
+        <nav class="header-nav">
+            <span class="nav-group-label">팝업</span>
+            <a href="/stores" class="nav-link">전체보기</a>
+            <a href="/stores?category=패션" class="nav-link nav-cat-item">패션</a>
+            <a href="/stores?category=뷰티" class="nav-link nav-cat-item">뷰티</a>
+            <a href="/stores?category=식음료" class="nav-link nav-cat-item">식음료</a>
+            <a href="/stores?category=라이프스타일" class="nav-link nav-cat-item">라이프스타일</a>
+            <a href="/stores?category=아트/문화" class="nav-link nav-cat-item">아트/문화</a>
+            <a href="/stores?category=엔터테인먼트" class="nav-link nav-cat-item">엔터테인먼트</a>
+            <a href="/stores?category=테크" class="nav-link nav-cat-item">테크</a>
+            <details class="nav-dropdown">
+                <summary>
+                    카테고리
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/stores?category=패션" class="nav-dropdown-item">패션</a>
+                    <a href="/stores?category=뷰티" class="nav-dropdown-item">뷰티</a>
+                    <a href="/stores?category=식음료" class="nav-dropdown-item">식음료</a>
+                    <a href="/stores?category=라이프스타일" class="nav-dropdown-item">라이프스타일</a>
+                    <a href="/stores?category=아트/문화" class="nav-dropdown-item">아트/문화</a>
+                    <a href="/stores?category=엔터테인먼트" class="nav-dropdown-item">엔터테인먼트</a>
+                    <a href="/stores?category=테크" class="nav-dropdown-item">테크</a>
+                </div>
+            </details>
+            <span class="nav-sep"></span>
+            <span class="nav-group-label">소식</span>
+            <a href="/news" class="nav-link nav-news-item" th:classappend="${selectedTag == null} ? ' active' : ''">전체</a>
+            <a href="/news?tag=공지" class="nav-link nav-news-item" th:classappend="${selectedTag == '공지'} ? ' active' : ''">공지</a>
+            <a href="/news?tag=소식" class="nav-link nav-news-item" th:classappend="${selectedTag == '소식'} ? ' active' : ''">소식</a>
+            <a href="/news?tag=트렌드" class="nav-link nav-news-item" th:classappend="${selectedTag == '트렌드'} ? ' active' : ''">트렌드</a>
+            <a href="/news?tag=후기" class="nav-link nav-news-item" th:classappend="${selectedTag == '후기'} ? ' active' : ''">후기</a>
+            <details class="nav-dropdown">
+                <summary th:classappend="${selectedTag != null} ? ' active' : ''">
+                    <span th:text="${selectedTag} ?: '소식'">소식</span>
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/news" class="nav-dropdown-item" th:classappend="${selectedTag == null} ? ' active' : ''">전체</a>
+                    <a href="/news?tag=공지" class="nav-dropdown-item" th:classappend="${selectedTag == '공지'} ? ' active' : ''">공지</a>
+                    <a href="/news?tag=소식" class="nav-dropdown-item" th:classappend="${selectedTag == '소식'} ? ' active' : ''">소식</a>
+                    <a href="/news?tag=트렌드" class="nav-dropdown-item" th:classappend="${selectedTag == '트렌드'} ? ' active' : ''">트렌드</a>
+                    <a href="/news?tag=후기" class="nav-dropdown-item" th:classappend="${selectedTag == '후기'} ? ' active' : ''">후기</a>
+                </div>
+            </details>
+        </nav>
+    </div>
+</div>
+</header>
+
+<div class="news-page">
+    <div class="news-page-header">
+        <h1 class="news-page-title">📢 팝업 소식</h1>
+    </div>
+
+    <div class="news-tabs">
+        <a href="/news" class="news-tab" th:classappend="${selectedTag == null} ? ' active' : ''">전체</a>
+        <a th:each="t : ${ {'공지','소식','트렌드','후기'} }"
+           th:href="@{/news(tag=${t})}" th:text="${t}" class="news-tab"
+           th:classappend="${t == selectedTag} ? ' active' : ''"></a>
+    </div>
+
+    <table class="board-table" th:if="${not #lists.isEmpty(newsList)}">
+        <colgroup>
+            <col style="width:60px"/>
+            <col style="width:80px"/>
+            <col/>
+            <col style="width:110px"/>
+            <col style="width:70px"/>
+        </colgroup>
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>태그</th>
+                <th>제목</th>
+                <th>날짜</th>
+                <th>조회</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="n, i : ${newsList}" class="board-row"
+                th:onclick="|location.href='@{/news/{id}(id=${n.id})}'|">
+                <td class="board-num" th:text="${newsList.size() - i.index}"></td>
+                <td>
+                    <span class="news-tag" th:text="${n.tag}"
+                          th:classappend="${n.tag == 'NEW'} ? ' new' : ''"></span>
+                </td>
+                <td class="board-title-cell">
+                    <a th:href="@{/news/{id}(id=${n.id}, from=${selectedTag})}" th:text="${n.title}" class="board-title"></a>
+                </td>
+                <td class="board-date" th:text="${#temporals.format(n.publishedAt, 'yyyy.MM.dd')}"></td>
+                <td class="board-views" th:text="${n.viewCount}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="news-list-header">
+        <th:block th:if="${selectedTag == '후기'}">
+            <a sec:authorize="isAuthenticated()"
+               href="/news/write?tag=후기" class="btn-primary news-write-btn">글쓰기</a>
+            <button sec:authorize="isAnonymous()"
+                    class="btn-primary news-write-btn" id="writeBtn">글쓰기</button>
+        </th:block>
+    </div>
+
+    <!-- 로그인 필요 토스트 -->
+    <div id="loginToast" class="login-toast" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
+        </svg>
+        로그인이 필요합니다. 로그인 화면으로 이동합니다...
+    </div>
+
+    <div th:if="${#lists.isEmpty(newsList)}" class="news-page-empty">
+        <p>등록된 소식이 없습니다.</p>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <span class="footer-logo">📍 팝업맵</span>
+        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+    </div>
+</footer>
+
+<script src="/js/nav.js"></script>
+<script>
+(function () {
+    var btn = document.getElementById('writeBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        var toast = document.getElementById('loginToast');
+        toast.hidden = false;
+        setTimeout(function () {
+            location.href = '/login';
+        }, 1500);
+    });
+})();
+</script>
+</body>
+</html>

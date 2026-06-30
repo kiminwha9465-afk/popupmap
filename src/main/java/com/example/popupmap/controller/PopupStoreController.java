@@ -1,6 +1,7 @@
 package com.example.popupmap.controller;
 
 import com.example.popupmap.domain.PopupStore;
+import com.example.popupmap.service.PopupNewsService;
 import com.example.popupmap.service.PopupStoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import java.util.List;
 public class PopupStoreController {
 
     private final PopupStoreService service;
+    private final PopupNewsService newsService;
 
     @GetMapping("/")
     public String index(
@@ -21,11 +23,12 @@ public class PopupStoreController {
             Model model) {
 
         List<PopupStore> stores = (keyword != null && !keyword.isBlank())
-                ? service.search(keyword)
+                ? service.search(keyword, null, null)
                 : service.getOngoing();
 
         model.addAttribute("stores", stores);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("recentNews", newsService.getRecent5());
         return "index";
     }
 
@@ -38,7 +41,7 @@ public class PopupStoreController {
 
         List<PopupStore> stores;
         if (keyword != null && !keyword.isBlank()) {
-            stores = service.search(keyword);
+            stores = service.search(keyword, category, region);
         } else {
             stores = service.getByFilter(category, region);
         }
@@ -55,6 +58,7 @@ public class PopupStoreController {
         PopupStore store = service.getById(id)
                 .orElseThrow(() -> new IllegalArgumentException("팝업스토어를 찾을 수 없습니다: " + id));
         model.addAttribute("store", store);
+        model.addAttribute("reviews", newsService.getReviewsByStoreId(id));
         return "detail";
     }
 }

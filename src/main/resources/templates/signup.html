@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=4"/>
+    <link rel="stylesheet" href="/css/style.css?v=5"/>
     <style>
         .auth-wrap { min-height: calc(100vh - 56px); display: flex; align-items: center; justify-content: center; padding: 40px 16px; background: var(--bg); }
         .auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 40px 36px; width: 100%; max-width: 400px; }
@@ -26,10 +26,14 @@
 </head>
 <body>
 <header class="header">
-    <a href="/" class="header-brand">
-        <span class="brand-icon">📍</span>
-        <span class="brand-text">팝업맵</span>
-    </a>
+<div class="header-inner">
+    <div class="header-top">
+        <a href="/" class="header-brand">
+            <span class="brand-icon">📍</span>
+            <span class="brand-text">팝업맵</span>
+        </a>
+    </div>
+</div>
 </header>
 
 <div class="auth-wrap">
@@ -45,6 +49,12 @@
                 <input type="text" name="username" class="auth-input" placeholder="영문, 숫자 4~20자" required
                        minlength="4" maxlength="20" pattern="[a-zA-Z0-9]+"/>
                 <p class="auth-hint">영문, 숫자만 사용 가능 (4~20자)</p>
+            </div>
+            <div class="auth-field">
+                <label class="auth-label">닉네임</label>
+                <input type="text" name="nickname" class="auth-input" placeholder="게시글에 표시될 이름" required
+                       minlength="2" maxlength="20"/>
+                <p class="auth-hint">2~20자, 게시글 작성자로 표시됩니다</p>
             </div>
             <div class="auth-field">
                 <label class="auth-label">이메일</label>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소식 작성 - 팝업맵</title>
+    <link rel="stylesheet" href="/css/style.css?v=6"/>
+    <style>
+        .store-autocomplete { position: relative; }
+        .store-ac-dropdown {
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); box-shadow: 0 4px 14px rgba(0,0,0,.1);
+            max-height: 200px; overflow-y: auto; display: none;
+        }
+        .store-ac-dropdown.open { display: block; }
+        .store-ac-item {
+            padding: 10px 14px; font-size: 14px; cursor: pointer;
+            border-bottom: 1px solid var(--border); color: var(--text);
+        }
+        .store-ac-item:last-child { border-bottom: none; }
+        .store-ac-item:hover, .store-ac-item.active { background: var(--bg); color: var(--primary); }
+        .store-ac-empty { padding: 10px 14px; font-size: 13px; color: var(--text-sub); }
+        .store-ac-chip {
+            display: none; align-items: center; gap: 6px; margin-top: 8px;
+            padding: 5px 10px 5px 12px; width: fit-content;
+            background: var(--bg); border: 1px solid var(--border); border-radius: 20px;
+            font-size: 13px; color: var(--text);
+        }
+        .store-ac-chip button {
+            display: flex; align-items: center;
+            background: none; border: none; cursor: pointer;
+            color: var(--text-sub); font-size: 16px; line-height: 1; padding: 0;
+        }
+        .store-ac-chip button:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<header class="header">
+<div class="header-inner">
+    <div class="header-top">
+        <a href="/" class="header-brand">
+            <span class="brand-icon">📍</span>
+            <span class="brand-text">팝업맵</span>
+        </a>
+        <div class="header-top-right">
+            <div class="header-right">
+                <div class="header-auth">
+                    <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header-nav-row">
+        <nav class="header-nav">
+            <span class="nav-group-label">팝업</span>
+            <a href="/stores" class="nav-link">전체보기</a>
+            <span class="nav-sep"></span>
+            <span class="nav-group-label">소식</span>
+            <a href="/news" class="nav-link nav-news-item">전체</a>
+            <a href="/news?tag=공지" class="nav-link nav-news-item">공지</a>
+            <a href="/news?tag=소식" class="nav-link nav-news-item">소식</a>
+            <a href="/news?tag=트렌드" class="nav-link nav-news-item">트렌드</a>
+            <a href="/news?tag=후기" class="nav-link nav-news-item active">후기</a>
+            <details class="nav-dropdown">
+                <summary>
+                    소식
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/news" class="nav-dropdown-item">전체</a>
+                    <a href="/news?tag=공지" class="nav-dropdown-item">공지</a>
+                    <a href="/news?tag=소식" class="nav-dropdown-item">소식</a>
+                    <a href="/news?tag=트렌드" class="nav-dropdown-item">트렌드</a>
+                    <a href="/news?tag=후기" class="nav-dropdown-item">후기</a>
+                </div>
+            </details>
+        </nav>
+    </div>
+</div>
+</header>
+
+<div class="news-write-page">
+    <div class="news-write-inner">
+        <h1 class="news-write-title">소식 작성</h1>
+
+        <form th:action="@{/news/write}" method="post" enctype="multipart/form-data" class="news-write-form">
+
+            <div class="form-group">
+                <label class="form-label">태그</label>
+                <select name="tag" class="form-select">
+                    <option value="공지"  th:selected="${defaultTag == '공지'}">공지</option>
+                    <option value="소식"  th:selected="${defaultTag == '소식'}">소식</option>
+                    <option value="트렌드" th:selected="${defaultTag == '트렌드'}">트렌드</option>
+                    <option value="후기"  th:selected="${defaultTag == '후기'}">후기</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="store-picker-group">
+                <label class="form-label">관련 팝업 <span class="form-label-sub">(선택)</span></label>
+                <div class="store-autocomplete">
+                    <input type="text" id="store-search" class="form-input"
+                           placeholder="팝업 이름으로 검색..." autocomplete="off"/>
+                    <div id="store-ac-dropdown" class="store-ac-dropdown"></div>
+                    <input type="hidden" name="popupStoreId" id="store-id-input"/>
+                    <div id="store-ac-chip" class="store-ac-chip">
+                        <span id="store-ac-chip-name"></span>
+                        <button type="button" id="store-ac-clear" title="선택 해제">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M18 6 6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">제목</label>
+                <input type="text" name="title" class="form-input" placeholder="제목을 입력하세요" required/>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">썸네일 <span class="form-label-sub">(선택, 이미지 파일)</span></label>
+                <input type="file" name="thumbnailFile" class="form-file" accept="image/*"/>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">내용</label>
+                <textarea name="content" class="form-textarea" rows="16" placeholder="내용을 입력하세요" required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="/news" class="btn-secondary">취소</a>
+                <button type="submit" class="btn-primary">등록</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <span class="footer-logo">📍 팝업맵</span>
+        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+    </div>
+</footer>
+
+<script src="/js/nav.js"></script>
+<script th:inline="javascript">
+(function () {
+    const STORES = /*[[${stores}]]*/ [];
+
+    const tagSelect    = document.querySelector('select[name="tag"]');
+    const pickerGroup  = document.getElementById('store-picker-group');
+    const searchInput  = document.getElementById('store-search');
+    const dropdown     = document.getElementById('store-ac-dropdown');
+    const idInput      = document.getElementById('store-id-input');
+    const chip         = document.getElementById('store-ac-chip');
+    const chipName     = document.getElementById('store-ac-chip-name');
+    const clearBtn     = document.getElementById('store-ac-clear');
+
+    let activeIdx = -1;
+
+    function syncPicker() {
+        pickerGroup.style.display = tagSelect.value === '후기' ? 'block' : 'none';
+        if (tagSelect.value !== '후기') clearSelection();
+    }
+
+    function clearSelection() {
+        searchInput.value = '';
+        idInput.value = '';
+        chip.style.display = 'none';
+        closeDropdown();
+    }
+
+    function selectStore(id, name) {
+        idInput.value = id;
+        chipName.textContent = name;
+        chip.style.display = 'inline-flex';
+        searchInput.value = '';
+        closeDropdown();
+    }
+
+    function closeDropdown() {
+        dropdown.classList.remove('open');
+        dropdown.innerHTML = '';
+        activeIdx = -1;
+    }
+
+    function renderDropdown(results) {
+        dropdown.innerHTML = '';
+        activeIdx = -1;
+        if (results.length === 0) {
+            var empty = document.createElement('div');
+            empty.className = 'store-ac-empty';
+            empty.textContent = '검색 결과 없음';
+            dropdown.appendChild(empty);
+        } else {
+            results.forEach(function (s, i) {
+                var item = document.createElement('div');
+                item.className = 'store-ac-item';
+                item.textContent = s.name;
+                item.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    selectStore(s.id, s.name);
+                });
+                dropdown.appendChild(item);
+            });
+        }
+        dropdown.classList.add('open');
+    }
+
+    function getItems() {
+        return dropdown.querySelectorAll('.store-ac-item');
+    }
+
+    searchInput.addEventListener('input', function () {
+        var q = this.value.trim();
+        if (!q) { closeDropdown(); return; }
+        var matched = STORES.filter(function (s) {
+            return s.name.toLowerCase().includes(q.toLowerCase());
+        });
+        renderDropdown(matched);
+    });
+
+    searchInput.addEventListener('keydown', function (e) {
+        var items = getItems();
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIdx = Math.min(activeIdx + 1, items.length - 1);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIdx = Math.max(activeIdx - 1, 0);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            var target = activeIdx >= 0 ? items[activeIdx] : items[0];
+            if (target) target.dispatchEvent(new MouseEvent('mousedown'));
+            return;
+        } else if (e.key === 'Escape') {
+            closeDropdown(); return;
+        }
+        items.forEach(function (el, i) {
+            el.classList.toggle('active', i === activeIdx);
+        });
+    });
+
+    searchInput.addEventListener('blur', function () {
+        setTimeout(closeDropdown, 150);
+    });
+
+    clearBtn.addEventListener('click', function () {
+        clearSelection();
+        searchInput.focus();
+    });
+
+    tagSelect.addEventListener('change', syncPicker);
+    syncPicker();
+
+    // 상세페이지에서 넘어온 경우 팝업 자동 선택
+    var PRE = /*[[${preSelectedStore}]]*/ null;
+    if (PRE) {
+        selectStore(PRE.id, PRE.name);
+    }
+})();
+</script>
+</body>
+</html>
