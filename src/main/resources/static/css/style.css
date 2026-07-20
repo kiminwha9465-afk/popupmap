@@ -566,7 +566,7 @@ button { cursor: pointer; border: none; background: none; }
 .news-item { display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; }
 .news-tag {
     font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
-    background: var(--primary-light); color: var(--primary); flex-shrink: 0;
+    background: var(--primary-light); color: var(--primary); flex-shrink: 0; white-space: nowrap;
 }
 .news-tag.new { background: var(--primary); color: white; }
 .news-title { font-size: 13px; font-weight: 500; flex: 1; line-height: 1.4; transition: color .15s; }
@@ -592,7 +592,7 @@ button { cursor: pointer; border: none; background: none; }
 .news-write-link { font-size: 13px; color: var(--primary); font-weight: 600; }
 
 /* ── 소식 목록 페이지 ─────────────────────────────── */
-.news-page { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+.news-page { width: 100%; max-width: var(--max-w); margin: 0 auto; padding: 40px 24px 80px; }
 .news-page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .news-page-title { font-size: 22px; font-weight: 800; }
 .news-write-btn { font-size: 13px; padding: 8px 18px; }
@@ -734,9 +734,6 @@ button { cursor: pointer; border: none; background: none; }
 .like-btn:hover { border-color: #F87171; color: #EF4444; background: #FFF5F5; }
 .like-btn.liked { border-color: #EF4444; color: #EF4444; background: #FFF5F5; }
 
-@media (max-width: 600px) {
-    .news-detail-inner { padding: 28px 20px; }
-}
 .news-delete-btn { padding: 8px 18px; border-radius: 8px; border: 1px solid #FCA5A5; background: #FEF2F2; color: #DC2626; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
 .news-delete-btn:hover { background: #DC2626; color: white; }
 
@@ -971,18 +968,12 @@ button { cursor: pointer; border: none; background: none; }
 .detail-reviews-empty-sub { font-size: 13px; color: var(--text-sub); margin-bottom: 4px; }
 .detail-reviews-write-btn { font-size: 14px; padding: 10px 28px; margin-top: 4px; }
 
-@media (max-width: 900px) {
-    .detail-reviews-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 560px) {
-    .detail-reviews-grid { grid-template-columns: 1fr; }
-}
 
 
 /* ── Stores 목록 페이지 ───────────────────────────── */
 .stores-container {
     max-width: var(--max-w); margin: 0 auto;
-    padding: 32px 28px 64px;
+    padding: 32px 24px 64px;
 }
 
 .stores-page-header {
@@ -1000,10 +991,10 @@ button { cursor: pointer; border: none; background: none; }
 }
 .stores-cats::-webkit-scrollbar { display: none; }
 .stores-cat-tab {
-    padding: 8px 18px; border-radius: 22px; flex-shrink: 0;
+    padding: 8px 20px; border-radius: 22px; flex-shrink: 0;
     font-size: 14px; font-weight: 500; color: var(--text-sub);
     border: 1.5px solid var(--border); background: var(--surface);
-    transition: all .18s;
+    transition: all .18s; min-width: 64px; text-align: center;
 }
 .stores-cat-tab:hover { border-color: var(--primary); color: var(--primary); }
 .stores-cat-tab.active { background: var(--primary); border-color: var(--primary); color: white; font-weight: 700; }
@@ -1015,9 +1006,9 @@ button { cursor: pointer; border: none; background: none; }
 }
 .stores-regions { display: flex; gap: 6px; flex-wrap: wrap; }
 .region-chip {
-    padding: 5px 13px; border-radius: 14px; font-size: 13px; font-weight: 500;
+    padding: 5px 14px; border-radius: 14px; font-size: 13px; font-weight: 500;
     color: var(--text-sub); border: 1px solid var(--border); background: var(--surface);
-    transition: all .15s;
+    transition: all .15s; min-width: 52px; text-align: center;
 }
 .region-chip:hover { border-color: var(--primary); color: var(--primary); }
 .region-chip.active { background: var(--text); border-color: var(--text); color: white; font-weight: 600; }
@@ -1039,21 +1030,28 @@ button { cursor: pointer; border: none; background: none; }
 .stores-empty-desc { font-size: 14px; color: var(--text-sub); }
 
 /* ── Responsive ───────────────────────────────────── */
-@media (max-width: 768px) {
+/* PC:      1024px 이상 (기본값)                        */
+/* Tablet:  768px ~ 1023px                             */
+/* Mobile:  767px 이하                                  */
+
+@media (max-width: 1023px) {
     .nav-dropdown { display: block; }
     .nav-cat-item, .nav-news-item { display: none; }
-}
-@media (max-width: 1100px) {
-    .mid-inner { grid-template-columns: 340px 1fr; }
-}
-@media (max-width: 900px) {
-    .mid-inner { grid-template-columns: 1fr; }
-    .bottom-inner { grid-template-columns: 1fr; }
+    .page-main { padding: 0 40px 60px; }
+    .news-page { padding: 40px 32px 80px; }
+    .mid-inner { grid-template-columns: repeat(2, 1fr); }
+    .bottom-inner { grid-template-columns: repeat(2, 1fr); }
     .detail-content { grid-template-columns: 1fr; }
+    .detail-reviews-grid { grid-template-columns: repeat(2, 1fr); }
+    .stores-grid { grid-template-columns: repeat(2, 1fr); }
+    .stores-container { padding: 32px 40px 64px; }
+    .news-tab { padding: 9px 18px; text-align: center; }
 }
-@media (max-width: 600px) {
-    .page-main { padding: 0 14px 40px; }
-    .header-inner { padding: 0 14px; }
+
+@media (max-width: 767px) {
+    .mid-inner { grid-template-columns: 1fr; }
+    .page-main { padding: 0 18px 40px; }
+    .header-inner { padding: 0 18px; }
     .banner-name { font-size: 18px; }
     .banner-overlay { padding: 20px 20px; }
     .recommend-grid { grid-template-columns: 1fr; }
@@ -1062,14 +1060,18 @@ button { cursor: pointer; border: none; background: none; }
     .bm-list { grid-template-columns: 1fr; }
     .mid-filter { flex-wrap: wrap; gap: 8px; }
     .mid-filter-right { width: 100%; justify-content: flex-end; }
-}
-@media (max-width: 1200px) {
-    .stores-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 800px) {
-    .stores-grid { grid-template-columns: repeat(2, 1fr); }
-    .stores-container { padding: 24px 16px 48px; }
-}
-@media (max-width: 500px) {
+    .news-detail-inner { padding: 28px 20px; }
+    .bottom-inner { grid-template-columns: 1fr; }
+    .stores-container { padding: 20px 18px 48px; }
     .stores-grid { grid-template-columns: 1fr; }
+    .detail-reviews-grid { grid-template-columns: 1fr; }
+    /* 소식 페이지 */
+    .news-page { padding: 20px 20px 48px; }
+    .news-tabs { overflow-x: auto; scrollbar-width: none; }
+    .news-tabs::-webkit-scrollbar { display: none; }
+    .board-table thead th:nth-child(1),
+    .board-table thead th:nth-child(5),
+    .board-num,
+    .board-views { display: none; }
+    .board-table th, .board-row td { padding: 11px 10px; }
 }
