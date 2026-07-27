@@ -183,7 +183,7 @@
                     <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
                         <button type="submit" class="auth-link-btn">로그아웃</button>
                     </form>
-                    <a sec:authorize="isAuthenticated()" href="/news/write" class="auth-link-btn signup">글쓰기</a>
+
                     <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
                     <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
                 </div>
