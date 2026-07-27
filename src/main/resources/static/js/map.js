@@ -1,33 +1,16 @@
 window.PopupMap = (() => {
     'use strict';
     const container = document.getElementById('map');
-    if (!container || typeof kakao === 'undefined') return null;
+    if (!container || typeof naver === 'undefined') return null;
 
-    const map = new kakao.maps.Map(container, {
-        center: new kakao.maps.LatLng(36.5, 127.5),
-        level: 12
+    const map = new naver.maps.Map(container, {
+        center: new naver.maps.LatLng(36.5, 127.5),
+        zoom: 7,
+        zoomControl: true,
+        zoomControlOptions: { position: naver.maps.Position.RIGHT_CENTER }
     });
-    map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
 
     const today = new Date(); today.setHours(0, 0, 0, 0);
-
-    const clusterer = new kakao.maps.MarkerClusterer({
-        map,
-        averageCenter: true,
-        minLevel: 5,
-        styles: [{
-            width: '38px', height: '38px',
-            background: '#FF4B4B',
-            border: '3px solid white',
-            borderRadius: '50%',
-            color: '#fff',
-            textAlign: 'center',
-            lineHeight: '32px',
-            fontWeight: '700',
-            fontSize: '13px',
-            boxShadow: '0 2px 8px rgba(255,75,75,.45)'
-        }]
-    });
 
     function _parse(str) {
         if (!str) return null;
@@ -35,29 +18,37 @@ window.PopupMap = (() => {
         return new Date(y, m - 1, d);
     }
 
-    function _markerImage(upcoming) {
+    function _markerIcon(upcoming) {
         const color = upcoming ? '%23F59E0B' : '%23FF4B4B';
         const svg = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='44' viewBox='0 0 32 44'><path d='M16 0C7.163 0 0 7.163 0 16c0 12 16 28 16 28s16-16 16-28C32 7.163 24.837 0 16 0z' fill='${color}'/><circle cx='16' cy='16' r='6.5' fill='white'/></svg>`;
-        return new kakao.maps.MarkerImage(svg, new kakao.maps.Size(32, 44), {
-            offset: new kakao.maps.Point(16, 44)
-        });
+        return {
+            url: svg,
+            size: new naver.maps.Size(32, 44),
+            anchor: new naver.maps.Point(16, 44)
+        };
     }
 
     let _markers = [];
     let _activeIW = null;
+    let _clusterer = null;
 
     function _addMarkers(list) {
-        clusterer.clear();
+        _markers.forEach(m => m.setMap(null));
         _markers = [];
+        if (_clusterer) { _clusterer.setMap(null); _clusterer = null; }
         if (_activeIW) { _activeIW.close(); _activeIW = null; }
 
-        const bounds = new kakao.maps.LatLngBounds();
+        const bounds = new naver.maps.LatLngBounds();
         const valid = list.filter(s => s.latitude && s.longitude);
 
         valid.forEach(store => {
             const upcoming = _parse(store.startDate) > today;
-            const pos = new kakao.maps.LatLng(store.latitude, store.longitude);
-            const marker = new kakao.maps.Marker({ position: pos, image: _markerImage(upcoming) });
+            const pos = new naver.maps.LatLng(store.latitude, store.longitude);
+            const marker = new naver.maps.Marker({
+                position: pos,
+                map: map,
+                icon: _markerIcon(upcoming)
+            });
 
             const sd  = (store.startDate || '').replace(/-/g, '.');
             const ed  = (store.endDate   || '').replace(/-/g, '.');
@@ -68,7 +59,7 @@ window.PopupMap = (() => {
                 ? `<img src="${store.imageUrl}" style="width:100%;height:90px;object-fit:cover;border-radius:6px;margin-bottom:8px;display:block;" onerror="this.style.display='none'"/>`
                 : '';
 
-            const iw = new kakao.maps.InfoWindow({
+            const iw = new naver.maps.InfoWindow({
                 content: `<div style="padding:12px;min-width:220px;max-width:260px;font-family:-apple-system,sans-serif;line-height:1.5;">
                     ${img}
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
@@ -80,10 +71,13 @@ window.PopupMap = (() => {
                     <div style="font-size:12px;color:#6E6E73;margin-bottom:10px;">${sd} ~ ${ed}</div>
                     <a href="/store/${store.id}" style="font-size:12px;color:#FF4B4B;font-weight:700;text-decoration:none;">자세히 보기 →</a>
                 </div>`,
-                removable: true
+                borderWidth: 0,
+                disableAnchor: true,
+                backgroundColor: 'white',
+                pixelOffset: new naver.maps.Point(0, -10)
             });
 
-            kakao.maps.event.addListener(marker, 'click', () => {
+            naver.maps.Event.addListener(marker, 'click', () => {
                 if (_activeIW) _activeIW.close();
                 iw.open(map, marker);
                 _activeIW = iw;
@@ -93,22 +87,42 @@ window.PopupMap = (() => {
             bounds.extend(pos);
         });
 
-        clusterer.addMarkers(_markers);
+        if (typeof MarkerClustering !== 'undefined') {
+            _clusterer = new MarkerClustering({
+                minClusterSize: 2,
+                maxZoom: 13,
+                map: map,
+                markers: _markers,
+                disableClickZoom: false,
+                gridSize: 120,
+                icons: [{
+                    content: '<div style="cursor:pointer;width:38px;height:38px;line-height:38px;font-size:13px;color:white;text-align:center;font-weight:700;background:#FF4B4B;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(255,75,75,.45);">COUNT</div>',
+                    size: new naver.maps.Size(38, 38),
+                    anchor: new naver.maps.Point(19, 19)
+                }],
+                stylingFunction: (clusterMarker, count) => {
+                    clusterMarker.getElement().querySelector('div').textContent = count;
+                }
+            });
+        }
 
         if (valid.length === 1) {
-            map.setCenter(new kakao.maps.LatLng(valid[0].latitude, valid[0].longitude));
-            map.setLevel(5);
+            map.setCenter(new naver.maps.LatLng(valid[0].latitude, valid[0].longitude));
+            map.setZoom(14);
         } else if (valid.length > 1) {
-            map.setBounds(bounds);
+            map.fitBounds(bounds);
         }
     }
+
+    naver.maps.Event.addListener(map, 'click', () => {
+        if (_activeIW) { _activeIW.close(); _activeIW = null; }
+    });
 
     function setStores(list) { _addMarkers(list); }
     _addMarkers(window.storesData || []);
 
-    /* 현위치 버튼 */
     const locateBtn = document.getElementById('mapLocate');
-    let _locOverlay = null;
+    let _locMarker = null;
 
     locateBtn?.addEventListener('click', () => {
         if (!navigator.geolocation) { alert('이 브라우저는 위치 정보를 지원하지 않습니다.'); return; }
@@ -116,18 +130,20 @@ window.PopupMap = (() => {
         navigator.geolocation.getCurrentPosition(
             pos => {
                 locateBtn.classList.remove('locating');
-                const latlng = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-                if (_locOverlay) _locOverlay.setMap(null);
-                _locOverlay = new kakao.maps.CustomOverlay({
+                const latlng = new naver.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                if (_locMarker) _locMarker.setMap(null);
+                _locMarker = new naver.maps.Marker({
                     position: latlng,
-                    content: '<div style="width:14px;height:14px;border-radius:50%;background:#3B82F6;border:2px solid white;box-shadow:0 0 0 4px rgba(59,130,246,.3);transform:translate(-50%,-50%);"></div>',
-                    xAnchor: 0.5,
-                    yAnchor: 0.5,
+                    map: map,
+                    icon: {
+                        content: '<div style="width:14px;height:14px;border-radius:50%;background:#3B82F6;border:2px solid white;box-shadow:0 0 0 4px rgba(59,130,246,.3);transform:translate(-50%,-50%);"></div>',
+                        size: new naver.maps.Size(14, 14),
+                        anchor: new naver.maps.Point(7, 7)
+                    },
                     zIndex: 10
                 });
-                _locOverlay.setMap(map);
                 map.setCenter(latlng);
-                map.setLevel(4);
+                map.setZoom(15);
             },
             () => {
                 locateBtn.classList.remove('locating');

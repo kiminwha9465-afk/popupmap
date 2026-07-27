@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 팝업맵</title>
+    <link rel="stylesheet" href="/css/style.css?v=8"/>
+    <style>
+        .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
+        .admin-title { font-size: 22px; font-weight: 800; margin-bottom: 28px; }
+        .admin-nav { display: flex; gap: 10px; margin-bottom: 32px; flex-wrap: wrap; }
+        .admin-nav a { padding: 8px 18px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); font-size: 14px; font-weight: 600; color: var(--text); transition: all .15s; }
+        .admin-nav a:hover, .admin-nav a.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 36px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; box-shadow: var(--shadow-sm); text-align: center; }
+        .stat-num { font-size: 40px; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 14px; color: var(--text-sub); margin-top: 6px; font-weight: 600; }
+        @media(max-width: 600px) { .stat-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <div class="header-top">
+            <a href="/" class="header-brand">
+                <span class="brand-icon">📍</span>
+                <span class="brand-text">팝업맵</span>
+            </a>
+            <div class="header-top-right" style="margin-left:auto;">
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit" class="auth-link-btn">로그아웃</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="admin-wrap">
+    <div class="admin-title">관리자 대시보드</div>
+
+    <nav class="admin-nav">
+        <a href="/admin" class="active">대시보드</a>
+        <a href="/admin/stores">팝업 관리</a>
+        <a href="/admin/news">게시판 관리</a>
+        <a href="/admin/users">회원 관리</a>
+    </nav>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-num" th:text="${storeCount}">0</div>
+            <div class="stat-label">등록된 팝업스토어</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${newsCount}">0</div>
+            <div class="stat-label">게시글</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${userCount}">0</div>
+            <div class="stat-label">가입 회원</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

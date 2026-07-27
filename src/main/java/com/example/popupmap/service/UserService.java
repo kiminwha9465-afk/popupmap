@@ -48,4 +48,23 @@ public class UserService implements UserDetailsService {
                 .map(User::getNickname)
                 .orElse(username);
     }
+
+    public List<User> getAll() {
+        return userRepository.findAll();
+    }
+
+    public long count() {
+        return userRepository.count();
+    }
+
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    public void changeRole(Long id, String role) {
+        userRepository.findById(id).ifPresent(u -> {
+            u.setRole(role);
+            userRepository.save(u);
+        });
+    }
 }

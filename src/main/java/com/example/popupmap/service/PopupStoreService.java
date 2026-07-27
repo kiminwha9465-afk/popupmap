@@ -38,4 +38,16 @@ public class PopupStoreService {
     public Optional<PopupStore> getById(Long id) {
         return repository.findById(id);
     }
+
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+
+    public PopupStore save(PopupStore store) {
+        return repository.save(store);
+    }
+
+    public long count() {
+        return repository.count();
+    }
 }

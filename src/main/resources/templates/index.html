@@ -3,6 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>팝업맵 - 전국 팝업스토어 일정 & 위치</title>
     <link rel="stylesheet" href="/css/style.css?v=8"/>
@@ -353,7 +354,8 @@
     </div>
 </footer>
 
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=485292affcaa12b81dd492b7569dabe9&libraries=clusterer"></script>
+<script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=t6ao0o80r6"></script>
+<script src="/js/MarkerClustering.js"></script>
 <script th:inline="javascript">
     window.storesData = /*[[${stores}]]*/ [];
 </script>

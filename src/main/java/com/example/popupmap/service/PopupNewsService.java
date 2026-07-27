@@ -73,4 +73,8 @@ public class PopupNewsService {
     public boolean isLikedBy(Long newsId, String username) {
         return likeRepository.existsByNewsIdAndUsername(newsId, username);
     }
+
+    public long count() {
+        return repository.count();
+    }
 }

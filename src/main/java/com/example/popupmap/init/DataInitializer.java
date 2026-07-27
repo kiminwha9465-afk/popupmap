@@ -10,6 +10,7 @@ import com.example.popupmap.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -24,9 +25,22 @@ public class DataInitializer implements CommandLineRunner {
     private final PopupNewsRepository newsRepository;
     private final PopgaCrawlerService crawlerService;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
+        // 관리자 계정 생성 (최초 1회)
+        if (userRepository.findByUsername("admin").isEmpty()) {
+            userRepository.save(User.builder()
+                    .username("admin")
+                    .nickname("관리자")
+                    .email("admin@popupmap.kr")
+                    .password(passwordEncoder.encode("admin1234!"))
+                    .role("ROLE_ADMIN")
+                    .build());
+            log.info("관리자 계정 생성 완료 (admin / admin1234!)");
+        }
+
         // 닉네임 없는 기존 계정 → 아이디를 닉네임으로 설정
         userRepository.findAll().stream()
                 .filter(u -> u.getNickname() == null)

@@ -3,6 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${store.name} + ' - 팝업맵'">팝업스토어 상세</title>
     <link rel="stylesheet" href="/css/style.css?v=8"/>
@@ -233,7 +234,7 @@
 </div>
 
 <script src="/js/nav.js"></script>
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=485292affcaa12b81dd492b7569dabe9"></script>
+<script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=t6ao0o80r6"></script>
 <script th:inline="javascript">
     const storeDetail = {
         lat: /*[[${store.latitude}]]*/ 37.5665,
