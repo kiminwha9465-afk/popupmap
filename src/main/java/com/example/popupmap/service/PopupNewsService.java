@@ -22,7 +22,7 @@ public class PopupNewsService {
         if (tag != null && !tag.isBlank()) {
             return repository.findByTagOrderByIdDesc(tag);
         }
-        return repository.findAllByOrderByIdDesc();
+        return repository.findByTagNotOrderByIdDesc("후기");
     }
 
     public List<PopupNews> getRecent5() {

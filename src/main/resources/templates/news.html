@@ -10,6 +10,9 @@
     <title>팝업 소식 - 팝업맵</title>
     <link rel="stylesheet" href="/css/style.css?v=8"/>
     <style>
+        /* ── 후기 탭 구분 ─────────────────────────── */
+        .news-tab-sep { display:inline-block; width:1px; height:14px; background:var(--border); margin:0 4px; align-self:center; }
+        .news-tab-review { font-weight:600; }
         /* ── 후기 카드 그리드 ─────────────────────── */
         .review-toolbar { display:flex; align-items:center; justify-content:flex-end; margin-bottom:16px; gap:10px; }
         .review-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
@@ -247,9 +250,12 @@
 
     <div class="news-tabs">
         <a href="/news" class="news-tab" th:classappend="${selectedTag == null} ? ' active' : ''">전체</a>
-        <a th:each="t : ${ {'공지','소식','트렌드','후기'} }"
+        <a th:each="t : ${ {'공지','소식','트렌드'} }"
            th:href="@{/news(tag=${t})}" th:text="${t}" class="news-tab"
            th:classappend="${t == selectedTag} ? ' active' : ''"></a>
+        <span class="news-tab-sep"></span>
+        <a href="/news?tag=후기" class="news-tab news-tab-review"
+           th:classappend="${selectedTag == '후기'} ? ' active' : ''">후기</a>
     </div>
 
     <!-- ── 후기 탭: 카드 그리드 뷰 ─────────────────── -->
