@@ -30,4 +30,6 @@ public class PopupNews {
 
     @Builder.Default
     private int viewCount = 0;
+
+    private Integer rating; // 1-5, 후기 태그에만 사용
 }

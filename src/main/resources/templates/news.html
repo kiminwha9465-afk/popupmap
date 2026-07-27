@@ -7,12 +7,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>팝업 소식 - 팝업맵</title>
     <link rel="stylesheet" href="/css/style.css?v=8"/>
+    <style>
+        /* ── 후기 카드 그리드 ─────────────────────── */
+        .review-toolbar { display:flex; align-items:center; justify-content:flex-end; margin-bottom:16px; gap:10px; }
+        .review-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+        @media(max-width:640px){ .review-grid { grid-template-columns:1fr; } }
+
+        .review-card {
+            background:var(--surface); border:1px solid var(--border);
+            border-radius:var(--radius); padding:20px;
+            box-shadow:var(--shadow-sm); cursor:pointer;
+            transition:box-shadow .18s, transform .18s;
+            display:flex; flex-direction:column; gap:12px;
+        }
+        .review-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
+
+        /* 카드 헤더 */
+        .rc-header { display:flex; align-items:center; gap:10px; }
+        .rc-avatar {
+            width:38px; height:38px; border-radius:50%;
+            background:var(--bg); border:1px solid var(--border);
+            display:flex; align-items:center; justify-content:center;
+            font-size:18px; flex-shrink:0;
+        }
+        .rc-meta { flex:1; min-width:0; }
+        .rc-author { font-size:14px; font-weight:700; color:var(--text); }
+        .rc-count { font-size:12px; color:var(--text-sub); margin-left:5px; }
+        .rc-date { font-size:12px; color:var(--text-sub); flex-shrink:0; }
+
+        /* 별점 */
+        .rc-stars { display:flex; align-items:center; gap:3px; }
+        .rc-star { font-size:15px; color:#e0e0e0; line-height:1; }
+        .rc-star.filled { color:#f59e0b; }
+        .rc-rating-text { font-size:13px; font-weight:700; color:#f59e0b; margin-left:4px; }
+
+        /* 썸네일 */
+        .rc-thumb { width:100%; max-height:200px; object-fit:cover; border-radius:10px; }
+
+        /* 인용 텍스트 */
+        .rc-quote { position:relative; padding:8px 12px; }
+        .rc-qq { font-size:36px; line-height:1; color:var(--border); position:absolute; }
+        .rc-qq.open { top:0; left:0; }
+        .rc-qq.close { bottom:-8px; right:4px; }
+        .rc-text {
+            font-size:14px; color:var(--text); line-height:1.65;
+            display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;
+            padding:4px 18px;
+        }
+        .rc-text-plain {
+            font-size:14px; color:var(--text); line-height:1.65;
+            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+        }
+
+        /* 연결 팝업 정보 */
+        .rc-store {
+            display:flex; align-items:center; gap:10px; margin-top:auto;
+            padding:10px 12px; background:var(--bg); border-radius:var(--radius-sm);
+        }
+        .rc-store-img { width:44px; height:44px; object-fit:cover; border-radius:8px; flex-shrink:0; }
+        .rc-store-img-placeholder { width:44px; height:44px; border-radius:8px; background:var(--border); flex-shrink:0; }
+        .rc-store-info { flex:1; min-width:0; }
+        .rc-store-meta { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
+        .rc-store-cat { font-size:11px; color:var(--text-sub); }
+        .rc-store-status { font-size:11px; color:#1a8a4a; font-weight:600; }
+        .rc-store-name { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .rc-store-region { font-size:11px; color:var(--text-sub); margin-top:2px; }
+
+        /* ── 모달 ────────────────────────────────── */
+        .rm-overlay {
+            display:none; position:fixed; inset:0; z-index:1000;
+            background:rgba(0,0,0,.6); align-items:center; justify-content:center;
+            padding:20px;
+            animation-duration:.18s;
+        }
+        .rm-overlay.open { display:flex; }
+        .rm-box {
+            background:var(--surface); border-radius:var(--radius);
+            width:100%; max-width:680px; max-height:88vh; overflow-y:auto;
+            box-shadow:0 24px 60px rgba(0,0,0,.25); position:relative;
+            animation:rmSlideUp .2s ease;
+        }
+        @keyframes rmSlideUp {
+            from { opacity:0; transform:translateY(24px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .rm-head {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:20px 24px 16px; border-bottom:1px solid var(--border);
+            position:sticky; top:0; background:var(--surface); z-index:1;
+        }
+        .rm-head-title { font-size:17px; font-weight:800; }
+        .rm-close {
+            width:32px; height:32px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:20px; color:var(--text-sub); cursor:pointer;
+            background:var(--bg); border:none; transition:all .15s;
+        }
+        .rm-close:hover { background:var(--border); color:var(--text); }
+        .rm-body { padding:24px; display:flex; flex-direction:column; gap:18px; }
+        .rm-user { display:flex; align-items:center; gap:12px; }
+        .rm-avatar {
+            width:46px; height:46px; border-radius:50%;
+            background:var(--bg); border:1.5px solid var(--border);
+            display:flex; align-items:center; justify-content:center;
+            font-size:21px; flex-shrink:0; font-weight:700;
+        }
+        .rm-user-meta { flex:1; }
+        .rm-user-name { font-size:15px; font-weight:700; }
+        .rm-user-count { font-size:12px; color:var(--text-sub); margin-left:6px; }
+        .rm-user-date { font-size:13px; color:var(--text-sub); }
+        .rm-stars { display:flex; align-items:center; gap:4px; }
+        .rm-star { font-size:22px; color:#e0e0e0; line-height:1; }
+        .rm-star.filled { color:#f59e0b; }
+        .rm-rating-text { font-size:14px; font-weight:700; color:#f59e0b; margin-left:6px; }
+        .rm-content {
+            font-size:15px; color:var(--text); line-height:1.85; white-space:pre-wrap;
+            padding:18px 20px; background:var(--bg); border-radius:var(--radius-sm);
+        }
+        .rm-thumb { width:100%; border-radius:var(--radius-sm); object-fit:cover; max-height:360px; }
+        .rm-store {
+            display:flex; align-items:center; gap:12px;
+            padding:14px 16px; background:var(--bg); border-radius:var(--radius-sm);
+            border:1px solid var(--border);
+        }
+        .rm-store-img { width:56px; height:56px; object-fit:cover; border-radius:10px; }
+        .rm-store-img-ph { width:56px; height:56px; border-radius:10px; background:var(--border); }
+        .rm-store-info { flex:1; min-width:0; }
+        .rm-store-meta { font-size:12px; color:var(--text-sub); margin-bottom:4px; }
+        .rm-store-name { font-size:15px; font-weight:700; }
+        .rm-store-region { font-size:12px; color:var(--text-sub); margin-top:3px; }
+        .rm-divider { border:none; border-top:1px solid var(--border); margin:0; }
+        .rm-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+        .rm-helpful-btn {
+            display:flex; align-items:center; gap:8px;
+            padding:10px 22px; border:1.5px solid var(--border); border-radius:24px;
+            font-size:14px; font-weight:600; color:var(--text-sub);
+            background:var(--surface); cursor:pointer; transition:all .15s;
+        }
+        .rm-helpful-btn:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+        .rm-all-btn {
+            margin-left:auto; padding:10px 22px;
+            border:1.5px solid var(--border); border-radius:24px;
+            text-align:center; font-size:14px; font-weight:600; color:var(--text);
+            background:var(--surface); cursor:pointer; transition:all .15s;
+            text-decoration:none; display:none;
+        }
+        .rm-all-btn:hover { background:var(--bg); }
+        .rm-all-btn.visible { display:inline-flex; align-items:center; gap:5px; }
+    </style>
 </head>
 <body>
 
 <header class="header">
 <div class="header-inner">
-    <!-- 1행: 로고 / 인증 -->
     <div class="header-top">
         <a href="/" class="header-brand">
             <span class="brand-icon">📍</span>
@@ -38,7 +185,6 @@
             </div>
         </div>
     </div>
-    <!-- 2행: 네비게이션 (항상 표시, 모바일에서 가로 스크롤) -->
     <div class="header-nav-row">
         <nav class="header-nav">
             <span class="nav-group-label">팝업</span>
@@ -104,48 +250,123 @@
            th:classappend="${t == selectedTag} ? ' active' : ''"></a>
     </div>
 
-    <table class="board-table" th:if="${not #lists.isEmpty(newsList)}">
-        <colgroup>
-            <col style="width:60px"/>
-            <col style="width:80px"/>
-            <col/>
-            <col style="width:110px"/>
-            <col style="width:70px"/>
-        </colgroup>
-        <thead>
-            <tr>
-                <th>번호</th>
-                <th>태그</th>
-                <th>제목</th>
-                <th>날짜</th>
-                <th>조회</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="n, i : ${newsList}" class="board-row"
-                th:onclick="|location.href='@{/news/{id}(id=${n.id})}'|">
-                <td class="board-num" th:text="${newsList.size() - i.index}"></td>
-                <td>
-                    <span class="news-tag" th:text="${n.tag}"
-                          th:classappend="${n.tag == 'NEW'} ? ' new' : ''"></span>
-                </td>
-                <td class="board-title-cell">
-                    <a th:href="@{/news/{id}(id=${n.id}, from=${selectedTag})}" th:text="${n.title}" class="board-title"></a>
-                </td>
-                <td class="board-date" th:text="${#temporals.format(n.publishedAt, 'yyyy.MM.dd')}"></td>
-                <td class="board-views" th:text="${n.viewCount}"></td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- ── 후기 탭: 카드 그리드 뷰 ─────────────────── -->
+    <th:block th:if="${selectedTag == '후기'}">
+        <div class="review-toolbar">
+            <a sec:authorize="isAuthenticated()" href="/news/write?tag=후기" class="btn-primary news-write-btn">후기 작성</a>
+            <button sec:authorize="isAnonymous()" class="btn-primary news-write-btn" id="writeBtn">후기 작성</button>
+        </div>
 
-    <div class="news-list-header">
-        <th:block th:if="${selectedTag == '후기'}">
-            <a sec:authorize="isAuthenticated()"
-               href="/news/write?tag=후기" class="btn-primary news-write-btn">글쓰기</a>
-            <button sec:authorize="isAnonymous()"
-                    class="btn-primary news-write-btn" id="writeBtn">글쓰기</button>
-        </th:block>
-    </div>
+        <div class="review-grid" th:if="${not #lists.isEmpty(newsList)}">
+            <div th:each="n : ${newsList}"
+                 th:with="store=${storeMap != null ? storeMap[n.popupStoreId] : null}"
+                 class="review-card"
+                 th:data-id="${n.id}"
+                 onclick="openReviewModal(this)">
+
+                <!-- 헤더: 아바타 + 이름 + 날짜 -->
+                <div class="rc-header">
+                    <div class="rc-avatar">
+                        <span th:text="${n.author != null and #strings.length(n.author) > 0 ? #strings.substring(n.author,0,1) : '?'}">?</span>
+                    </div>
+                    <div class="rc-meta">
+                        <span class="rc-author" th:text="${n.author ?: '익명'}"></span>
+                        <span class="rc-count"
+                              th:text="'후기 ' + ${reviewCounts != null ? reviewCounts.get(n.authorUsername) : 1}"></span>
+                    </div>
+                    <span class="rc-date" th:text="${n.publishedAt != null ? #temporals.format(n.publishedAt, 'yy.MM.dd') : ''}"></span>
+                </div>
+
+                <!-- 별점 -->
+                <div class="rc-stars" th:if="${n.rating != null}">
+                    <span th:each="i : ${#numbers.sequence(1,5)}"
+                          th:classappend="${i <= n.rating} ? ' filled' : ''"
+                          class="rc-star">★</span>
+                    <span class="rc-rating-text" th:text="${n.rating} + '.0 / 5.0'"></span>
+                </div>
+
+                <!-- 썸네일 있는 경우 -->
+                <img th:if="${n.thumbnailUrl != null}" th:src="${n.thumbnailUrl}"
+                     class="rc-thumb" alt="" onclick="event.stopPropagation()"/>
+
+                <!-- 본문 내용 -->
+                <div th:if="${n.thumbnailUrl == null}" class="rc-quote">
+                    <span class="rc-qq open">"</span>
+                    <p class="rc-text" th:text="${#strings.abbreviate(n.content, 120)}"></p>
+                    <span class="rc-qq close">"</span>
+                </div>
+                <p th:if="${n.thumbnailUrl != null}" class="rc-text-plain"
+                   th:text="${#strings.abbreviate(n.content, 80)}"></p>
+
+                <!-- 연결 팝업 -->
+                <div th:if="${store != null}" class="rc-store">
+                    <img th:if="${store.imageUrl}" th:src="${store.imageUrl}" class="rc-store-img" alt=""
+                         onclick="event.stopPropagation()"/>
+                    <div th:unless="${store.imageUrl}" class="rc-store-img-placeholder"></div>
+                    <div class="rc-store-info">
+                        <div class="rc-store-meta">
+                            <span class="rc-store-cat" th:text="${store.category}"></span>
+                            <span class="rc-store-status">● 진행중</span>
+                        </div>
+                        <div class="rc-store-name" th:text="${store.name}"></div>
+                        <div class="rc-store-region" th:text="${store.region}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(newsList)}" class="news-page-empty">
+            <p>아직 후기가 없습니다. 첫 번째로 후기를 남겨보세요!</p>
+        </div>
+    </th:block>
+
+    <!-- ── 일반 탭: 게시판 테이블 뷰 ────────────────── -->
+    <th:block th:unless="${selectedTag == '후기'}">
+        <table class="board-table" th:if="${not #lists.isEmpty(newsList)}">
+            <colgroup>
+                <col style="width:60px"/>
+                <col style="width:80px"/>
+                <col/>
+                <col style="width:110px"/>
+                <col style="width:70px"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>태그</th>
+                    <th>제목</th>
+                    <th>날짜</th>
+                    <th>조회</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="n, i : ${newsList}" class="board-row"
+                    th:onclick="|location.href='@{/news/{id}(id=${n.id})}'|">
+                    <td class="board-num" th:text="${newsList.size() - i.index}"></td>
+                    <td>
+                        <span class="news-tag" th:text="${n.tag}"
+                              th:classappend="${n.tag == 'NEW'} ? ' new' : ''"></span>
+                    </td>
+                    <td class="board-title-cell">
+                        <a th:href="@{/news/{id}(id=${n.id}, from=${selectedTag})}" th:text="${n.title}" class="board-title"></a>
+                    </td>
+                    <td class="board-date" th:text="${n.publishedAt != null ? #temporals.format(n.publishedAt, 'yyyy.MM.dd') : ''}"></td>
+                    <td class="board-views" th:text="${n.viewCount}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="news-list-header">
+            <th:block th:if="${selectedTag == '후기'}">
+                <a sec:authorize="isAuthenticated()" href="/news/write?tag=후기" class="btn-primary news-write-btn">글쓰기</a>
+                <button sec:authorize="isAnonymous()" class="btn-primary news-write-btn" id="writeBtn2">글쓰기</button>
+            </th:block>
+        </div>
+
+        <div th:if="${#lists.isEmpty(newsList)}" class="news-page-empty">
+            <p>등록된 소식이 없습니다.</p>
+        </div>
+    </th:block>
 
     <!-- 로그인 필요 토스트 -->
     <div id="loginToast" class="login-toast" hidden>
@@ -155,9 +376,66 @@
         </svg>
         로그인이 필요합니다. 로그인 화면으로 이동합니다...
     </div>
+</div>
 
-    <div th:if="${#lists.isEmpty(newsList)}" class="news-page-empty">
-        <p>등록된 소식이 없습니다.</p>
+<!-- ── 후기 상세 모달 ─────────────────────────────── -->
+<div class="rm-overlay" id="reviewModal" onclick="closeReviewModal(event)">
+    <div class="rm-box">
+        <div class="rm-head">
+            <span class="rm-head-title">후기</span>
+            <button class="rm-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="rm-body">
+            <!-- 유저 정보 + 날짜 -->
+            <div class="rm-user">
+                <div class="rm-avatar" id="rmAvatar">?</div>
+                <div class="rm-user-meta">
+                    <div>
+                        <span class="rm-user-name" id="rmAuthor"></span>
+                        <span class="rm-user-count" id="rmCount"></span>
+                    </div>
+                    <!-- 별점 -->
+                    <div class="rm-stars" id="rmStarsRow" style="margin-top:4px;"></div>
+                </div>
+                <span class="rm-user-date" id="rmDate"></span>
+            </div>
+            <!-- 썸네일 -->
+            <img id="rmThumb" class="rm-thumb" alt="" style="display:none"/>
+            <!-- 본문 -->
+            <p class="rm-content" id="rmContent"></p>
+            <!-- 연결 팝업 -->
+            <div id="rmStore" class="rm-store" style="display:none">
+                <img id="rmStoreImg" class="rm-store-img" alt="" style="display:none"/>
+                <div id="rmStoreImgPh" class="rm-store-img-ph" style="display:none"></div>
+                <div class="rm-store-info">
+                    <div class="rm-store-meta" id="rmStoreCat"></div>
+                    <div class="rm-store-name" id="rmStoreName"></div>
+                    <div class="rm-store-region" id="rmStoreRegion"></div>
+                </div>
+            </div>
+            <hr class="rm-divider"/>
+            <!-- 액션 -->
+            <div class="rm-actions">
+                <form id="rmLikeForm" method="post" style="display:contents;">
+                    <input type="hidden" id="rmCsrfInput" name="_csrf" th:value="${_csrf.token}"/>
+                    <button type="submit" class="rm-helpful-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+                            <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                        </svg>
+                        도움이 되었어요 <span id="rmLikeCount"></span>
+                    </button>
+                </form>
+                <a id="rmAllBtn" href="#" class="rm-all-btn">
+                    이 팝업 후기 전체보기
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -169,18 +447,118 @@
 </footer>
 
 <script src="/js/nav.js"></script>
-<script>
+<script th:inline="javascript">
+// 후기 데이터 (LocalDate 등 직렬화 안전한 DTO로 변환하여 전달)
+var _reviews  = /*[[${reviewsJson}]]*/ [];
+var _storeMap = /*[[${storesJson}]]*/ {};
+var _likeCounts = /*[[${likeCountMap}]]*/ {};
+var _reviewCounts = /*[[${reviewCounts}]]*/ {};
+
 (function () {
-    var btn = document.getElementById('writeBtn');
-    if (!btn) return;
-    btn.addEventListener('click', function () {
-        var toast = document.getElementById('loginToast');
-        toast.hidden = false;
-        setTimeout(function () {
-            location.href = '/login';
-        }, 1500);
+    // 로그인 안내 토스트
+    ['writeBtn', 'writeBtn2'].forEach(function(id) {
+        var btn = document.getElementById(id);
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            var toast = document.getElementById('loginToast');
+            toast.hidden = false;
+            setTimeout(function () { location.href = '/login'; }, 1500);
+        });
     });
 })();
+
+function openReviewModal(card) {
+    var id = parseInt(card.dataset.id);
+    var review = (_reviews || []).find(function(r) { return r.id === id; });
+    if (!review) return;
+
+    var store = review.popupStoreId ? (_storeMap || {})[review.popupStoreId] : null;
+    var likeCount = (_likeCounts || {})[id] || 0;
+    var reviewCount = review.authorUsername ? ((_reviewCounts || {})[review.authorUsername] || 1) : 1;
+
+    var author = review.author || '익명';
+    var date = review.publishedAt ? String(review.publishedAt).replace(/(\d{4})-(\d{2})-(\d{2}).*/, '$1.$2.$3') : '';
+
+    // 아바타 & 유저 정보
+    document.getElementById('rmAvatar').textContent = author.charAt(0);
+    document.getElementById('rmAuthor').textContent = author;
+    document.getElementById('rmCount').textContent = '후기 ' + reviewCount;
+    document.getElementById('rmDate').textContent = date;
+
+    // 별점
+    var rating = review.rating || 0;
+    var starsRow = document.getElementById('rmStarsRow');
+    starsRow.innerHTML = '';
+    if (rating > 0) {
+        for (var i = 1; i <= 5; i++) {
+            var s = document.createElement('span');
+            s.className = 'rm-star' + (i <= rating ? ' filled' : '');
+            s.textContent = '★';
+            starsRow.appendChild(s);
+        }
+        var txt = document.createElement('span');
+        txt.className = 'rm-rating-text';
+        txt.textContent = rating + '.0 / 5.0';
+        starsRow.appendChild(txt);
+    }
+
+    // 썸네일
+    var thumb = document.getElementById('rmThumb');
+    if (review.thumbnailUrl) {
+        thumb.src = review.thumbnailUrl;
+        thumb.style.display = 'block';
+    } else {
+        thumb.style.display = 'none';
+    }
+
+    // 본문 (줄바꿈 보존)
+    document.getElementById('rmContent').textContent = review.content || '';
+
+    // 연결 팝업
+    var storeBox = document.getElementById('rmStore');
+    var allBtn   = document.getElementById('rmAllBtn');
+    if (store) {
+        storeBox.style.display = 'flex';
+        var storeImg   = document.getElementById('rmStoreImg');
+        var storeImgPh = document.getElementById('rmStoreImgPh');
+        if (store.imageUrl) {
+            storeImg.src = store.imageUrl;
+            storeImg.style.display = 'block';
+            storeImgPh.style.display = 'none';
+        } else {
+            storeImg.style.display = 'none';
+            storeImgPh.style.display = 'block';
+        }
+        document.getElementById('rmStoreCat').textContent = (store.category || '') + ' ● 진행중';
+        document.getElementById('rmStoreName').textContent = store.name || '';
+        document.getElementById('rmStoreRegion').textContent = store.region || '';
+        allBtn.href = '/store/' + store.id;
+        allBtn.classList.add('visible');
+    } else {
+        storeBox.style.display = 'none';
+        allBtn.classList.remove('visible');
+    }
+
+    // 도움이 되었어요
+    document.getElementById('rmLikeForm').action = '/news/' + id + '/like';
+    document.getElementById('rmLikeCount').textContent = likeCount > 0 ? '(' + likeCount + ')' : '';
+
+    document.getElementById('reviewModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('reviewModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function closeReviewModal(e) {
+    if (e.target === document.getElementById('reviewModal')) closeModal();
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+});
 </script>
 </body>
 </html>

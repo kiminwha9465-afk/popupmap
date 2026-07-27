@@ -8,6 +8,15 @@
     <title>소식 작성 - 팝업맵</title>
     <link rel="stylesheet" href="/css/style.css?v=8"/>
     <style>
+        /* ── 별점 입력 ── */
+        .star-rating { display:flex; flex-direction:row-reverse; gap:4px; width:fit-content; }
+        .star-rating input { display:none; }
+        .star-rating label { font-size:34px; color:#ddd; cursor:pointer; transition:color .1s; line-height:1; }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label { color:#f59e0b; }
+        .star-hint { font-size:12px; color:var(--text-sub); margin-top:6px; }
+
         .store-autocomplete { position: relative; }
         .store-ac-dropdown {
             position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
@@ -90,7 +99,7 @@
     <div class="news-write-inner">
         <h1 class="news-write-title">소식 작성</h1>
 
-        <form th:action="@{/news/write}" method="post" enctype="multipart/form-data" class="news-write-form">
+        <form th:action="@{/news/write}" method="post" enctype="multipart/form-data" class="news-write-form" id="writeForm">
 
             <div class="form-group">
                 <label class="form-label">태그</label>
@@ -102,11 +111,29 @@
                 </select>
             </div>
 
+            <!-- 별점 (후기 태그일 때만 표시) -->
+            <div class="form-group" id="rating-group" style="display:none;">
+                <label class="form-label">별점</label>
+                <div class="star-rating">
+                    <input type="radio" name="rating" id="s5" value="5">
+                    <label for="s5">★</label>
+                    <input type="radio" name="rating" id="s4" value="4">
+                    <label for="s4">★</label>
+                    <input type="radio" name="rating" id="s3" value="3">
+                    <label for="s3">★</label>
+                    <input type="radio" name="rating" id="s2" value="2">
+                    <label for="s2">★</label>
+                    <input type="radio" name="rating" id="s1" value="1">
+                    <label for="s1">★</label>
+                </div>
+                <p class="star-hint">별을 클릭해서 점수를 선택하세요 (1~5점)</p>
+            </div>
+
             <div class="form-group" id="store-picker-group">
-                <label class="form-label">관련 팝업 <span class="form-label-sub">(선택)</span></label>
+                <label class="form-label">관련 팝업 <span class="form-label-sub" style="color:var(--primary);">*필수</span></label>
                 <div class="store-autocomplete">
                     <input type="text" id="store-search" class="form-input"
-                           placeholder="팝업 이름으로 검색..." autocomplete="off"/>
+                           placeholder="후기를 남길 팝업을 검색하세요..." autocomplete="off"/>
                     <div id="store-ac-dropdown" class="store-ac-dropdown"></div>
                     <input type="hidden" name="popupStoreId" id="store-id-input"/>
                     <div id="store-ac-chip" class="store-ac-chip">
@@ -157,6 +184,7 @@
     const STORES = /*[[${stores}]]*/ [];
 
     const tagSelect    = document.querySelector('select[name="tag"]');
+    const ratingGroup  = document.getElementById('rating-group');
     const pickerGroup  = document.getElementById('store-picker-group');
     const searchInput  = document.getElementById('store-search');
     const dropdown     = document.getElementById('store-ac-dropdown');
@@ -168,8 +196,10 @@
     let activeIdx = -1;
 
     function syncPicker() {
-        pickerGroup.style.display = tagSelect.value === '후기' ? 'block' : 'none';
-        if (tagSelect.value !== '후기') clearSelection();
+        var isReview = tagSelect.value === '후기';
+        ratingGroup.style.display  = isReview ? 'block' : 'none';
+        pickerGroup.style.display  = isReview ? 'block' : 'none';
+        if (!isReview) clearSelection();
     }
 
     function clearSelection() {
@@ -267,6 +297,20 @@
     if (PRE) {
         selectStore(PRE.id, PRE.name);
     }
+
+    // 후기 작성 시 팝업 선택 필수 검사
+    document.getElementById('writeForm').addEventListener('submit', function (e) {
+        if (tagSelect.value === '후기' && !idInput.value) {
+            e.preventDefault();
+            searchInput.focus();
+            searchInput.style.borderColor = 'var(--primary)';
+            searchInput.placeholder = '관련 팝업을 선택해주세요 (필수)';
+            setTimeout(function () {
+                searchInput.style.borderColor = '';
+                searchInput.placeholder = '후기를 남길 팝업을 검색하세요...';
+            }, 2500);
+        }
+    });
 })();
 </script>
 </body>

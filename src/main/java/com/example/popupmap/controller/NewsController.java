@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,8 +33,62 @@ public class NewsController {
 
     @GetMapping("/news")
     public String list(@RequestParam(required = false) String tag, Model model) {
-        model.addAttribute("newsList", newsService.getAll(tag));
+        List<PopupNews> newsList = newsService.getAll(tag);
+        model.addAttribute("newsList", newsList);
         model.addAttribute("selectedTag", tag);
+
+        if ("후기".equals(tag)) {
+            Map<Long, PopupStore> storeMap = newsList.stream()
+                    .filter(n -> n.getPopupStoreId() != null)
+                    .map(n -> storeService.getById(n.getPopupStoreId()))
+                    .filter(java.util.Optional::isPresent)
+                    .map(java.util.Optional::get)
+                    .collect(Collectors.toMap(PopupStore::getId, s -> s, (a, b) -> a));
+            model.addAttribute("storeMap", storeMap);
+
+            Map<String, Long> reviewCounts = newsList.stream()
+                    .filter(n -> n.getAuthorUsername() != null)
+                    .collect(Collectors.groupingBy(PopupNews::getAuthorUsername, Collectors.counting()));
+            model.addAttribute("reviewCounts", reviewCounts);
+
+            Map<Long, Long> likeCountMap = newsList.stream()
+                    .collect(Collectors.toMap(PopupNews::getId, n -> newsService.getLikeCount(n.getId())));
+            model.addAttribute("likeCountMap", likeCountMap);
+
+            // JS 인라인용 DTO (LocalDate 포함 엔티티 직렬화 오류 방지)
+            List<java.util.Map<String, Object>> reviewsJson = newsList.stream().map(n -> {
+                java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
+                m.put("id", n.getId());
+                m.put("author", n.getAuthor());
+                m.put("authorUsername", n.getAuthorUsername());
+                m.put("rating", n.getRating());
+                m.put("content", n.getContent());
+                m.put("thumbnailUrl", n.getThumbnailUrl());
+                m.put("popupStoreId", n.getPopupStoreId());
+                m.put("publishedAt", n.getPublishedAt() != null ? n.getPublishedAt().toString() : null);
+                return m;
+            }).collect(Collectors.toList());
+            model.addAttribute("reviewsJson", reviewsJson);
+
+            java.util.Map<Long, java.util.Map<String, Object>> storesJson = new java.util.LinkedHashMap<>();
+            storeMap.forEach((id, s) -> {
+                java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
+                m.put("id", s.getId());
+                m.put("name", s.getName());
+                m.put("imageUrl", s.getImageUrl());
+                m.put("category", s.getCategory());
+                m.put("region", s.getRegion());
+                storesJson.put(id, m);
+            });
+            model.addAttribute("storesJson", storesJson);
+        } else {
+            model.addAttribute("storeMap", java.util.Collections.emptyMap());
+            model.addAttribute("reviewCounts", java.util.Collections.emptyMap());
+            model.addAttribute("likeCountMap", java.util.Collections.emptyMap());
+            model.addAttribute("reviewsJson", java.util.Collections.emptyList());
+            model.addAttribute("storesJson", java.util.Collections.emptyMap());
+        }
+
         return "news";
     }
 
@@ -78,6 +135,7 @@ public class NewsController {
                         @RequestParam String content,
                         @RequestParam(required = false) MultipartFile thumbnailFile,
                         @RequestParam(required = false) Long popupStoreId,
+                        @RequestParam(required = false) Integer rating,
                         Principal principal) throws IOException {
         String thumbnailUrl = null;
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
@@ -105,6 +163,7 @@ public class NewsController {
                 .author(nickname)
                 .authorUsername(username)
                 .popupStoreId(resolvedStoreId)
+                .rating("후기".equals(tag) ? rating : null)
                 .publishedAt(LocalDate.now())
                 .build());
         return "redirect:/news";
