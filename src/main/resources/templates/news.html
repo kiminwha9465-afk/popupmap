@@ -262,6 +262,17 @@
                  th:with="store=${storeMap != null ? storeMap[n.popupStoreId] : null}"
                  class="review-card"
                  th:data-id="${n.id}"
+                 th:data-author="${n.author}"
+                 th:data-author-username="${n.authorUsername}"
+                 th:data-rating="${n.rating}"
+                 th:data-content="${n.content}"
+                 th:data-thumbnail="${n.thumbnailUrl}"
+                 th:data-published="${n.publishedAt}"
+                 th:data-store-id="${store != null ? store.id : ''}"
+                 th:data-store-name="${store != null ? store.name : ''}"
+                 th:data-store-img="${store != null ? store.imageUrl : ''}"
+                 th:data-store-cat="${store != null ? store.category : ''}"
+                 th:data-store-region="${store != null ? store.region : ''}"
                  onclick="openReviewModal(this)">
 
                 <!-- 헤더: 아바타 + 이름 + 날짜 -->
@@ -448,14 +459,11 @@
 
 <script src="/js/nav.js"></script>
 <script th:inline="javascript">
-// 후기 데이터 (LocalDate 등 직렬화 안전한 DTO로 변환하여 전달)
-var _reviews  = /*[[${reviewsJson}]]*/ [];
-var _storeMap = /*[[${storesJson}]]*/ {};
-var _likeCounts = /*[[${likeCountMap}]]*/ {};
+// 좋아요 수, 후기 수만 인라인 JS (단순 Map이라 직렬화 안전)
+var _likeCounts   = /*[[${likeCountMap}]]*/ {};
 var _reviewCounts = /*[[${reviewCounts}]]*/ {};
 
 (function () {
-    // 로그인 안내 토스트
     ['writeBtn', 'writeBtn2'].forEach(function(id) {
         var btn = document.getElementById(id);
         if (!btn) return;
@@ -468,25 +476,33 @@ var _reviewCounts = /*[[${reviewCounts}]]*/ {};
 })();
 
 function openReviewModal(card) {
-    var id = parseInt(card.dataset.id);
-    var review = (_reviews || []).find(function(r) { return r.id === id; });
-    if (!review) return;
+    var d = card.dataset;
+    var id       = d.id;
+    var author   = d.author || '익명';
+    var username = d.authorUsername || '';
+    var rating   = parseInt(d.rating) || 0;
+    var content  = d.content || '';
+    var thumb    = d.thumbnail || '';
+    var pub      = d.published || '';
+    var date     = pub ? pub.replace(/(\d{4})-(\d{2})-(\d{2}).*/, '$1.$2.$3') : '';
 
-    var store = review.popupStoreId ? (_storeMap || {})[review.popupStoreId] : null;
-    var likeCount = (_likeCounts || {})[id] || 0;
-    var reviewCount = review.authorUsername ? ((_reviewCounts || {})[review.authorUsername] || 1) : 1;
+    var storeId     = d.storeId || '';
+    var storeName   = d.storeName || '';
+    var storeImg    = d.storeImg || '';
+    var storeCat    = d.storeCat || '';
+    var storeRegion = d.storeRegion || '';
 
-    var author = review.author || '익명';
-    var date = review.publishedAt ? String(review.publishedAt).replace(/(\d{4})-(\d{2})-(\d{2}).*/, '$1.$2.$3') : '';
+    // 좋아요/후기 수는 인라인 JS에서
+    var likeCount   = (_likeCounts[id] || _likeCounts[parseInt(id)] || 0);
+    var reviewCount = username ? (_reviewCounts[username] || 1) : 1;
 
-    // 아바타 & 유저 정보
-    document.getElementById('rmAvatar').textContent = author.charAt(0);
-    document.getElementById('rmAuthor').textContent = author;
-    document.getElementById('rmCount').textContent = '후기 ' + reviewCount;
-    document.getElementById('rmDate').textContent = date;
+    // 아바타 & 유저
+    document.getElementById('rmAvatar').textContent  = author.charAt(0);
+    document.getElementById('rmAuthor').textContent  = author;
+    document.getElementById('rmCount').textContent   = '후기 ' + reviewCount;
+    document.getElementById('rmDate').textContent    = date;
 
     // 별점
-    var rating = review.rating || 0;
     var starsRow = document.getElementById('rmStarsRow');
     starsRow.innerHTML = '';
     if (rating > 0) {
@@ -503,36 +519,36 @@ function openReviewModal(card) {
     }
 
     // 썸네일
-    var thumb = document.getElementById('rmThumb');
-    if (review.thumbnailUrl) {
-        thumb.src = review.thumbnailUrl;
-        thumb.style.display = 'block';
+    var thumbEl = document.getElementById('rmThumb');
+    if (thumb && thumb !== 'null') {
+        thumbEl.src = thumb;
+        thumbEl.style.display = 'block';
     } else {
-        thumb.style.display = 'none';
+        thumbEl.style.display = 'none';
     }
 
-    // 본문 (줄바꿈 보존)
-    document.getElementById('rmContent').textContent = review.content || '';
+    // 본문
+    document.getElementById('rmContent').textContent = content;
 
     // 연결 팝업
     var storeBox = document.getElementById('rmStore');
     var allBtn   = document.getElementById('rmAllBtn');
-    if (store) {
+    if (storeId && storeId !== 'null' && storeId !== '') {
         storeBox.style.display = 'flex';
-        var storeImg   = document.getElementById('rmStoreImg');
+        var storeImgEl = document.getElementById('rmStoreImg');
         var storeImgPh = document.getElementById('rmStoreImgPh');
-        if (store.imageUrl) {
-            storeImg.src = store.imageUrl;
-            storeImg.style.display = 'block';
+        if (storeImg && storeImg !== 'null' && storeImg !== '') {
+            storeImgEl.src = storeImg;
+            storeImgEl.style.display = 'block';
             storeImgPh.style.display = 'none';
         } else {
-            storeImg.style.display = 'none';
+            storeImgEl.style.display = 'none';
             storeImgPh.style.display = 'block';
         }
-        document.getElementById('rmStoreCat').textContent = (store.category || '') + ' ● 진행중';
-        document.getElementById('rmStoreName').textContent = store.name || '';
-        document.getElementById('rmStoreRegion').textContent = store.region || '';
-        allBtn.href = '/store/' + store.id;
+        document.getElementById('rmStoreCat').textContent    = (storeCat || '') + ' ● 진행중';
+        document.getElementById('rmStoreName').textContent   = storeName;
+        document.getElementById('rmStoreRegion').textContent = storeRegion;
+        allBtn.href = '/store/' + storeId;
         allBtn.classList.add('visible');
     } else {
         storeBox.style.display = 'none';
