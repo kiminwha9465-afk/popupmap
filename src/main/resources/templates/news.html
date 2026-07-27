@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>팝업 소식 - 팝업맵</title>
     <link rel="stylesheet" href="/css/style.css?v=8"/>
     <style>
@@ -259,7 +261,7 @@
 
         <div class="review-grid" th:if="${not #lists.isEmpty(newsList)}">
             <div th:each="n : ${newsList}"
-                 th:with="store=${storeMap != null ? storeMap[n.popupStoreId] : null}"
+                 th:with="store=${storeMap != null and n.popupStoreId != null ? storeMap[n.popupStoreId] : null}"
                  class="review-card"
                  th:data-id="${n.id}"
                  th:data-author="${n.author}"
@@ -429,17 +431,14 @@
             <hr class="rm-divider"/>
             <!-- 액션 -->
             <div class="rm-actions">
-                <form id="rmLikeForm" method="post" style="display:contents;">
-                    <input type="hidden" id="rmCsrfInput" name="_csrf" th:value="${_csrf.token}"/>
-                    <button type="submit" class="rm-helpful-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
-                            <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
-                        </svg>
-                        도움이 되었어요 <span id="rmLikeCount"></span>
-                    </button>
-                </form>
+                <button type="button" class="rm-helpful-btn" id="rmLikeBtn" onclick="submitLike()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+                        <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                    </svg>
+                    도움이 되었어요 <span id="rmLikeCount"></span>
+                </button>
                 <a id="rmAllBtn" href="#" class="rm-all-btn">
                     이 팝업 후기 전체보기
                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
@@ -544,11 +543,28 @@ function openReviewModal(card) {
         allBtn.classList.remove('visible');
     }
 
-    document.getElementById('rmLikeForm').action = '/news/' + id + '/like';
+    currentReviewId = id;
     document.getElementById('rmLikeCount').textContent = likeCount > 0 ? '(' + likeCount + ')' : '';
 
     document.getElementById('reviewModal').classList.add('open');
     document.body.style.overflow = 'hidden';
+}
+
+var currentReviewId = null;
+
+function submitLike() {
+    if (!currentReviewId) return;
+    var csrfMeta = document.querySelector('meta[name="_csrf"]');
+    var csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+    if (!csrfMeta || !csrfHeaderMeta || !csrfMeta.content) {
+        window.location.href = '/news/' + currentReviewId;
+        return;
+    }
+    var headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+    headers[csrfHeaderMeta.content] = csrfMeta.content;
+    fetch('/news/' + currentReviewId + '/like', { method: 'POST', headers: headers })
+        .then(function() { window.location.href = '/news/' + currentReviewId; })
+        .catch(function() { window.location.href = '/news/' + currentReviewId; });
 }
 
 function closeModal() {
