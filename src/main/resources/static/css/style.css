@@ -68,7 +68,7 @@ button { cursor: pointer; border: none; background: none; }
     flex-shrink: 0; padding-right: 28px;
     border-right: 1px solid var(--border);
 }
-.brand-icon { font-size: 20px; }
+.brand-icon { width: 22px; height: 22px; display: inline-block; vertical-align: middle; }
 .brand-text { font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
 
 /* 헤더 2행: 네비게이션 */
