@@ -268,6 +268,8 @@
                  th:data-content="${n.content}"
                  th:data-thumbnail="${n.thumbnailUrl}"
                  th:data-published="${n.publishedAt}"
+                 th:data-like-count="${likeCountMap != null ? (likeCountMap[n.id] ?: 0) : 0}"
+                 th:data-review-count="${reviewCounts != null and n.authorUsername != null ? (reviewCounts[n.authorUsername] ?: 1) : 1}"
                  th:data-store-id="${store != null ? store.id : ''}"
                  th:data-store-name="${store != null ? store.name : ''}"
                  th:data-store-img="${store != null ? store.imageUrl : ''}"
@@ -458,14 +460,10 @@
 </footer>
 
 <script src="/js/nav.js"></script>
-<script th:inline="javascript">
-// 좋아요 수, 후기 수만 인라인 JS (단순 Map이라 직렬화 안전)
-var _likeCounts   = /*[[${likeCountMap}]]*/ {};
-var _reviewCounts = /*[[${reviewCounts}]]*/ {};
-
+<script>
 (function () {
-    ['writeBtn', 'writeBtn2'].forEach(function(id) {
-        var btn = document.getElementById(id);
+    ['writeBtn', 'writeBtn2'].forEach(function(btnId) {
+        var btn = document.getElementById(btnId);
         if (!btn) return;
         btn.addEventListener('click', function () {
             var toast = document.getElementById('loginToast');
@@ -476,33 +474,27 @@ var _reviewCounts = /*[[${reviewCounts}]]*/ {};
 })();
 
 function openReviewModal(card) {
-    var d = card.dataset;
-    var id       = d.id;
-    var author   = d.author || '익명';
-    var username = d.authorUsername || '';
-    var rating   = parseInt(d.rating) || 0;
-    var content  = d.content || '';
-    var thumb    = d.thumbnail || '';
-    var pub      = d.published || '';
-    var date     = pub ? pub.replace(/(\d{4})-(\d{2})-(\d{2}).*/, '$1.$2.$3') : '';
-
+    var d           = card.dataset;
+    var id          = d.id || '';
+    var author      = d.author || '익명';
+    var rating      = parseInt(d.rating) || 0;
+    var content     = d.content || '';
+    var thumb       = d.thumbnail || '';
+    var pub         = d.published || '';
+    var likeCount   = parseInt(d.likeCount) || 0;
+    var reviewCount = parseInt(d.reviewCount) || 1;
     var storeId     = d.storeId || '';
     var storeName   = d.storeName || '';
     var storeImg    = d.storeImg || '';
     var storeCat    = d.storeCat || '';
     var storeRegion = d.storeRegion || '';
+    var date = pub ? pub.replace(/(\d{4})-(\d{2})-(\d{2}).*/, '$1.$2.$3') : '';
 
-    // 좋아요/후기 수는 인라인 JS에서
-    var likeCount   = (_likeCounts[id] || _likeCounts[parseInt(id)] || 0);
-    var reviewCount = username ? (_reviewCounts[username] || 1) : 1;
-
-    // 아바타 & 유저
     document.getElementById('rmAvatar').textContent  = author.charAt(0);
     document.getElementById('rmAuthor').textContent  = author;
     document.getElementById('rmCount').textContent   = '후기 ' + reviewCount;
     document.getElementById('rmDate').textContent    = date;
 
-    // 별점
     var starsRow = document.getElementById('rmStarsRow');
     starsRow.innerHTML = '';
     if (rating > 0) {
@@ -512,32 +504,29 @@ function openReviewModal(card) {
             s.textContent = '★';
             starsRow.appendChild(s);
         }
-        var txt = document.createElement('span');
-        txt.className = 'rm-rating-text';
-        txt.textContent = rating + '.0 / 5.0';
-        starsRow.appendChild(txt);
+        var ratingTxt = document.createElement('span');
+        ratingTxt.className = 'rm-rating-text';
+        ratingTxt.textContent = rating + '.0 / 5.0';
+        starsRow.appendChild(ratingTxt);
     }
 
-    // 썸네일
     var thumbEl = document.getElementById('rmThumb');
-    if (thumb && thumb !== 'null') {
+    if (thumb) {
         thumbEl.src = thumb;
         thumbEl.style.display = 'block';
     } else {
         thumbEl.style.display = 'none';
     }
 
-    // 본문
     document.getElementById('rmContent').textContent = content;
 
-    // 연결 팝업
     var storeBox = document.getElementById('rmStore');
     var allBtn   = document.getElementById('rmAllBtn');
-    if (storeId && storeId !== 'null' && storeId !== '') {
+    if (storeId) {
         storeBox.style.display = 'flex';
         var storeImgEl = document.getElementById('rmStoreImg');
         var storeImgPh = document.getElementById('rmStoreImgPh');
-        if (storeImg && storeImg !== 'null' && storeImg !== '') {
+        if (storeImg) {
             storeImgEl.src = storeImg;
             storeImgEl.style.display = 'block';
             storeImgPh.style.display = 'none';
@@ -555,7 +544,6 @@ function openReviewModal(card) {
         allBtn.classList.remove('visible');
     }
 
-    // 도움이 되었어요
     document.getElementById('rmLikeForm').action = '/news/' + id + '/like';
     document.getElementById('rmLikeCount').textContent = likeCount > 0 ? '(' + likeCount + ')' : '';
 
