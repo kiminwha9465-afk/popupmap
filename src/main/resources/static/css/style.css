@@ -785,7 +785,7 @@ button { cursor: pointer; border: none; background: none; }
     max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
     display: flex; align-items: center; gap: 16px;
 }
-.footer-logo { font-size: 16px; font-weight: 700; color: var(--primary); }
+.footer-logo { font-size: 16px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 5px; }
 .footer-copy { font-size: 13px; color: var(--text-sub); }
 
 /* ── Detail Page ──────────────────────────────────── */
