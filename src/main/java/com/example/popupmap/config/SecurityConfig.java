@@ -52,6 +52,7 @@ public class SecurityConfig {
                                  "/news", "/news/**",
                                  "/login", "/signup",
                                  "/css/**", "/js/**", "/images/**", "/uploads/**",
+                                 "/favicon.svg", "/favicon.ico",
                                  "/api/**", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
             )
