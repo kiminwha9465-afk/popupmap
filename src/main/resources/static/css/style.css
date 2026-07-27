@@ -118,6 +118,8 @@ button { cursor: pointer; border: none; background: none; }
 }
 .nav-dropdown-item:hover { background: var(--primary-light); color: var(--primary); }
 .nav-dropdown-item.active { color: var(--primary); font-weight: 700; background: var(--primary-light); }
+.nav-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+.nav-dropdown-label { display: block; padding: 4px 12px 2px; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.04em; }
 .nav-link, .cat-link {
     padding: 6px 12px; border-radius: 18px;
     font-size: 13px; font-weight: 500; color: var(--text-sub);
