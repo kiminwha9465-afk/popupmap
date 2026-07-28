@@ -49,6 +49,7 @@ window.PopupMap = (() => {
                 map: map,
                 icon: _markerIcon(upcoming)
             });
+            marker._store = store;
 
             const sd  = (store.startDate || '').replace(/-/g, '.');
             const ed  = (store.endDate   || '').replace(/-/g, '.');
@@ -93,7 +94,6 @@ window.PopupMap = (() => {
                 maxZoom: 13,
                 map: map,
                 markers: _markers,
-                disableClickZoom: false,
                 gridSize: 120,
                 icons: [{
                     content: '<div style="cursor:pointer;width:38px;height:38px;line-height:38px;font-size:13px;color:white;text-align:center;font-weight:700;background:#FF4B4B;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(255,75,75,.45);">COUNT</div>',
@@ -102,6 +102,10 @@ window.PopupMap = (() => {
                 }],
                 stylingFunction: (clusterMarker, count) => {
                     clusterMarker.getElement().querySelector('div').textContent = count;
+                },
+                onClusterClick: (markers) => {
+                    const stores = markers.map(m => m._store).filter(Boolean);
+                    _showClusterList(stores);
                 }
             });
         }
@@ -116,7 +120,55 @@ window.PopupMap = (() => {
 
     naver.maps.Event.addListener(map, 'click', () => {
         if (_activeIW) { _activeIW.close(); _activeIW = null; }
+        _hideClusterList();
     });
+
+    function _showClusterList(stores) {
+        const panel = document.getElementById('clusterPanel');
+        const list  = document.getElementById('clusterList');
+        const count = document.getElementById('clusterCount');
+        if (!panel || !list) return;
+
+        const today = new Date(); today.setHours(0,0,0,0);
+        count.textContent = stores.length;
+        list.innerHTML = '';
+
+        stores.forEach(store => {
+            const start = store.startDate ? new Date(store.startDate) : null;
+            const upcoming = start && start > today;
+            const sd = (store.startDate || '').replace(/-/g,'.');
+            const ed = (store.endDate   || '').replace(/-/g,'.');
+            const badgeColor = upcoming ? '#D97706' : '#16A34A';
+            const badgeBg    = upcoming ? '#FEF3C7' : '#DCFCE7';
+            const badgeTxt   = upcoming ? '예정' : '진행중';
+
+            const li = document.createElement('li');
+            li.className = 'cl-item';
+            li.innerHTML = `
+                <a href="/store/${store.id}" class="cl-link">
+                    <div class="cl-img-wrap">
+                        ${store.imageUrl
+                            ? `<img src="${store.imageUrl}" class="cl-img" onerror="this.style.display='none'"/>`
+                            : '<div class="cl-img-ph"></div>'}
+                    </div>
+                    <div class="cl-info">
+                        <span class="cl-badge" style="background:${badgeBg};color:${badgeColor};">${badgeTxt}</span>
+                        <div class="cl-name">${store.name}</div>
+                        <div class="cl-date">${sd} ~ ${ed}</div>
+                    </div>
+                </a>`;
+            list.appendChild(li);
+        });
+
+        panel.style.display = 'flex';
+    }
+
+    function _hideClusterList() {
+        const panel = document.getElementById('clusterPanel');
+        if (panel) panel.style.display = 'none';
+    }
+
+    window._hideClusterList = _hideClusterList;
 
     function setStores(list) { _addMarkers(list); }
     _addMarkers(window.storesData || []);

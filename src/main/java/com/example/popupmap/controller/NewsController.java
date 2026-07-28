@@ -6,6 +6,7 @@ import com.example.popupmap.service.PopupNewsService;
 import com.example.popupmap.service.PopupStoreService;
 import com.example.popupmap.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -103,6 +104,7 @@ public class NewsController {
         boolean isAuthor = username != null
                 && username.equals(news.getAuthorUsername());
         model.addAttribute("isAuthor", isAuthor);
+        model.addAttribute("isLoggedIn", username != null);
         model.addAttribute("likeCount", newsService.getLikeCount(id));
         model.addAttribute("liked", username != null && newsService.isLikedBy(id, username));
 
@@ -176,6 +178,22 @@ public class NewsController {
         return "redirect:/news/" + id;
     }
 
+    @PostMapping("/api/news/{id}/like")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<?> likeApi(@PathVariable Long id, Principal principal) {
+        if (principal == null) {
+            return org.springframework.http.ResponseEntity.status(401)
+                    .body(java.util.Map.of("error", "login_required"));
+        }
+        newsService.toggleLike(id, principal.getName());
+        long likeCount = newsService.getLikeCount(id);
+        boolean liked = newsService.isLikedBy(id, principal.getName());
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("liked", liked);
+        result.put("likeCount", likeCount);
+        return org.springframework.http.ResponseEntity.ok(result);
+    }
+
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/news/{id}/delete")
     public String delete(@PathVariable Long id, Principal principal) {
@@ -186,5 +204,18 @@ public class NewsController {
         }
         newsService.delete(id);
         return "redirect:/news";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/api/news/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteApi(@PathVariable Long id, Principal principal) {
+        PopupNews news = newsService.getById(id)
+                .orElseThrow(() -> new IllegalArgumentException("소식을 찾을 수 없습니다: " + id));
+        if (!principal.getName().equals(news.getAuthorUsername())) {
+            return ResponseEntity.status(403).body(Map.of("error", "forbidden"));
+        }
+        newsService.delete(id);
+        return ResponseEntity.ok(Map.of("deleted", true));
     }
 }

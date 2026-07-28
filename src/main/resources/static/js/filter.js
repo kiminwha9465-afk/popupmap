@@ -4,9 +4,13 @@
     const STORAGE_KEY = 'popupmap-bookmarks';
     let _category = null;
     let _bmMode   = false;
+    let _query    = '';
 
     /* ── Bookmark CRUD ──────────────────────────────── */
     function _load() {
+        if (window.isLoggedIn && Array.isArray(window.serverBookmarks)) {
+            return window.serverBookmarks.map(String);
+        }
         try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
         catch { return []; }
     }
@@ -20,10 +24,31 @@
     }
 
     function toggleBookmark(id) {
-        const bm  = _load();
-        const key = String(id);
-        const idx = bm.indexOf(key);
-        const added = idx < 0;
+        if (window.isLoggedIn) {
+            var csrf = document.querySelector('meta[name="_csrf"]')?.content;
+            var csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+            var headers = { 'Content-Type': 'application/json' };
+            if (csrf && csrfHeader) headers[csrfHeader] = csrf;
+            fetch('/api/bookmarks/' + id + '/toggle', { method: 'POST', headers: headers })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var added = data.bookmarked;
+                    var sid = Number(id);
+                    if (added) {
+                        if (!window.serverBookmarks.includes(sid)) window.serverBookmarks.push(sid);
+                    } else {
+                        window.serverBookmarks = window.serverBookmarks.filter(function(x) { return x !== sid; });
+                    }
+                    _syncIcons(String(id), added);
+                    _syncBadge();
+                    if (_bmMode) _apply();
+                });
+            return;
+        }
+        var bm  = _load();
+        var key = String(id);
+        var idx = bm.indexOf(key);
+        var added = idx < 0;
         if (added) bm.push(key); else bm.splice(idx, 1);
         _save(bm);
         _syncIcons(key, added);
@@ -42,6 +67,15 @@
         }
         if (_category) {
             list = list.filter(s => s.category === _category);
+        }
+        if (_query) {
+            const q = _query.toLowerCase();
+            list = list.filter(s =>
+                (s.name    || '').toLowerCase().includes(q) ||
+                (s.address || '').toLowerCase().includes(q) ||
+                (s.region  || '').toLowerCase().includes(q) ||
+                (s.brand   || '').toLowerCase().includes(q)
+            );
         }
         return list;
     }
@@ -202,21 +236,39 @@
         const searchToggle = document.getElementById('searchToggle');
         const searchRow    = document.getElementById('searchRow');
         const searchClose  = document.getElementById('searchClose');
+        const searchInput  = searchRow?.querySelector('.search-input');
+        const searchForm   = searchRow?.querySelector('form');
 
         function openSearch() {
             searchRow.removeAttribute('hidden');
             searchToggle.classList.add('active');
-            searchRow.querySelector('.search-input')?.focus();
+            searchInput?.focus();
         }
         function closeSearch() {
             searchRow.setAttribute('hidden', '');
             searchToggle.classList.remove('active');
+            _query = '';
+            if (searchInput) searchInput.value = '';
+            _apply();
         }
 
         searchToggle?.addEventListener('click', () => {
             searchRow.hasAttribute('hidden') ? openSearch() : closeSearch();
         });
         searchClose?.addEventListener('click', closeSearch);
+
+        // 클라이언트 사이드 실시간 검색 (지도·달력 필터링)
+        if (searchInput && window.storesData) {
+            searchInput.addEventListener('input', () => {
+                _query = searchInput.value.trim();
+                _apply();
+            });
+            searchForm?.addEventListener('submit', e => {
+                e.preventDefault();
+                _query = searchInput.value.trim();
+                _apply();
+            });
+        }
 
         // 배너 북마크 버튼 (onclick 미사용 버전)
         document.querySelectorAll('.banner-bm').forEach(btn => {

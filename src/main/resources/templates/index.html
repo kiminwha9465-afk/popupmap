@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>팝업맵 - 전국 팝업스토어 일정 & 위치</title>
-    <link rel="stylesheet" href="/css/style.css?v=8"/>
+    <link rel="stylesheet" href="/css/style.css?v=11"/>
 </head>
 <body>
 
@@ -36,6 +38,28 @@
                         </svg>
                         <span sec:authentication="name"></span>
                     </span>
+                    <div sec:authorize="isAuthenticated()" class="bell-wrap">
+                        <button class="bell-btn" id="bellBtn" title="알림">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.6"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+                            </svg>
+                            <span th:if="${bellCount != null and bellCount > 0}" class="bell-badge" th:text="${bellCount}"></span>
+                        </button>
+                        <div class="bell-dropdown" id="bellDropdown" hidden>
+                            <div class="bell-dd-hd">D-3 마감 북마크</div>
+                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">임박한 종료 팝업이 없어요</div>
+                            <a th:each="item : ${bellItems}" th:href="@{/store/{id}(id=${item.id})}" class="bell-dd-item">
+                                <span class="bell-dd-name" th:text="${item.name}"></span>
+                                <span class="bell-dd-dday"
+                                      th:text="${item.dday == 0} ? 'D-DAY' : ('D-' + ${item.dday})"
+                                      th:classappend="${item.dday == 0} ? ' dday-today'"></span>
+                            </a>
+                            <a href="/mypage" class="bell-dd-footer">북마크 관리 →</a>
+                        </div>
+                    </div>
+                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">마이페이지</a>
                     <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
                         <button type="submit" class="auth-link-btn">로그아웃</button>
                     </form>
@@ -118,8 +142,8 @@
                         th:selected="${cat == selectedCategory}">카테고리</option>
             </select>
             <span class="search-divider"></span>
-            <input type="text" name="keyword" class="search-input" placeholder="팝업스토어 검색..."
-                   th:value="${keyword}"/>
+            <input type="text" name="keyword" class="search-input" placeholder="이름, 주소, 지하철역으로 검색..."
+                   th:value="${keyword}" autocomplete="off"/>
             <button type="submit" class="search-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
                      fill="none" stroke="currentColor" stroke-width="2.5">
@@ -144,6 +168,7 @@
     <section class="banner-section">
         <div class="banner-track" id="bannerTrack">
             <div th:each="store,i : ${stores}" th:if="${i.index < 6}" class="banner-slide">
+                <div class="banner-bg" th:style="|background-image:url('${store.imageUrl}')|"></div>
                 <img th:src="${store.imageUrl}" th:alt="${store.name}" class="banner-img"/>
                 <div class="banner-overlay">
                     <div class="banner-meta">
@@ -243,6 +268,18 @@
                 </div>
                 <div class="map-container">
                     <div id="map"></div>
+                    <div id="clusterPanel" class="cluster-panel" style="display:none">
+                        <div class="cluster-panel-hd">
+                            <span class="cluster-panel-title">팝업 <span id="clusterCount">0</span>개</span>
+                            <button class="cluster-panel-close" onclick="_hideClusterList()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M18 6 6 18M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <ul id="clusterList" class="cluster-list"></ul>
+                    </div>
                     <button class="map-locate-btn" id="mapLocate" title="현재 위치로 이동">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                              fill="none" stroke="currentColor" stroke-width="2.2">
@@ -360,6 +397,8 @@
 <script src="/js/MarkerClustering.js"></script>
 <script th:inline="javascript">
     window.storesData = /*[[${stores}]]*/ [];
+    window.isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+    window.serverBookmarks = /*[[${serverBookmarks}]]*/ [];
 </script>
 <script src="/js/nav.js"></script>
 <script src="/js/filter.js"></script>

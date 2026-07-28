@@ -6,6 +6,7 @@ function MarkerClustering(options) {
     this.gridSize = options.gridSize || 100;
     this.icons = options.icons || [];
     this.stylingFunction = options.stylingFunction || function() {};
+    this.onClusterClick = options.onClusterClick || null;
     this._clusterMarkers = [];
     this._listener = null;
 
@@ -84,8 +85,12 @@ MarkerClustering.prototype._redraw = function() {
         this.stylingFunction(cm, group.length);
 
         naver.maps.Event.addListener(cm, 'click', () => {
-            this.map.setZoom(Math.min(this.map.getZoom() + 3, this.maxZoom + 1));
-            this.map.setCenter(new naver.maps.LatLng(lat, lng));
+            if (typeof this.onClusterClick === 'function') {
+                this.onClusterClick(group);
+            } else {
+                this.map.setZoom(Math.min(this.map.getZoom() + 3, this.maxZoom + 1));
+                this.map.setCenter(new naver.maps.LatLng(lat, lng));
+            }
         });
 
         this._clusterMarkers.push(cm);

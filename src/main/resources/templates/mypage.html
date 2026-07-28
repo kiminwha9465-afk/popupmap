@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>마이페이지 - 팝업맵</title>
+    <link rel="stylesheet" href="/css/style.css?v=11"/>
+</head>
+<body>
+
+<header class="header">
+<div class="header-inner">
+    <div class="header-top">
+        <a href="/" class="header-brand">
+            <img src="/favicon.svg" class="brand-icon" alt="팝업맵"/>
+            <span class="brand-text">팝업맵</span>
+        </a>
+        <div class="header-top-right">
+            <div class="header-right">
+                <div class="header-auth">
+                    <span sec:authorize="isAuthenticated()" class="header-user">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                        </svg>
+                        <span sec:authentication="name"></span>
+                    </span>
+                    <div sec:authorize="isAuthenticated()" class="bell-wrap">
+                        <button class="bell-btn" id="bellBtn" title="알림">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.6"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+                            </svg>
+                            <span th:if="${bellCount != null and bellCount > 0}" class="bell-badge" th:text="${bellCount}"></span>
+                        </button>
+                        <div class="bell-dropdown" id="bellDropdown" hidden>
+                            <div class="bell-dd-hd">D-3 마감 북마크</div>
+                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">임박한 종료 팝업이 없어요</div>
+                            <a th:each="item : ${bellItems}" th:href="@{/store/{id}(id=${item.id})}" class="bell-dd-item">
+                                <span class="bell-dd-name" th:text="${item.name}"></span>
+                                <span class="bell-dd-dday"
+                                      th:text="${item.dday == 0} ? 'D-DAY' : ('D-' + ${item.dday})"
+                                      th:classappend="${item.dday == 0} ? ' dday-today'"></span>
+                            </a>
+                            <a href="/mypage" class="bell-dd-footer">북마크 관리 →</a>
+                        </div>
+                    </div>
+                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn" style="color:var(--primary);font-weight:700;">마이페이지</a>
+                    <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                    </form>
+                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
+                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header-nav-row">
+        <nav class="header-nav">
+            <span class="nav-group-label">팝업</span>
+            <a href="/stores" class="nav-link">전체보기</a>
+            <details class="nav-dropdown">
+                <summary>카테고리
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/stores?category=패션" class="nav-dropdown-item">패션</a>
+                    <a href="/stores?category=뷰티" class="nav-dropdown-item">뷰티</a>
+                    <a href="/stores?category=식음료" class="nav-dropdown-item">식음료</a>
+                    <a href="/stores?category=라이프스타일" class="nav-dropdown-item">라이프스타일</a>
+                    <a href="/stores?category=아트/문화" class="nav-dropdown-item">아트/문화</a>
+                    <a href="/stores?category=엔터테인먼트" class="nav-dropdown-item">엔터테인먼트</a>
+                    <a href="/stores?category=테크" class="nav-dropdown-item">테크</a>
+                </div>
+            </details>
+            <span class="nav-sep"></span>
+            <span class="nav-group-label">커뮤니티</span>
+            <a href="/news" class="nav-link nav-news-item">전체</a>
+            <a href="/news?tag=후기" class="nav-link nav-news-item">후기</a>
+            <details class="nav-dropdown">
+                <summary>커뮤니티
+                    <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a href="/news" class="nav-dropdown-item">전체</a>
+                    <a href="/news?tag=공지" class="nav-dropdown-item">공지</a>
+                    <a href="/news?tag=소식" class="nav-dropdown-item">소식</a>
+                    <a href="/news?tag=트렌드" class="nav-dropdown-item">트렌드</a>
+                    <div class="nav-dropdown-divider"></div>
+                    <span class="nav-dropdown-label">후기</span>
+                    <a href="/news?tag=후기" class="nav-dropdown-item">후기</a>
+                </div>
+            </details>
+        </nav>
+    </div>
+</div>
+</header>
+
+<main class="mp-wrap">
+<div class="mp-inner">
+
+    <!-- 프로필 카드 -->
+    <div class="mp-profile-card">
+        <div class="mp-avatar" th:text="${#strings.toUpperCase(#strings.substring(username,0,1))}">U</div>
+        <div class="mp-user-info">
+            <div class="mp-username" th:text="${username}"></div>
+            <div class="mp-stats">
+                <span class="mp-stat mp-stat-link" onclick="switchTabById('bookmarks')">
+                    <b class="mp-stat-val" th:text="${totalCount}">0</b>
+                    <span class="mp-stat-lbl">북마크</span>
+                </span>
+                <span class="mp-stat-sep"></span>
+                <span class="mp-stat mp-stat-link" onclick="switchTabById('status')">
+                    <b class="mp-stat-val" th:text="${plannedCount}">0</b>
+                    <span class="mp-stat-lbl">방문예정</span>
+                </span>
+                <span class="mp-stat-sep"></span>
+                <span class="mp-stat mp-stat-link" onclick="switchTabById('status')">
+                    <b class="mp-stat-val" th:text="${completedCount}">0</b>
+                    <span class="mp-stat-lbl">방문완료</span>
+                </span>
+                <span class="mp-stat-sep"></span>
+                <span class="mp-stat mp-stat-link" onclick="switchTabById('reviews')">
+                    <b class="mp-stat-val" th:text="${reviewCount}">0</b>
+                    <span class="mp-stat-lbl">작성리뷰</span>
+                </span>
+                <span class="mp-stat-sep"></span>
+                <span class="mp-stat mp-stat-link" onclick="switchTabById('liked')">
+                    <b class="mp-stat-val" th:text="${likedCount}">0</b>
+                    <span class="mp-stat-lbl">도움줌</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 북마크 지도 (고정 섹션) -->
+    <div class="mp-map-section">
+        <div class="mp-map-section-hd">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            북마크 지도
+        </div>
+        <div th:if="${items.isEmpty()}" class="mp-empty mp-map-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                 fill="none" stroke="#ccc" stroke-width="1.5"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
+            <p>북마크한 팝업이 없습니다.</p>
+        </div>
+        <div th:unless="${items.isEmpty()}" id="mypage-map" class="mp-map"></div>
+    </div>
+
+    <!-- 탭 네비게이션 -->
+    <div class="mp-tabs" role="tablist">
+        <button class="mp-tab active" id="tab-bookmarks" onclick="switchTab('bookmarks',this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+            북마크 관리
+        </button>
+        <button class="mp-tab" id="tab-dday" onclick="switchTab('dday',this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            디데이
+        </button>
+        <button class="mp-tab" id="tab-status" onclick="switchTab('status',this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            방문 현황
+        </button>
+        <button class="mp-tab" id="tab-reviews" onclick="switchTab('reviews',this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            작성 리뷰
+        </button>
+        <button class="mp-tab" id="tab-liked" onclick="switchTab('liked',this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            도움 목록
+        </button>
+    </div>
+
+    <!-- ── 탭: 북마크 관리 ──────────────────────────── -->
+    <div class="mp-panel" id="panel-bookmarks">
+        <div th:if="${items.isEmpty()}" class="mp-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="#ccc" stroke-width="1.5"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+            <p>북마크한 팝업이 없습니다.</p>
+            <a href="/stores" class="mp-empty-btn">팝업 둘러보기</a>
+        </div>
+        <div th:unless="${items.isEmpty()}" class="mp-bm-list">
+            <div th:each="item : ${items}" class="mp-bm-row" th:data-id="${item.store.id}">
+                <img th:src="${item.store.imageUrl}" th:alt="${item.store.name}" class="mp-bm-thumb"
+                     onerror="this.onerror=null;this.style.background='#eee';this.removeAttribute('src')"/>
+                <div class="mp-bm-info">
+                    <span class="mp-bm-badge"
+                          th:classappend="${item.storeStatus=='upcoming'} ? ' badge-upcoming' : (${item.storeStatus=='ended'} ? ' badge-ended' : ' badge-ongoing')"
+                          th:text="${item.storeStatus=='upcoming'} ? '오픈예정' : (${item.storeStatus=='ended'} ? '종료' : '진행중')"></span>
+                    <div class="mp-bm-name" th:text="${item.store.name}"></div>
+                    <div class="mp-bm-meta">
+                        <span th:text="${item.store.region}"></span>
+                        <span class="mp-bm-dot">·</span>
+                        <span>
+                            <th:block th:text="${item.store.startDate != null ? #temporals.format(item.store.startDate,'yy.MM.dd') : ''}"></th:block>
+                            ~
+                            <th:block th:text="${item.store.endDate != null ? #temporals.format(item.store.endDate,'yy.MM.dd') : ''}"></th:block>
+                        </span>
+                    </div>
+                </div>
+                <div class="mp-bm-actions">
+                    <a th:href="@{/store/{id}(id=${item.store.id})}" class="mp-bm-btn mp-bm-view">보기</a>
+                    <button class="mp-bm-btn mp-bm-del" th:onclick="|removeBookmark(${item.store.id})|">삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 탭: 디데이 ───────────────────────────────── -->
+    <div class="mp-panel" id="panel-dday" hidden>
+        <div th:if="${items.isEmpty()}" class="mp-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <p>북마크한 팝업이 없습니다.</p>
+        </div>
+        <div th:unless="${items.isEmpty()}" class="mp-dday-list">
+            <a th:each="item : ${ddayItems}"
+               th:href="@{/store/{id}(id=${item.store.id})}"
+               class="mp-dday-row"
+               th:classappend="${item.storeStatus=='ended'} ? ' dday-ended' : ''">
+                <img th:src="${item.store.imageUrl}" th:alt="${item.store.name}" class="mp-dday-thumb"
+                     onerror="this.onerror=null;this.style.background='#eee';this.removeAttribute('src')"/>
+                <div class="mp-dday-info">
+                    <div class="mp-dday-name" th:text="${item.store.name}"></div>
+                    <div class="mp-dday-meta">
+                        <span th:text="${item.store.region}"></span>
+                        <span class="mp-dday-dot">·</span>
+                        <span>
+                            <th:block th:text="${item.store.startDate != null ? #temporals.format(item.store.startDate,'yy.MM.dd') : ''}"></th:block>
+                            ~
+                            <th:block th:text="${item.store.endDate != null ? #temporals.format(item.store.endDate,'yy.MM.dd') : ''}"></th:block>
+                        </span>
+                    </div>
+                </div>
+                <span class="mp-dday-badge"
+                      th:classappend="${item.storeStatus=='ended'} ? ' dday-b-ended' : (${item.storeStatus=='upcoming'} ? ' dday-b-upcoming' : (${item.dday}<=3 ? ' dday-b-urgent' : (${item.dday}<=7 ? ' dday-b-soon' : ' dday-b-ok')))"
+                      th:text="${item.ddayLabel}">D-?</span>
+                <svg class="mp-dday-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="m9 18 6-6-6-6"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- ── 탭: 방문 현황 ────────────────────────────── -->
+    <div class="mp-panel" id="panel-status" hidden>
+        <div th:if="${items.isEmpty()}" class="mp-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="#ccc" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <p>북마크한 팝업이 없습니다.</p>
+        </div>
+        <div th:unless="${items.isEmpty()}" class="mp-status-cols">
+            <!-- 방문 예정 -->
+            <div class="mp-status-col">
+                <div class="mp-status-col-hd planned-hd">
+                    <span>방문 예정</span>
+                    <span class="mp-status-cnt" th:text="${plannedCount} + '개'">0개</span>
+                </div>
+                <div class="mp-status-list">
+                    <div th:each="item : ${items}" th:if="${item.visitStatus=='PLANNED'}"
+                         class="mp-status-item" th:data-id="${item.store.id}">
+                        <img th:src="${item.store.imageUrl}" class="mp-status-img"
+                             onerror="this.onerror=null;this.style.background='#eee';this.removeAttribute('src')"/>
+                        <div class="mp-status-info">
+                            <div class="mp-status-name" th:text="${item.store.name}"></div>
+                            <div class="mp-status-meta">
+                                <span th:text="${item.store.region}"></span>
+                                <span class="mp-status-dday" th:text="${item.ddayLabel}"></span>
+                            </div>
+                        </div>
+                        <button class="mp-status-toggle planned-toggle"
+                                th:onclick="|updateStatus(${item.store.id},'COMPLETED',this)|">
+                            방문완료
+                        </button>
+                    </div>
+                    <div th:if="${plannedCount==0}" class="mp-status-empty">방문 예정 팝업이 없어요.</div>
+                </div>
+            </div>
+            <!-- 방문 완료 -->
+            <div class="mp-status-col">
+                <div class="mp-status-col-hd completed-hd">
+                    <span>방문 완료</span>
+                    <span class="mp-status-cnt" th:text="${completedCount} + '개'">0개</span>
+                </div>
+                <div class="mp-status-list">
+                    <div th:each="item : ${items}" th:if="${item.visitStatus=='COMPLETED'}"
+                         class="mp-status-item completed" th:data-id="${item.store.id}">
+                        <img th:src="${item.store.imageUrl}" class="mp-status-img"
+                             onerror="this.onerror=null;this.style.background='#eee';this.removeAttribute('src')"/>
+                        <div class="mp-status-info">
+                            <div class="mp-status-name" th:text="${item.store.name}"></div>
+                            <div class="mp-status-meta">
+                                <span th:text="${item.store.region}"></span>
+                                <span class="mp-status-dday" th:text="${item.ddayLabel}"></span>
+                            </div>
+                        </div>
+                        <button class="mp-status-toggle completed-toggle"
+                                th:onclick="|updateStatus(${item.store.id},'PLANNED',this)|">
+                            예정으로
+                        </button>
+                    </div>
+                    <div th:if="${completedCount==0}" class="mp-status-empty">방문 완료한 팝업이 없어요.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 탭: 작성 리뷰 ────────────────────────────── -->
+    <div class="mp-panel" id="panel-reviews" hidden>
+        <div th:if="${userReviews.isEmpty()}" class="mp-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="#ccc" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <p>작성한 리뷰가 없습니다.</p>
+            <a href="/news?tag=후기" class="mp-empty-btn">후기 작성하기</a>
+        </div>
+        <div th:unless="${userReviews.isEmpty()}" class="mp-post-list">
+            <div th:each="r : ${userReviews}" class="mp-post-row" th:data-review-id="${r.id}">
+                <a th:href="@{/news/{id}(id=${r.id})}" class="mp-post-item">
+                    <div class="mp-post-thumb-wrap">
+                        <img th:if="${r.thumbnailUrl != null and !#strings.isEmpty(r.thumbnailUrl)}"
+                             th:src="${r.thumbnailUrl}" th:alt="${r.title}" class="mp-post-thumb"
+                             onerror="this.onerror=null;this.style.background='#eee';this.removeAttribute('src')"/>
+                        <div th:unless="${r.thumbnailUrl != null and !#strings.isEmpty(r.thumbnailUrl)}"
+                             class="mp-post-thumb-ph">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none" stroke="#ccc" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                    </div>
+                    <div class="mp-post-info">
+                        <span class="mp-post-tag">후기</span>
+                        <div class="mp-post-title" th:text="${r.title}"></div>
+                        <div class="mp-post-meta">
+                            <span th:text="${r.publishedAt != null ? #temporals.format(r.publishedAt,'yyyy.MM.dd') : ''}"></span>
+                            <span>조회 <span th:text="${r.viewCount}"></span></span>
+                        </div>
+                    </div>
+                    <svg class="mp-post-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </a>
+                <button class="mp-review-del" th:onclick="|deleteReview(${r.id})|">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 탭: 도움 목록 ────────────────────────────── -->
+    <div class="mp-panel" id="panel-liked" hidden>
+        <div th:if="${likedPosts.isEmpty()}" class="mp-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="#ccc" stroke-width="1.5"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg>
+            <p>도움이 되었어요를 누른 게시물이 없습니다.</p>
+        </div>
+        <div th:unless="${likedPosts.isEmpty()}" class="mp-post-list">
+            <a th:each="p : ${likedPosts}"
+               th:href="@{/news/{id}(id=${p.id})}"
+               class="mp-post-item">
+                <div class="mp-post-thumb-wrap">
+                    <img th:if="${p.thumbnailUrl != null and !#strings.isEmpty(p.thumbnailUrl)}"
+                         th:src="${p.thumbnailUrl}" th:alt="${p.title}" class="mp-post-thumb"
+                         onerror="this.onerror=null;this.style.background='#eee';this.removeAttribute('src')"/>
+                    <div th:unless="${p.thumbnailUrl != null and !#strings.isEmpty(p.thumbnailUrl)}"
+                         class="mp-post-thumb-ph">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                             fill="none" stroke="#ccc" stroke-width="1.5"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg>
+                    </div>
+                </div>
+                <div class="mp-post-info">
+                    <span class="mp-post-tag" th:text="${p.tag}"></span>
+                    <div class="mp-post-title" th:text="${p.title}"></div>
+                    <div class="mp-post-meta">
+                        <span th:text="${p.author}"></span>
+                        <span th:text="${p.publishedAt != null ? #temporals.format(p.publishedAt,'yyyy.MM.dd') : ''}"></span>
+                    </div>
+                </div>
+                <svg class="mp-post-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="m9 18 6-6-6-6"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+</div>
+</main>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="팝업맵"/> 팝업맵</span>
+        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+    </div>
+</footer>
+
+<script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=t6ao0o80r6"></script>
+<script th:inline="javascript">
+    window.mypageItems = /*[[${itemsJson}]]*/ [];
+</script>
+<script src="/js/nav.js"></script>
+<script>
+    /* ── 탭 전환 ───────────────────────────────────── */
+    function switchTab(name, btn) {
+        document.querySelectorAll('.mp-tab').forEach(function(t){ t.classList.remove('active'); });
+        btn.classList.add('active');
+        document.querySelectorAll('.mp-panel').forEach(function(p){ p.hidden = true; });
+        document.getElementById('panel-' + name).hidden = false;
+    }
+    function switchTabById(name) {
+        var btn = document.getElementById('tab-' + name)
+                || document.querySelector('.mp-tab[onclick*="\'' + name + '\'"]');
+        if (btn) switchTab(name, btn);
+    }
+
+    /* ── CSRF 헤더 ─────────────────────────────────── */
+    function csrfHeaders(json) {
+        var csrf = document.querySelector('meta[name="_csrf"]')?.content;
+        var hdr  = document.querySelector('meta[name="_csrf_header"]')?.content;
+        var h = json ? { 'Content-Type': 'application/json' } : {};
+        if (csrf && hdr) h[hdr] = csrf;
+        return h;
+    }
+
+    /* ── 북마크 제거 ────────────────────────────────── */
+    function removeBookmark(storeId) {
+        if (!confirm('북마크를 제거하시겠습니까?')) return;
+        fetch('/api/bookmarks/' + storeId, { method: 'DELETE', headers: csrfHeaders(false) })
+            .then(function(r) {
+                if (!r.ok) return;
+                document.querySelectorAll('[data-id="' + storeId + '"]').forEach(function(el) { el.remove(); });
+                var remaining = document.querySelectorAll('.mp-bm-card').length;
+                var statVals = document.querySelectorAll('.mp-stat-val');
+                if (statVals[0]) statVals[0].textContent = remaining;
+                if (remaining === 0) location.reload();
+            });
+    }
+
+    /* ── 방문 상태 변경 ─────────────────────────────── */
+    function updateStatus(storeId, newStatus, btn) {
+        btn.disabled = true;
+        fetch('/api/bookmarks/' + storeId + '/status', {
+            method: 'PATCH',
+            headers: csrfHeaders(true),
+            body: JSON.stringify({ status: newStatus })
+        }).then(function(r) {
+            if (r.ok) location.reload();
+            else btn.disabled = false;
+        });
+    }
+
+    /* ── 북마크 지도 ────────────────────────────────── */
+    function initMypageMap() {
+        var container = document.getElementById('mypage-map');
+        if (!container || typeof naver === 'undefined') return;
+
+        var map = new naver.maps.Map(container, {
+            center: new naver.maps.LatLng(37.5665, 126.9780),
+            zoom: 11,
+            zoomControl: true,
+            zoomControlOptions: { position: naver.maps.Position.RIGHT_CENTER }
+        });
+
+        var items = window.mypageItems || [];
+        var bounds = new naver.maps.LatLngBounds();
+        var hasValid = false;
+        var activeIW = null;
+
+        items.forEach(function(item) {
+            if (!item.latitude || !item.longitude) return;
+            hasValid = true;
+
+            var color = item.storeStatus === 'upcoming' ? '%23F59E0B'
+                      : item.storeStatus === 'ended'    ? '%23AAAAAA'
+                      : '%23FF4B4B';
+            var svg = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='44' viewBox='0 0 32 44'><path d='M16 0C7.163 0 0 7.163 0 16c0 12 16 28 16 28s16-16 16-28C32 7.163 24.837 0 16 0z' fill='" + color + "'/><circle cx='16' cy='16' r='6.5' fill='white'/></svg>";
+
+            var pos = new naver.maps.LatLng(item.latitude, item.longitude);
+            var marker = new naver.maps.Marker({
+                position: pos, map: map,
+                icon: { url: svg, size: new naver.maps.Size(32,44), anchor: new naver.maps.Point(16,44) }
+            });
+
+            var sd = (item.startDate || '').replace(/-/g,'.');
+            var ed = (item.endDate   || '').replace(/-/g,'.');
+            var img = item.imageUrl
+                ? '<img src="' + item.imageUrl + '" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px;" onerror="this.style.display=\'none\'"/>'
+                : '';
+            var visitBadge = item.visitStatus === 'COMPLETED'
+                ? '<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;background:#DCFCE7;color:#16A34A;margin-bottom:6px;">방문완료</span><br/>'
+                : '';
+
+            var iw = new naver.maps.InfoWindow({
+                content: '<div style="padding:12px;min-width:200px;max-width:240px;font-family:-apple-system,sans-serif;line-height:1.5;">'
+                    + img + visitBadge
+                    + '<div style="font-size:11px;color:#6E6E73;margin-bottom:4px;">' + item.ddayLabel + '</div>'
+                    + '<div style="font-size:14px;font-weight:700;color:#1A1A1A;margin-bottom:4px;">' + item.name + '</div>'
+                    + '<div style="font-size:12px;color:#6E6E73;margin-bottom:8px;">' + sd + ' ~ ' + ed + '</div>'
+                    + '<a href="/store/' + item.id + '" style="font-size:12px;color:#FF4B4B;font-weight:700;text-decoration:none;">자세히 보기 →</a>'
+                    + '</div>',
+                borderWidth: 0, disableAnchor: true, backgroundColor: 'white',
+                pixelOffset: new naver.maps.Point(0, -10)
+            });
+
+            naver.maps.Event.addListener(marker, 'click', function() {
+                if (activeIW) activeIW.close();
+                iw.open(map, marker);
+                activeIW = iw;
+            });
+            bounds.extend(pos);
+        });
+
+        naver.maps.Event.addListener(map, 'click', function() {
+            if (activeIW) { activeIW.close(); activeIW = null; }
+        });
+
+        if (hasValid) {
+            var validItems = items.filter(function(i){ return i.latitude && i.longitude; });
+            if (validItems.length === 1) { map.setCenter(new naver.maps.LatLng(validItems[0].latitude, validItems[0].longitude)); map.setZoom(15); }
+            else { map.fitBounds(bounds); }
+        }
+    }
+
+    /* ── 리뷰 삭제 ─────────────────────────────────── */
+    function deleteReview(newsId) {
+        if (!confirm('리뷰를 삭제하시겠습니까?')) return;
+        fetch('/api/news/' + newsId, { method: 'DELETE', headers: csrfHeaders(false) })
+            .then(function(r) {
+                if (!r.ok) return;
+                var row = document.querySelector('[data-review-id="' + newsId + '"]');
+                if (row) row.remove();
+                var remaining = document.querySelectorAll('.mp-post-row').length;
+                if (remaining === 0) location.reload();
+            });
+    }
+
+    /* 페이지 로드 시 지도 초기화 */
+    if (document.getElementById('mypage-map')) {
+        initMypageMap();
+    }
+</script>
+</body>
+</html>

@@ -77,4 +77,24 @@ public class PopupNewsService {
     public long count() {
         return repository.count();
     }
+
+    public long countReviewsByUser(String username) {
+        return repository.countByAuthorUsernameAndTag(username, "후기");
+    }
+
+    public long countLikesByUser(String username) {
+        return likeRepository.countByUsername(username);
+    }
+
+    public List<PopupNews> getReviewsByUser(String username) {
+        return repository.findByAuthorUsernameAndTagOrderByIdDesc(username, "후기");
+    }
+
+    public List<PopupNews> getLikedPostsByUser(String username) {
+        return likeRepository.findByUsernameOrderByIdDesc(username).stream()
+                .map(l -> repository.findById(l.getNewsId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

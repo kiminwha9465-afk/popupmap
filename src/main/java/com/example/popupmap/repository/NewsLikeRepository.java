@@ -7,4 +7,6 @@ public interface NewsLikeRepository extends JpaRepository<NewsLike, Long> {
     boolean existsByNewsIdAndUsername(Long newsId, String username);
     void deleteByNewsIdAndUsername(Long newsId, String username);
     long countByNewsId(Long newsId);
+    long countByUsername(String username);
+    java.util.List<com.example.popupmap.domain.NewsLike> findByUsernameOrderByIdDesc(String username);
 }

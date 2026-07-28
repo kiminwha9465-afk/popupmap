@@ -6,7 +6,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="(${selectedCategory} ?: '전체') + ' 팝업스토어 - 팝업맵'">팝업스토어 목록</title>
-    <link rel="stylesheet" href="/css/style.css?v=8"/>
+    <link rel="stylesheet" href="/css/style.css?v=11"/>
 </head>
 <body>
 
@@ -36,6 +36,28 @@
                         </svg>
                         <span sec:authentication="name"></span>
                     </span>
+                    <div sec:authorize="isAuthenticated()" class="bell-wrap">
+                        <button class="bell-btn" id="bellBtn" title="알림">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.6"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+                            </svg>
+                            <span th:if="${bellCount != null and bellCount > 0}" class="bell-badge" th:text="${bellCount}"></span>
+                        </button>
+                        <div class="bell-dropdown" id="bellDropdown" hidden>
+                            <div class="bell-dd-hd">D-3 마감 북마크</div>
+                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">임박한 종료 팝업이 없어요</div>
+                            <a th:each="item : ${bellItems}" th:href="@{/store/{id}(id=${item.id})}" class="bell-dd-item">
+                                <span class="bell-dd-name" th:text="${item.name}"></span>
+                                <span class="bell-dd-dday"
+                                      th:text="${item.dday == 0} ? 'D-DAY' : ('D-' + ${item.dday})"
+                                      th:classappend="${item.dday == 0} ? ' dday-today'"></span>
+                            </a>
+                            <a href="/mypage" class="bell-dd-footer">북마크 관리 →</a>
+                        </div>
+                    </div>
+                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">마이페이지</a>
                     <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
                         <button type="submit" class="auth-link-btn">로그아웃</button>
                     </form>
