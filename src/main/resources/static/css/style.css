@@ -323,6 +323,8 @@ button { cursor: pointer; border: none; background: none; }
 .auth-link-btn:hover { border-color: var(--primary); color: var(--primary); }
 .auth-link-btn.signup { background: var(--primary); border-color: var(--primary); color: white; }
 .auth-link-btn.signup:hover { opacity: .88; }
+.auth-link-btn.admin-link-btn { background: #1a1a2e; border-color: #1a1a2e; color: #fff; }
+.auth-link-btn.admin-link-btn:hover { background: #16213e; border-color: #16213e; color: #fff; }
 
 /* ── Bell notification ──────────────────────────────────── */
 .bell-wrap { position: relative; }

@@ -57,6 +57,7 @@
                             <a href="/mypage" class="bell-dd-footer">북마크 관리 →</a>
                         </div>
                     </div>
+                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">관리자페이지</a>
                     <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">마이페이지</a>
                     <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
                         <button type="submit" class="auth-link-btn">로그아웃</button>
