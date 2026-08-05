@@ -1,15 +1,19 @@
 package com.example.popupmap.controller;
 
 import com.example.popupmap.crawler.PopgaCrawlerService;
+import com.example.popupmap.domain.PopupStore;
 import com.example.popupmap.service.PopupNewsService;
 import com.example.popupmap.service.PopupStoreService;
 import com.example.popupmap.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/admin")
@@ -35,6 +39,39 @@ public class AdminController {
     public String stores(Model model) {
         model.addAttribute("stores", storeService.getAll());
         return "admin/stores";
+    }
+
+    @GetMapping("/stores/new")
+    public String newStoreForm() {
+        return "admin/store-form";
+    }
+
+    @PostMapping("/stores/new")
+    public String createStore(
+            @RequestParam String name,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String address,
+            @RequestParam(defaultValue = "0") double latitude,
+            @RequestParam(defaultValue = "0") double longitude,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String imageUrl,
+            @RequestParam(required = false) String website,
+            @RequestParam(required = false) String hours,
+            @RequestParam(required = false) String description,
+            RedirectAttributes ra) {
+
+        PopupStore store = PopupStore.builder()
+                .name(name).brand(brand).category(category).region(region)
+                .address(address).latitude(latitude).longitude(longitude)
+                .startDate(startDate).endDate(endDate)
+                .imageUrl(imageUrl).website(website).hours(hours).description(description)
+                .build();
+        storeService.save(store);
+        ra.addFlashAttribute("msg", "팝업스토어가 등록되었습니다.");
+        return "redirect:/admin/stores";
     }
 
     @PostMapping("/stores/{id}/delete")

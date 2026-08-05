@@ -61,8 +61,6 @@
         <a href="/admin/news">게시판 관리</a>
         <a href="/admin/reviews">후기 관리</a>
         <a href="/admin/users">회원 관리</a>
-        <a href="/admin/news">게시판 관리</a>
-        <a href="/admin/users">회원 관리</a>
     </nav>
 
     <div th:if="${msg}" class="flash-msg flash-ok" th:text="${msg}"></div>
@@ -70,10 +68,13 @@
 
     <div class="admin-toolbar">
         <span class="admin-count">총 <strong th:text="${#lists.size(stores)}">0</strong>개</span>
-        <form th:action="@{/admin/crawl}" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <button type="submit" class="btn-crawl">팝가 크롤링 실행</button>
-        </form>
+        <div style="display:flex;gap:8px;">
+            <a href="/admin/stores/new" class="btn-crawl" style="text-decoration:none;">+ 수동 등록</a>
+            <form th:action="@{/admin/crawl}" method="post" style="margin:0;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn-crawl">팝가 크롤링 실행</button>
+            </form>
+        </div>
     </div>
 
     <table class="admin-table">
