@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시판 관리 - 팝업맵</title>
+    <title>후기 관리 - 팝업맵</title>
     <link rel="stylesheet" href="/css/style.css?v=8"/>
     <style>
         .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
@@ -19,7 +19,7 @@
         .admin-table td { padding: 11px 14px; font-size: 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
         .admin-table tr:last-child td { border-bottom: none; }
         .admin-table tr:hover td { background: var(--bg); }
-        .tag-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; background: var(--primary-light); color: var(--primary); }
+        .star-cell { color: #f59e0b; font-size: 13px; white-space: nowrap; }
         .btn-del { padding: 5px 12px; background: #fff0f0; color: var(--primary); border: 1px solid #ffd0d0; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; }
         .btn-del:hover { background: var(--primary); color: white; }
         .flash-msg { padding: 12px 18px; border-radius: var(--radius-sm); margin-bottom: 18px; font-size: 14px; font-weight: 600; }
@@ -46,26 +46,26 @@
 </header>
 
 <div class="admin-wrap">
-    <div class="admin-title">게시판 관리</div>
+    <div class="admin-title">후기 관리</div>
 
     <nav class="admin-nav">
         <a href="/admin">대시보드</a>
         <a href="/admin/stores">팝업 관리</a>
-        <a href="/admin/news" class="active">게시판 관리</a>
-        <a href="/admin/reviews">후기 관리</a>
+        <a href="/admin/news">게시판 관리</a>
+        <a href="/admin/reviews" class="active">후기 관리</a>
         <a href="/admin/users">회원 관리</a>
     </nav>
 
     <div th:if="${msg}" class="flash-msg flash-ok" th:text="${msg}"></div>
 
     <div class="admin-toolbar">
-        <span class="admin-count">총 <strong th:text="${#lists.size(newsList)}">0</strong>개</span>
+        <span class="admin-count">총 <strong th:text="${#lists.size(reviewList)}">0</strong>개</span>
     </div>
 
     <table class="admin-table">
         <thead>
             <tr>
-                <th>태그</th>
+                <th>별점</th>
                 <th>제목</th>
                 <th>작성자</th>
                 <th>날짜</th>
@@ -74,19 +74,22 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="n : ${newsList}">
-                <td><span class="tag-badge" th:text="${n.tag}">-</span></td>
-                <td>
-                    <a th:href="@{/news/{id}(id=${n.id})}" target="_blank"
-                       style="color:var(--text);font-weight:600;"
-                       th:text="${#strings.abbreviate(n.title, 40)}"></a>
+            <tr th:each="r : ${reviewList}">
+                <td class="star-cell">
+                    <span th:if="${r.rating != null}" th:text="${'★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)}"></span>
+                    <span th:if="${r.rating == null}" style="color:var(--text-sub)">-</span>
                 </td>
-                <td th:text="${n.author != null ? n.author : '-'}">-</td>
-                <td style="font-size:13px;color:var(--text-sub);" th:text="${n.publishedAt}">-</td>
-                <td style="font-size:13px;color:var(--text-sub);" th:text="${n.viewCount}">0</td>
                 <td>
-                    <form th:action="@{/admin/news/{id}/delete(id=${n.id})}" method="post"
-                          onsubmit="return confirm('삭제하시겠습니까?')">
+                    <a th:href="@{/news/{id}(id=${r.id})}" target="_blank"
+                       style="color:var(--text);font-weight:600;"
+                       th:text="${#strings.abbreviate(r.title, 40)}"></a>
+                </td>
+                <td th:text="${r.author != null ? r.author : '-'}">-</td>
+                <td style="font-size:13px;color:var(--text-sub);" th:text="${r.publishedAt}">-</td>
+                <td style="font-size:13px;color:var(--text-sub);" th:text="${r.viewCount}">0</td>
+                <td>
+                    <form th:action="@{/admin/reviews/{id}/delete(id=${r.id})}" method="post"
+                          onsubmit="return confirm('후기를 삭제하시겠습니까?')">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                         <button type="submit" class="btn-del">삭제</button>
                     </form>

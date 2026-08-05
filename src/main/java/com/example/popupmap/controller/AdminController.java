@@ -69,6 +69,20 @@ public class AdminController {
         return "redirect:/admin/news";
     }
 
+    // ── 후기 관리 ──────────────────────────────────────
+    @GetMapping("/reviews")
+    public String reviews(Model model) {
+        model.addAttribute("reviewList", newsService.getAll("후기"));
+        return "admin/reviews";
+    }
+
+    @PostMapping("/reviews/{id}/delete")
+    public String deleteReview(@PathVariable Long id, RedirectAttributes ra) {
+        newsService.delete(id);
+        ra.addFlashAttribute("msg", "후기가 삭제되었습니다.");
+        return "redirect:/admin/reviews";
+    }
+
     // ── 회원 관리 ──────────────────────────────────────
     @GetMapping("/users")
     public String users(Model model) {

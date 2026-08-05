@@ -67,6 +67,9 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/")
                 .permitAll()
             )
+            .sessionManagement(session -> session
+                .invalidSessionUrl("/login")
+            )
             .headers(h -> h.frameOptions(f -> f.sameOrigin())); // H2 콘솔
         return http.build();
     }
