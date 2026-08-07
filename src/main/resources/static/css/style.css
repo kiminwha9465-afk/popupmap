@@ -849,8 +849,8 @@ button { cursor: pointer; border: none; background: none; }
 .news-delete-btn:hover { background: #DC2626; color: white; border-color: #DC2626; }
 
 /* ── 소식 작성 페이지 ─────────────────────────────── */
-.news-write-page { max-width: 960px; margin: 0 auto; padding: 52px 24px 80px; }
-.news-write-inner { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 52px 64px; box-shadow: var(--shadow-sm); }
+.news-write-page { max-width: 1200px; margin: 0 auto; padding: 52px 24px 80px; }
+.news-write-inner { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 52px 80px; box-shadow: var(--shadow-sm); }
 .news-write-title { font-size: 22px; font-weight: 800; margin-bottom: 32px; }
 .news-write-form { display: flex; flex-direction: column; gap: 22px; }
 .form-textarea { min-height: 320px; }
@@ -1192,8 +1192,8 @@ button { cursor: pointer; border: none; background: none; }
     .board-views { display: none; }
     .board-table th, .board-row td { padding: 11px 10px; }
     /* 작성 폼 — 모바일 */
-    .news-write-page { padding: 0 0 48px; }
-    .news-write-inner { border-radius: 0; border-left: none; border-right: none; padding: 24px 18px 36px; box-shadow: none; }
+    .news-write-page { padding: 0 0 40px; }
+    .news-write-inner { border-radius: 0; border-left: none; border-right: none; padding: 20px 14px 28px; box-shadow: none; }
     .news-write-title { font-size: 18px; margin-bottom: 20px; }
     .form-textarea { min-height: 220px; }
     .form-actions { gap: 8px; }
