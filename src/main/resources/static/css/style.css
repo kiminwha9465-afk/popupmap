@@ -849,8 +849,8 @@ button { cursor: pointer; border: none; background: none; }
 .news-delete-btn:hover { background: #DC2626; color: white; border-color: #DC2626; }
 
 /* ── 소식 작성 페이지 ─────────────────────────────── */
-.news-write-page { max-width: 1200px; margin: 0 auto; padding: 52px 24px 80px; }
-.news-write-inner { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 52px 80px; box-shadow: var(--shadow-sm); }
+.news-write-page { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+.news-write-inner { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 48px 52px; box-shadow: var(--shadow-sm); }
 .news-write-title { font-size: 22px; font-weight: 800; margin-bottom: 32px; }
 .news-write-form { display: flex; flex-direction: column; gap: 22px; }
 .form-textarea { min-height: 320px; }
