@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -7,13 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <title>팝업 소식 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=15"/>
+    <title>?앹뾽 ?뚯떇 - ?앹뾽留?/title>
+    <link rel="stylesheet" href="/css/style.css?v=16"/>
     <style>
-        /* ── 후기 탭 구분 ─────────────────────────── */
+        /* ?? ?꾧린 ??援щ텇 ??????????????????????????? */
         .news-tab-sep { display:inline-block; width:1px; height:14px; background:var(--border); margin:0 4px; align-self:center; }
         .news-tab-review { font-weight:600; }
-        /* ── 후기 카드 그리드 ─────────────────────── */
+        /* ?? ?꾧린 移대뱶 洹몃━????????????????????????? */
         .review-toolbar { display:flex; align-items:center; justify-content:flex-end; margin-bottom:16px; gap:10px; }
         .review-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
         @media(max-width:640px){ .review-grid { grid-template-columns:1fr; } }
@@ -27,7 +27,7 @@
         }
         .review-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
 
-        /* 카드 헤더 */
+        /* 移대뱶 ?ㅻ뜑 */
         .rc-header { display:flex; align-items:center; gap:10px; }
         .rc-avatar {
             width:38px; height:38px; border-radius:50%;
@@ -40,16 +40,16 @@
         .rc-count { font-size:12px; color:var(--text-sub); margin-left:5px; }
         .rc-date { font-size:12px; color:var(--text-sub); flex-shrink:0; }
 
-        /* 별점 */
+        /* 蹂꾩젏 */
         .rc-stars { display:flex; align-items:center; gap:3px; }
         .rc-star { font-size:15px; color:#e0e0e0; line-height:1; }
         .rc-star.filled { color:#f59e0b; }
         .rc-rating-text { font-size:13px; font-weight:700; color:#f59e0b; margin-left:4px; }
 
-        /* 썸네일 */
+        /* ?몃꽕??*/
         .rc-thumb { width:100%; max-height:200px; object-fit:cover; border-radius:10px; }
 
-        /* 인용 텍스트 */
+        /* ?몄슜 ?띿뒪??*/
         .rc-quote { position:relative; padding:8px 12px; }
         .rc-qq { font-size:36px; line-height:1; color:var(--border); position:absolute; }
         .rc-qq.open { top:0; left:0; }
@@ -64,7 +64,7 @@
             display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
         }
 
-        /* 연결 팝업 정보 */
+        /* ?곌껐 ?앹뾽 ?뺣낫 */
         .rc-store {
             display:flex; align-items:center; gap:10px; margin-top:auto;
             padding:10px 12px; background:var(--bg); border-radius:var(--radius-sm);
@@ -78,7 +78,7 @@
         .rc-store-name { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .rc-store-region { font-size:11px; color:var(--text-sub); margin-top:2px; }
 
-        /* ── 모달 ────────────────────────────────── */
+        /* ?? 紐⑤떖 ?????????????????????????????????? */
         .rm-overlay {
             display:none; position:fixed; inset:0; z-index:1000;
             background:rgba(0,0,0,.6); align-items:center; justify-content:center;
@@ -160,6 +160,93 @@
         }
         .rm-all-btn:hover { background:var(--bg); }
         .rm-all-btn.visible { display:inline-flex; align-items:center; gap:5px; }
+
+        /* ?? ?꾧린 ?묒꽦 紐⑤떖 ????????????????????????? */
+        .wm-overlay {
+            display:none; position:fixed; inset:0; z-index:1100;
+            background:rgba(0,0,0,.55); align-items:center; justify-content:center;
+            padding:20px;
+        }
+        .wm-overlay.open { display:flex; }
+        .wm-box {
+            background:var(--surface); border-radius:var(--radius);
+            width:100%; max-width:600px; max-height:92vh;
+            display:flex; flex-direction:column;
+            box-shadow:0 24px 60px rgba(0,0,0,.28);
+            animation:wmSlideUp .2s ease;
+        }
+        @keyframes wmSlideUp {
+            from { opacity:0; transform:translateY(20px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .wm-head {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:20px 24px 16px; border-bottom:1px solid var(--border);
+            flex-shrink:0;
+        }
+        .wm-title { font-size:17px; font-weight:800; }
+        .wm-close {
+            width:32px; height:32px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:20px; color:var(--text-sub); background:var(--bg);
+            border:none; cursor:pointer; transition:all .15s; line-height:1;
+        }
+        .wm-close:hover { background:var(--border); color:var(--text); }
+        .wm-body { padding:24px; overflow-y:auto; flex:1; }
+        .wm-form { display:flex; flex-direction:column; gap:18px; }
+        .wm-group { display:flex; flex-direction:column; gap:6px; }
+        .wm-label { font-size:13px; font-weight:600; color:var(--text); }
+        .wm-label-sub { font-weight:400; color:var(--text-sub); }
+        .wm-input, .wm-textarea {
+            padding:10px 14px; border:1.5px solid var(--border); border-radius:8px;
+            font-size:14px; outline:none; transition:border-color .15s;
+            background:var(--surface); font-family:inherit;
+        }
+        .wm-input:focus, .wm-textarea:focus { border-color:var(--primary); }
+        .wm-textarea { resize:vertical; min-height:160px; line-height:1.7; }
+        .wm-file { font-size:13px; color:var(--text-sub); padding:6px 0; }
+        .wm-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:4px; }
+        /* 蹂꾩젏 */
+        .wm-stars { display:flex; flex-direction:row-reverse; gap:4px; width:fit-content; }
+        .wm-stars input { display:none; }
+        .wm-stars label { font-size:32px; color:#ddd; cursor:pointer; transition:color .1s; line-height:1; }
+        .wm-stars input:checked ~ label,
+        .wm-stars label:hover,
+        .wm-stars label:hover ~ label { color:#f59e0b; }
+        .wm-star-hint { font-size:12px; color:var(--text-sub); margin-top:4px; }
+        /* ?앹뾽 ?먮룞?꾩꽦 */
+        .wm-ac-wrap { position:relative; }
+        .wm-ac-drop {
+            position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:200;
+            background:var(--surface); border:1px solid var(--border);
+            border-radius:8px; box-shadow:0 4px 14px rgba(0,0,0,.1);
+            max-height:180px; overflow-y:auto; display:none;
+        }
+        .wm-ac-drop.open { display:block; }
+        .wm-ac-item {
+            padding:10px 14px; font-size:14px; cursor:pointer;
+            border-bottom:1px solid var(--border); color:var(--text);
+        }
+        .wm-ac-item:last-child { border-bottom:none; }
+        .wm-ac-item:hover, .wm-ac-item.active { background:var(--bg); color:var(--primary); }
+        .wm-ac-empty { padding:10px 14px; font-size:13px; color:var(--text-sub); }
+        .wm-ac-chip {
+            display:none; align-items:center; gap:6px; margin-top:8px;
+            padding:5px 10px 5px 12px; width:fit-content;
+            background:var(--bg); border:1px solid var(--border); border-radius:20px;
+            font-size:13px; color:var(--text);
+        }
+        .wm-ac-chip button {
+            background:none; border:none; cursor:pointer;
+            color:var(--text-sub); font-size:16px; line-height:1; padding:0;
+            display:flex; align-items:center;
+        }
+        .wm-ac-chip button:hover { color:var(--primary); }
+        @media(max-width:640px) {
+            .wm-box { max-height:96vh; }
+            .wm-head { padding:16px 18px 14px; }
+            .wm-body { padding:18px; }
+        }
     </style>
 </head>
 <body>
@@ -168,8 +255,8 @@
 <div class="header-inner">
     <div class="header-top">
         <a href="/" class="header-brand">
-            <img src="/favicon.svg" class="brand-icon" alt="팝업맵"/>
-            <span class="brand-text">팝업맵</span>
+            <img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/>
+            <span class="brand-text">?앹뾽留?/span>
         </a>
         <div class="header-top-right">
             <div class="header-right">
@@ -182,7 +269,7 @@
                         <span sec:authentication="name"></span>
                     </span>
                     <div sec:authorize="isAuthenticated()" class="bell-wrap">
-                        <button class="bell-btn" id="bellBtn" title="알림">
+                        <button class="bell-btn" id="bellBtn" title="?뚮┝">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="1.6"
                                  stroke-linecap="round" stroke-linejoin="round">
@@ -191,77 +278,77 @@
                             <span th:if="${bellCount != null and bellCount > 0}" class="bell-badge" th:text="${bellCount}"></span>
                         </button>
                         <div class="bell-dropdown" id="bellDropdown" hidden>
-                            <div class="bell-dd-hd">D-3 마감 북마크</div>
-                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">임박한 종료 팝업이 없어요</div>
+                            <div class="bell-dd-hd">D-3 留덇컧 遺곷쭏??/div>
+                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">?꾨컯??醫낅즺 ?앹뾽???놁뼱??/div>
                             <a th:each="item : ${bellItems}" th:href="@{/store/{id}(id=${item.id})}" class="bell-dd-item">
                                 <span class="bell-dd-name" th:text="${item.name}"></span>
                                 <span class="bell-dd-dday"
                                       th:text="${item.dday == 0} ? 'D-DAY' : ('D-' + ${item.dday})"
                                       th:classappend="${item.dday == 0} ? ' dday-today'"></span>
                             </a>
-                            <a href="/mypage" class="bell-dd-footer">북마크 관리 →</a>
+                            <a href="/mypage" class="bell-dd-footer">遺곷쭏??愿由???/a>
                         </div>
                     </div>
-                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">관리자페이지</a>
-                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">마이페이지</a>
+                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">愿由ъ옄?섏씠吏</a>
+                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">留덉씠?섏씠吏</a>
                     <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
-                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                        <button type="submit" class="auth-link-btn">濡쒓렇?꾩썐</button>
                     </form>
 
-                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
-                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">濡쒓렇??/a>
+                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">?뚯썝媛??/a>
                 </div>
             </div>
         </div>
     </div>
     <div class="header-nav-row">
         <nav class="header-nav">
-            <span class="nav-group-label">팝업</span>
-            <a href="/stores" class="nav-link">전체보기</a>
-            <a href="/stores?category=패션" class="nav-link nav-cat-item">패션</a>
-            <a href="/stores?category=뷰티" class="nav-link nav-cat-item">뷰티</a>
-            <a href="/stores?category=식음료" class="nav-link nav-cat-item">식음료</a>
-            <a href="/stores?category=라이프스타일" class="nav-link nav-cat-item">라이프스타일</a>
-            <a href="/stores?category=아트/문화" class="nav-link nav-cat-item">아트/문화</a>
-            <a href="/stores?category=엔터테인먼트" class="nav-link nav-cat-item">엔터테인먼트</a>
-            <a href="/stores?category=테크" class="nav-link nav-cat-item">테크</a>
+            <span class="nav-group-label">?앹뾽</span>
+            <a href="/stores" class="nav-link">?꾩껜蹂닿린</a>
+            <a href="/stores?category=?⑥뀡" class="nav-link nav-cat-item">?⑥뀡</a>
+            <a href="/stores?category=酉고떚" class="nav-link nav-cat-item">酉고떚</a>
+            <a href="/stores?category=?앹쓬猷? class="nav-link nav-cat-item">?앹쓬猷?/a>
+            <a href="/stores?category=?쇱씠?꾩뒪??? class="nav-link nav-cat-item">?쇱씠?꾩뒪???/a>
+            <a href="/stores?category=?꾪듃/臾명솕" class="nav-link nav-cat-item">?꾪듃/臾명솕</a>
+            <a href="/stores?category=?뷀꽣?뚯씤癒쇳듃" class="nav-link nav-cat-item">?뷀꽣?뚯씤癒쇳듃</a>
+            <a href="/stores?category=?뚰겕" class="nav-link nav-cat-item">?뚰겕</a>
             <details class="nav-dropdown">
                 <summary>
-                    카테고리
+                    移댄뀒怨좊━
                     <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
                 <div class="nav-dropdown-menu">
-                    <a href="/stores?category=패션" class="nav-dropdown-item">패션</a>
-                    <a href="/stores?category=뷰티" class="nav-dropdown-item">뷰티</a>
-                    <a href="/stores?category=식음료" class="nav-dropdown-item">식음료</a>
-                    <a href="/stores?category=라이프스타일" class="nav-dropdown-item">라이프스타일</a>
-                    <a href="/stores?category=아트/문화" class="nav-dropdown-item">아트/문화</a>
-                    <a href="/stores?category=엔터테인먼트" class="nav-dropdown-item">엔터테인먼트</a>
-                    <a href="/stores?category=테크" class="nav-dropdown-item">테크</a>
+                    <a href="/stores?category=?⑥뀡" class="nav-dropdown-item">?⑥뀡</a>
+                    <a href="/stores?category=酉고떚" class="nav-dropdown-item">酉고떚</a>
+                    <a href="/stores?category=?앹쓬猷? class="nav-dropdown-item">?앹쓬猷?/a>
+                    <a href="/stores?category=?쇱씠?꾩뒪??? class="nav-dropdown-item">?쇱씠?꾩뒪???/a>
+                    <a href="/stores?category=?꾪듃/臾명솕" class="nav-dropdown-item">?꾪듃/臾명솕</a>
+                    <a href="/stores?category=?뷀꽣?뚯씤癒쇳듃" class="nav-dropdown-item">?뷀꽣?뚯씤癒쇳듃</a>
+                    <a href="/stores?category=?뚰겕" class="nav-dropdown-item">?뚰겕</a>
                 </div>
             </details>
             <span class="nav-sep"></span>
-            <span class="nav-group-label">커뮤니티</span>
-            <a href="/news" class="nav-link nav-news-item" th:classappend="${selectedTag == null} ? ' active' : ''">전체</a>
-            <a href="/news?tag=공지" class="nav-link nav-news-item" th:classappend="${selectedTag == '공지'} ? ' active' : ''">공지</a>
-            <a href="/news?tag=소식" class="nav-link nav-news-item" th:classappend="${selectedTag == '소식'} ? ' active' : ''">소식</a>
-            <a href="/news?tag=트렌드" class="nav-link nav-news-item" th:classappend="${selectedTag == '트렌드'} ? ' active' : ''">트렌드</a>
-            <a href="/news?tag=후기" class="nav-link nav-news-item" th:classappend="${selectedTag == '후기'} ? ' active' : ''">후기</a>
+            <span class="nav-group-label">而ㅻ??덊떚</span>
+            <a href="/news" class="nav-link nav-news-item" th:classappend="${selectedTag == null} ? ' active' : ''">?꾩껜</a>
+            <a href="/news?tag=怨듭?" class="nav-link nav-news-item" th:classappend="${selectedTag == '怨듭?'} ? ' active' : ''">怨듭?</a>
+            <a href="/news?tag=?뚯떇" class="nav-link nav-news-item" th:classappend="${selectedTag == '?뚯떇'} ? ' active' : ''">?뚯떇</a>
+            <a href="/news?tag=?몃젋?? class="nav-link nav-news-item" th:classappend="${selectedTag == '?몃젋??} ? ' active' : ''">?몃젋??/a>
+            <a href="/news?tag=?꾧린" class="nav-link nav-news-item" th:classappend="${selectedTag == '?꾧린'} ? ' active' : ''">?꾧린</a>
             <details class="nav-dropdown">
                 <summary th:classappend="${selectedTag != null} ? ' active' : ''">
-                    <span th:text="${selectedTag} ?: '소식'">소식</span>
+                    <span th:text="${selectedTag} ?: '?뚯떇'">?뚯떇</span>
                     <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
                 <div class="nav-dropdown-menu">
-                    <a href="/news" class="nav-dropdown-item" th:classappend="${selectedTag == null} ? ' active' : ''">전체</a>
-                    <a href="/news?tag=공지" class="nav-dropdown-item" th:classappend="${selectedTag == '공지'} ? ' active' : ''">공지</a>
-                    <a href="/news?tag=소식" class="nav-dropdown-item" th:classappend="${selectedTag == '소식'} ? ' active' : ''">소식</a>
-                    <a href="/news?tag=트렌드" class="nav-dropdown-item" th:classappend="${selectedTag == '트렌드'} ? ' active' : ''">트렌드</a>
+                    <a href="/news" class="nav-dropdown-item" th:classappend="${selectedTag == null} ? ' active' : ''">?꾩껜</a>
+                    <a href="/news?tag=怨듭?" class="nav-dropdown-item" th:classappend="${selectedTag == '怨듭?'} ? ' active' : ''">怨듭?</a>
+                    <a href="/news?tag=?뚯떇" class="nav-dropdown-item" th:classappend="${selectedTag == '?뚯떇'} ? ' active' : ''">?뚯떇</a>
+                    <a href="/news?tag=?몃젋?? class="nav-dropdown-item" th:classappend="${selectedTag == '?몃젋??} ? ' active' : ''">?몃젋??/a>
                     <div class="nav-dropdown-divider"></div>
-                    <span class="nav-dropdown-label">후기</span>
-                    <a href="/news?tag=후기" class="nav-dropdown-item" th:classappend="${selectedTag == '후기'} ? ' active' : ''">후기</a>
+                    <span class="nav-dropdown-label">?꾧린</span>
+                    <a href="/news?tag=?꾧린" class="nav-dropdown-item" th:classappend="${selectedTag == '?꾧린'} ? ' active' : ''">?꾧린</a>
                 </div>
             </details>
         </nav>
@@ -271,24 +358,24 @@
 
 <div class="news-page">
     <div class="news-page-header">
-        <h1 class="news-page-title">📢 팝업 소식</h1>
+        <h1 class="news-page-title">?뱼 ?앹뾽 ?뚯떇</h1>
     </div>
 
     <div class="news-tabs">
-        <a href="/news" class="news-tab" th:classappend="${selectedTag == null} ? ' active' : ''">전체</a>
-        <a th:each="t : ${ {'공지','소식','트렌드'} }"
+        <a href="/news" class="news-tab" th:classappend="${selectedTag == null} ? ' active' : ''">?꾩껜</a>
+        <a th:each="t : ${ {'怨듭?','?뚯떇','?몃젋??} }"
            th:href="@{/news(tag=${t})}" th:text="${t}" class="news-tab"
            th:classappend="${t == selectedTag} ? ' active' : ''"></a>
         <span class="news-tab-sep"></span>
-        <a href="/news?tag=후기" class="news-tab news-tab-review"
-           th:classappend="${selectedTag == '후기'} ? ' active' : ''">후기</a>
+        <a href="/news?tag=?꾧린" class="news-tab news-tab-review"
+           th:classappend="${selectedTag == '?꾧린'} ? ' active' : ''">?꾧린</a>
     </div>
 
-    <!-- ── 후기 탭: 카드 그리드 뷰 ─────────────────── -->
-    <th:block th:if="${selectedTag == '후기'}">
+    <!-- ?? ?꾧린 ?? 移대뱶 洹몃━??酉???????????????????? -->
+    <th:block th:if="${selectedTag == '?꾧린'}">
         <div class="review-toolbar">
-            <a sec:authorize="isAuthenticated()" href="/news/write?tag=후기" class="btn-primary news-write-btn">후기 작성</a>
-            <button sec:authorize="isAnonymous()" class="btn-primary news-write-btn" id="writeBtn">후기 작성</button>
+            <button sec:authorize="isAuthenticated()" type="button" class="btn-primary news-write-btn" onclick="openWriteModal()">?꾧린 ?묒꽦</button>
+            <button sec:authorize="isAnonymous()" class="btn-primary news-write-btn" id="writeBtn">?꾧린 ?묒꽦</button>
         </div>
 
         <div class="review-grid" th:if="${not #lists.isEmpty(newsList)}">
@@ -311,32 +398,32 @@
                  th:data-store-region="${store != null ? store.region : ''}"
                  onclick="openReviewModal(this)">
 
-                <!-- 헤더: 아바타 + 이름 + 날짜 -->
+                <!-- ?ㅻ뜑: ?꾨컮? + ?대쫫 + ?좎쭨 -->
                 <div class="rc-header">
                     <div class="rc-avatar">
                         <span th:text="${n.author != null and #strings.length(n.author) > 0 ? #strings.substring(n.author,0,1) : '?'}">?</span>
                     </div>
                     <div class="rc-meta">
-                        <span class="rc-author" th:text="${n.author ?: '익명'}"></span>
+                        <span class="rc-author" th:text="${n.author ?: '?듬챸'}"></span>
                         <span class="rc-count"
-                              th:text="'후기 ' + ${reviewCounts != null ? reviewCounts.get(n.authorUsername) : 1}"></span>
+                              th:text="'?꾧린 ' + ${reviewCounts != null ? reviewCounts.get(n.authorUsername) : 1}"></span>
                     </div>
                     <span class="rc-date" th:text="${n.publishedAt != null ? #temporals.format(n.publishedAt, 'yy.MM.dd') : ''}"></span>
                 </div>
 
-                <!-- 별점 -->
+                <!-- 蹂꾩젏 -->
                 <div class="rc-stars" th:if="${n.rating != null}">
                     <span th:each="i : ${#numbers.sequence(1,5)}"
                           th:classappend="${i <= n.rating} ? ' filled' : ''"
-                          class="rc-star">★</span>
+                          class="rc-star">??/span>
                     <span class="rc-rating-text" th:text="${n.rating} + '.0 / 5.0'"></span>
                 </div>
 
-                <!-- 썸네일 있는 경우 -->
+                <!-- ?몃꽕???덈뒗 寃쎌슦 -->
                 <img th:if="${n.thumbnailUrl != null}" th:src="${n.thumbnailUrl}"
                      class="rc-thumb" alt="" onclick="event.stopPropagation()"/>
 
-                <!-- 본문 내용 -->
+                <!-- 蹂몃Ц ?댁슜 -->
                 <div th:if="${n.thumbnailUrl == null}" class="rc-quote">
                     <span class="rc-qq open">"</span>
                     <p class="rc-text" th:text="${#strings.abbreviate(n.content, 120)}"></p>
@@ -345,7 +432,7 @@
                 <p th:if="${n.thumbnailUrl != null}" class="rc-text-plain"
                    th:text="${#strings.abbreviate(n.content, 80)}"></p>
 
-                <!-- 연결 팝업 -->
+                <!-- ?곌껐 ?앹뾽 -->
                 <div th:if="${store != null}" class="rc-store">
                     <img th:if="${store.imageUrl}" th:src="${store.imageUrl}" class="rc-store-img" alt=""
                          onclick="event.stopPropagation()"/>
@@ -353,7 +440,7 @@
                     <div class="rc-store-info">
                         <div class="rc-store-meta">
                             <span class="rc-store-cat" th:text="${store.category}"></span>
-                            <span class="rc-store-status">● 진행중</span>
+                            <span class="rc-store-status">??吏꾪뻾以?/span>
                         </div>
                         <div class="rc-store-name" th:text="${store.name}"></div>
                         <div class="rc-store-region" th:text="${store.region}"></div>
@@ -363,12 +450,12 @@
         </div>
 
         <div th:if="${#lists.isEmpty(newsList)}" class="news-page-empty">
-            <p>아직 후기가 없습니다. 첫 번째로 후기를 남겨보세요!</p>
+            <p>?꾩쭅 ?꾧린媛 ?놁뒿?덈떎. 泥?踰덉㎏濡??꾧린瑜??④꺼蹂댁꽭??</p>
         </div>
     </th:block>
 
-    <!-- ── 일반 탭: 게시판 테이블 뷰 ────────────────── -->
-    <th:block th:unless="${selectedTag == '후기'}">
+    <!-- ?? ?쇰컲 ?? 寃뚯떆???뚯씠釉?酉??????????????????? -->
+    <th:block th:unless="${selectedTag == '?꾧린'}">
         <table class="board-table" th:if="${not #lists.isEmpty(newsList)}">
             <colgroup>
                 <col style="width:60px"/>
@@ -379,11 +466,11 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th>번호</th>
-                    <th>태그</th>
-                    <th>제목</th>
-                    <th>날짜</th>
-                    <th>조회</th>
+                    <th>踰덊샇</th>
+                    <th>?쒓렇</th>
+                    <th>?쒕ぉ</th>
+                    <th>?좎쭨</th>
+                    <th>議고쉶</th>
                 </tr>
             </thead>
             <tbody>
@@ -404,36 +491,103 @@
         </table>
 
         <div class="news-list-header">
-            <th:block th:if="${selectedTag == '후기'}">
-                <a sec:authorize="isAuthenticated()" href="/news/write?tag=후기" class="btn-primary news-write-btn">글쓰기</a>
-                <button sec:authorize="isAnonymous()" class="btn-primary news-write-btn" id="writeBtn2">글쓰기</button>
+            <th:block th:if="${selectedTag == '?꾧린'}">
+                <button sec:authorize="isAuthenticated()" type="button" class="btn-primary news-write-btn" onclick="openWriteModal()">湲?곌린</button>
+                <button sec:authorize="isAnonymous()" class="btn-primary news-write-btn" id="writeBtn2">湲?곌린</button>
             </th:block>
         </div>
 
         <div th:if="${#lists.isEmpty(newsList)}" class="news-page-empty">
-            <p>등록된 소식이 없습니다.</p>
+            <p>?깅줉???뚯떇???놁뒿?덈떎.</p>
         </div>
     </th:block>
 
-    <!-- 로그인 필요 토스트 -->
+    <!-- 濡쒓렇???꾩슂 ?좎뒪??-->
     <div id="loginToast" class="login-toast" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
              fill="none" stroke="currentColor" stroke-width="2.5">
             <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
         </svg>
-        로그인이 필요합니다. 로그인 화면으로 이동합니다...
+        濡쒓렇?몄씠 ?꾩슂?⑸땲?? 濡쒓렇???붾㈃?쇰줈 ?대룞?⑸땲??..
     </div>
 </div>
 
-<!-- ── 후기 상세 모달 ─────────────────────────────── -->
+<!-- ?? ?꾧린 ?묒꽦 紐⑤떖 ??????????????????????????????? -->
+<div id="writeModal" class="wm-overlay" onclick="closeWriteModal(event)">
+    <div class="wm-box">
+        <div class="wm-head">
+            <span class="wm-title">?꾧린 ?묒꽦</span>
+            <button type="button" class="wm-close" onclick="closeWriteModal()">횞</button>
+        </div>
+        <div class="wm-body">
+            <form th:action="@{/news/write}" method="post" enctype="multipart/form-data" class="wm-form" id="wmForm">
+                <input type="hidden" name="tag" value="?꾧린"/>
+
+                <!-- 蹂꾩젏 -->
+                <div class="wm-group">
+                    <label class="wm-label">蹂꾩젏</label>
+                    <div class="wm-stars">
+                        <input type="radio" name="rating" id="ws5" value="5"><label for="ws5">??/label>
+                        <input type="radio" name="rating" id="ws4" value="4"><label for="ws4">??/label>
+                        <input type="radio" name="rating" id="ws3" value="3"><label for="ws3">??/label>
+                        <input type="radio" name="rating" id="ws2" value="2"><label for="ws2">??/label>
+                        <input type="radio" name="rating" id="ws1" value="1"><label for="ws1">??/label>
+                    </div>
+                    <p class="wm-star-hint">蹂꾩쓣 ?대┃?댁꽌 ?먯닔瑜??좏깮?섏꽭??(1~5??</p>
+                </div>
+
+                <!-- 愿???앹뾽 -->
+                <div class="wm-group">
+                    <label class="wm-label">愿???앹뾽 <span class="wm-label-sub" style="color:var(--primary);">*?꾩닔</span></label>
+                    <div class="wm-ac-wrap">
+                        <input type="text" id="wmStoreSearch" class="wm-input" placeholder="?꾧린瑜??④만 ?앹뾽??寃?됲븯?몄슂..." autocomplete="off"/>
+                        <div id="wmAcDrop" class="wm-ac-drop"></div>
+                        <input type="hidden" name="popupStoreId" id="wmStoreId"/>
+                        <div id="wmAcChip" class="wm-ac-chip">
+                            <span id="wmChipName"></span>
+                            <button type="button" id="wmAcClear" title="?좏깮 ?댁젣">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ?쒕ぉ -->
+                <div class="wm-group">
+                    <label class="wm-label">?쒕ぉ</label>
+                    <input type="text" name="title" class="wm-input" placeholder="?쒕ぉ???낅젰?섏꽭?? required/>
+                </div>
+
+                <!-- ?몃꽕??-->
+                <div class="wm-group">
+                    <label class="wm-label">?몃꽕??<span class="wm-label-sub">(?좏깮, ?대?吏 ?뚯씪)</span></label>
+                    <input type="file" name="thumbnailFile" class="wm-file" accept="image/*"/>
+                </div>
+
+                <!-- ?댁슜 -->
+                <div class="wm-group">
+                    <label class="wm-label">?댁슜</label>
+                    <textarea name="content" class="wm-textarea" placeholder="?댁슜???낅젰?섏꽭?? required></textarea>
+                </div>
+
+                <div class="wm-actions">
+                    <button type="button" class="btn-secondary" onclick="closeWriteModal()">痍⑥냼</button>
+                    <button type="submit" class="btn-primary">?깅줉</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ?? ?꾧린 ?곸꽭 紐⑤떖 ??????????????????????????????? -->
 <div class="rm-overlay" id="reviewModal" onclick="closeReviewModal(event)">
     <div class="rm-box">
         <div class="rm-head">
-            <span class="rm-head-title">후기</span>
-            <button class="rm-close" onclick="closeModal()">×</button>
+            <span class="rm-head-title">?꾧린</span>
+            <button class="rm-close" onclick="closeModal()">횞</button>
         </div>
         <div class="rm-body">
-            <!-- 유저 정보 + 날짜 -->
+            <!-- ?좎? ?뺣낫 + ?좎쭨 -->
             <div class="rm-user">
                 <div class="rm-avatar" id="rmAvatar">?</div>
                 <div class="rm-user-meta">
@@ -441,16 +595,16 @@
                         <span class="rm-user-name" id="rmAuthor"></span>
                         <span class="rm-user-count" id="rmCount"></span>
                     </div>
-                    <!-- 별점 -->
+                    <!-- 蹂꾩젏 -->
                     <div class="rm-stars" id="rmStarsRow" style="margin-top:4px;"></div>
                 </div>
                 <span class="rm-user-date" id="rmDate"></span>
             </div>
-            <!-- 썸네일 -->
+            <!-- ?몃꽕??-->
             <img id="rmThumb" class="rm-thumb" alt="" style="display:none"/>
-            <!-- 본문 -->
+            <!-- 蹂몃Ц -->
             <p class="rm-content" id="rmContent"></p>
-            <!-- 연결 팝업 -->
+            <!-- ?곌껐 ?앹뾽 -->
             <div id="rmStore" class="rm-store" style="display:none">
                 <img id="rmStoreImg" class="rm-store-img" alt="" style="display:none"/>
                 <div id="rmStoreImgPh" class="rm-store-img-ph" style="display:none"></div>
@@ -461,7 +615,7 @@
                 </div>
             </div>
             <hr class="rm-divider"/>
-            <!-- 액션 -->
+            <!-- ?≪뀡 -->
             <div class="rm-actions">
                 <button type="button" class="rm-helpful-btn" id="rmLikeBtn" onclick="submitLike()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -469,10 +623,10 @@
                         <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
                         <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
                     </svg>
-                    도움이 되었어요 <span id="rmLikeCount"></span>
+                    ?꾩????섏뿀?댁슂 <span id="rmLikeCount"></span>
                 </button>
                 <a id="rmAllBtn" href="#" class="rm-all-btn">
-                    이 팝업 후기 전체보기
+                    ???앹뾽 ?꾧린 ?꾩껜蹂닿린
                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5">
                         <path d="m9 18 6-6-6-6"/>
@@ -485,13 +639,113 @@
 
 <footer class="footer">
     <div class="footer-inner">
-        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="팝업맵"/> 팝업맵</span>
-        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/> ?앹뾽留?/span>
+        <span class="footer-copy">?꾧뎅 ?앹뾽?ㅽ넗???쇱젙 諛??꾩튂 ?뺣낫 ?쒕퉬??/span>
     </div>
 </footer>
 
 <script src="/js/nav.js"></script>
 <script>
+/* ?? ?꾧린 ?묒꽦 紐⑤떖 ?? */
+(function () {
+    var STORES = [];
+    var wmModal = document.getElementById('writeModal');
+    var wmSearch = document.getElementById('wmStoreSearch');
+    var wmDrop   = document.getElementById('wmAcDrop');
+    var wmId     = document.getElementById('wmStoreId');
+    var wmChip   = document.getElementById('wmAcChip');
+    var wmChipName = document.getElementById('wmChipName');
+    var wmClear  = document.getElementById('wmAcClear');
+    var acIdx    = -1;
+
+    function loadStores(cb) {
+        if (STORES.length > 0) { cb(); return; }
+        fetch('/api/stores').then(function(r){ return r.json(); }).then(function(data){
+            STORES = data.map(function(s){ return { id: s.id, name: s.name }; });
+            cb();
+        });
+    }
+
+    window.openWriteModal = function(preId, preName) {
+        loadStores(function() {
+            wmModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            if (preId && preName) selectStore(preId, preName);
+        });
+    };
+
+    window.closeWriteModal = function(e) {
+        if (e && e.target !== wmModal) return;
+        wmModal.classList.remove('open');
+        document.body.style.overflow = '';
+    };
+
+    function selectStore(id, name) {
+        wmId.value = id;
+        wmChipName.textContent = name;
+        wmChip.style.display = 'inline-flex';
+        wmSearch.value = '';
+        closeDrop();
+    }
+
+    function clearStore() {
+        wmId.value = '';
+        wmChip.style.display = 'none';
+        wmSearch.value = '';
+        closeDrop();
+    }
+
+    function closeDrop() { wmDrop.classList.remove('open'); wmDrop.innerHTML = ''; acIdx = -1; }
+
+    function renderDrop(results) {
+        wmDrop.innerHTML = '';
+        acIdx = -1;
+        if (!results.length) {
+            wmDrop.innerHTML = '<div class="wm-ac-empty">寃??寃곌낵 ?놁쓬</div>';
+        } else {
+            results.forEach(function(s) {
+                var el = document.createElement('div');
+                el.className = 'wm-ac-item';
+                el.textContent = s.name;
+                el.addEventListener('mousedown', function(e){ e.preventDefault(); selectStore(s.id, s.name); });
+                wmDrop.appendChild(el);
+            });
+        }
+        wmDrop.classList.add('open');
+    }
+
+    wmSearch.addEventListener('input', function() {
+        var q = this.value.trim();
+        if (!q) { closeDrop(); return; }
+        renderDrop(STORES.filter(function(s){ return s.name.toLowerCase().includes(q.toLowerCase()); }));
+    });
+
+    wmSearch.addEventListener('keydown', function(e) {
+        var items = wmDrop.querySelectorAll('.wm-ac-item');
+        if (e.key === 'ArrowDown') { e.preventDefault(); acIdx = Math.min(acIdx+1, items.length-1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); acIdx = Math.max(acIdx-1, 0); }
+        else if (e.key === 'Enter') { e.preventDefault(); var t = acIdx>=0 ? items[acIdx] : items[0]; if(t) t.dispatchEvent(new MouseEvent('mousedown')); return; }
+        else if (e.key === 'Escape') { closeDrop(); return; }
+        items.forEach(function(el,i){ el.classList.toggle('active', i===acIdx); });
+    });
+
+    wmSearch.addEventListener('blur', function(){ setTimeout(closeDrop, 150); });
+    wmClear.addEventListener('click', function(){ clearStore(); wmSearch.focus(); });
+
+    document.getElementById('wmForm').addEventListener('submit', function(e) {
+        if (!wmId.value) {
+            e.preventDefault();
+            wmSearch.focus();
+            wmSearch.style.borderColor = 'var(--primary)';
+            wmSearch.placeholder = '愿???앹뾽???좏깮?댁＜?몄슂 (?꾩닔)';
+            setTimeout(function(){ wmSearch.style.borderColor=''; wmSearch.placeholder='?꾧린瑜??④만 ?앹뾽??寃?됲븯?몄슂...'; }, 2500);
+        }
+    });
+
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') { wmModal.classList.remove('open'); document.body.style.overflow=''; } });
+})();
+
+/* ?? 鍮꾨줈洹몄씤 踰꾪듉 ?? */
 (function () {
     ['writeBtn', 'writeBtn2'].forEach(function(btnId) {
         var btn = document.getElementById(btnId);
@@ -507,7 +761,7 @@
 function openReviewModal(card) {
     var d           = card.dataset;
     var id          = d.id || '';
-    var author      = d.author || '익명';
+    var author      = d.author || '?듬챸';
     var rating      = parseInt(d.rating) || 0;
     var content     = d.content || '';
     var thumb       = d.thumbnail || '';
@@ -523,7 +777,7 @@ function openReviewModal(card) {
 
     document.getElementById('rmAvatar').textContent  = author.charAt(0);
     document.getElementById('rmAuthor').textContent  = author;
-    document.getElementById('rmCount').textContent   = '후기 ' + reviewCount;
+    document.getElementById('rmCount').textContent   = '?꾧린 ' + reviewCount;
     document.getElementById('rmDate').textContent    = date;
 
     var starsRow = document.getElementById('rmStarsRow');
@@ -532,7 +786,7 @@ function openReviewModal(card) {
         for (var i = 1; i <= 5; i++) {
             var s = document.createElement('span');
             s.className = 'rm-star' + (i <= rating ? ' filled' : '');
-            s.textContent = '★';
+            s.textContent = '??;
             starsRow.appendChild(s);
         }
         var ratingTxt = document.createElement('span');
@@ -565,7 +819,7 @@ function openReviewModal(card) {
             storeImgEl.style.display = 'none';
             storeImgPh.style.display = 'block';
         }
-        document.getElementById('rmStoreCat').textContent    = (storeCat || '') + ' ● 진행중';
+        document.getElementById('rmStoreCat').textContent    = (storeCat || '') + ' ??吏꾪뻾以?;
         document.getElementById('rmStoreName').textContent   = storeName;
         document.getElementById('rmStoreRegion').textContent = storeRegion;
         allBtn.href = '/store/' + storeId;
@@ -629,3 +883,4 @@ document.addEventListener('keydown', function(e) {
 </script>
 </body>
 </html>
+

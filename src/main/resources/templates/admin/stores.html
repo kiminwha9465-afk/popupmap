@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>팝업 관리 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=15"/>
+    <title>?앹뾽 愿由?- ?앹뾽留?/title>
+    <link rel="stylesheet" href="/css/style.css?v=16"/>
     <style>
         .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
         .admin-title { font-size: 22px; font-weight: 800; margin-bottom: 28px; }
@@ -52,12 +52,12 @@
     <div class="header-inner">
         <div class="header-top">
             <a href="/" class="header-brand">
-                <img src="/favicon.svg" class="brand-icon" alt="팝업맵"/>
-                <span class="brand-text">팝업맵</span>
+                <img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/>
+                <span class="brand-text">?앹뾽留?/span>
             </a>
             <div class="header-top-right" style="margin-left:auto;">
                 <form th:action="@{/logout}" method="post" style="display:inline;">
-                    <button type="submit" class="auth-link-btn">로그아웃</button>
+                    <button type="submit" class="auth-link-btn">濡쒓렇?꾩썐</button>
                 </form>
             </div>
         </div>
@@ -65,26 +65,26 @@
 </header>
 
 <div class="admin-wrap">
-    <div class="admin-title">팝업 관리</div>
+    <div class="admin-title">?앹뾽 愿由?/div>
 
     <nav class="admin-nav">
-        <a href="/admin">대시보드</a>
-        <a href="/admin/stores" class="active">팝업 관리</a>
-        <a href="/admin/news">게시판 관리</a>
-        <a href="/admin/reviews">후기 관리</a>
-        <a href="/admin/users">회원 관리</a>
+        <a href="/admin">??쒕낫??/a>
+        <a href="/admin/stores" class="active">?앹뾽 愿由?/a>
+        <a href="/admin/news">寃뚯떆??愿由?/a>
+        <a href="/admin/reviews">?꾧린 愿由?/a>
+        <a href="/admin/users">?뚯썝 愿由?/a>
     </nav>
 
     <div th:if="${msg}" class="flash-msg flash-ok" th:text="${msg}"></div>
     <div th:if="${error}" class="flash-msg flash-err" th:text="${error}"></div>
 
     <div class="admin-toolbar">
-        <span class="admin-count">총 <strong th:text="${#lists.size(stores)}">0</strong>개</span>
+        <span class="admin-count">珥?<strong th:text="${#lists.size(stores)}">0</strong>媛?/span>
         <div style="display:flex;gap:8px;">
-            <a href="/admin/stores/new" class="btn-crawl" style="text-decoration:none;">+ 수동 등록</a>
+            <a href="/admin/stores/new" class="btn-crawl" style="text-decoration:none;">+ ?섎룞 ?깅줉</a>
             <form th:action="@{/admin/crawl}" method="post" style="margin:0;">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <button type="submit" class="btn-crawl">팝가 크롤링 실행</button>
+                <button type="submit" class="btn-crawl">?앷? ?щ·留??ㅽ뻾</button>
             </form>
         </div>
     </div>
@@ -93,14 +93,14 @@
     <table class="admin-table">
         <thead>
             <tr>
-                <th>썸네일</th>
-                <th>이름</th>
-                <th>카테고리</th>
-                <th>지역</th>
-                <th>기간</th>
-                <th>상태</th>
-                <th>수정</th>
-                <th>삭제</th>
+                <th>?몃꽕??/th>
+                <th>?대쫫</th>
+                <th>移댄뀒怨좊━</th>
+                <th>吏??/th>
+                <th>湲곌컙</th>
+                <th>?곹깭</th>
+                <th>?섏젙</th>
+                <th>??젣</th>
             </tr>
         </thead>
         <tbody>
@@ -124,18 +124,18 @@
                           th:classappend="${s.endDate != null and s.endDate.isBefore(today)} ? 'badge-ended' :
                                           (${s.startDate != null and s.startDate.isAfter(today)} ? 'badge-upcoming' : 'badge-ongoing')"
                           class="badge"
-                          th:text="${s.endDate != null and s.endDate.isBefore(today)} ? '종료' :
-                                    (${s.startDate != null and s.startDate.isAfter(today)} ? '예정' : '진행중')">
+                          th:text="${s.endDate != null and s.endDate.isBefore(today)} ? '醫낅즺' :
+                                    (${s.startDate != null and s.startDate.isAfter(today)} ? '?덉젙' : '吏꾪뻾以?)">
                     </span>
                 </td>
                 <td>
-                    <a th:href="@{/admin/stores/{id}/edit(id=${s.id})}" class="btn-edit">수정</a>
+                    <a th:href="@{/admin/stores/{id}/edit(id=${s.id})}" class="btn-edit">?섏젙</a>
                 </td>
                 <td>
                     <form th:action="@{/admin/stores/{id}/delete(id=${s.id})}" method="post"
-                          onsubmit="return confirm('삭제하시겠습니까?')">
+                          onsubmit="return confirm('??젣?섏떆寃좎뒿?덇퉴?')">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                        <button type="submit" class="btn-del">삭제</button>
+                        <button type="submit" class="btn-del">??젣</button>
                     </form>
                 </td>
             </tr>
@@ -154,3 +154,4 @@
 </script>
 </body>
 </html>
+

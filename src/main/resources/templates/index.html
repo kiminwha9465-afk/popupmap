@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -7,23 +7,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <title>팝업맵 - 전국 팝업스토어 일정 & 위치</title>
-    <link rel="stylesheet" href="/css/style.css?v=15"/>
+    <title>?앹뾽留?- ?꾧뎅 ?앹뾽?ㅽ넗???쇱젙 & ?꾩튂</title>
+    <link rel="stylesheet" href="/css/style.css?v=16"/>
 </head>
 <body>
 
-<!-- ── 헤더 ──────────────────────────────────────────── -->
+<!-- ?? ?ㅻ뜑 ???????????????????????????????????????????? -->
 <header class="header">
 <div class="header-inner">
 
-    <!-- 1행: 로고 / 검색 / 인증 -->
+    <!-- 1?? 濡쒓퀬 / 寃??/ ?몄쬆 -->
     <div class="header-top">
         <a href="/" class="header-brand">
-            <img src="/favicon.svg" class="brand-icon" alt="팝업맵"/>
-            <span class="brand-text">팝업맵</span>
+            <img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/>
+            <span class="brand-text">?앹뾽留?/span>
         </a>
         <div class="header-top-right">
-            <button id="searchToggle" class="search-toggle-btn" title="검색">
+            <button id="searchToggle" class="search-toggle-btn" title="寃??>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                      fill="none" stroke="currentColor" stroke-width="2.5">
                     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -39,7 +39,7 @@
                         <span sec:authentication="name"></span>
                     </span>
                     <div sec:authorize="isAuthenticated()" class="bell-wrap">
-                        <button class="bell-btn" id="bellBtn" title="알림">
+                        <button class="bell-btn" id="bellBtn" title="?뚮┝">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="1.6"
                                  stroke-linecap="round" stroke-linejoin="round">
@@ -48,102 +48,101 @@
                             <span th:if="${bellCount != null and bellCount > 0}" class="bell-badge" th:text="${bellCount}"></span>
                         </button>
                         <div class="bell-dropdown" id="bellDropdown" hidden>
-                            <div class="bell-dd-hd">D-3 마감 북마크</div>
-                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">임박한 종료 팝업이 없어요</div>
+                            <div class="bell-dd-hd">D-3 留덇컧 遺곷쭏??/div>
+                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">?꾨컯??醫낅즺 ?앹뾽???놁뼱??/div>
                             <a th:each="item : ${bellItems}" th:href="@{/store/{id}(id=${item.id})}" class="bell-dd-item">
                                 <span class="bell-dd-name" th:text="${item.name}"></span>
                                 <span class="bell-dd-dday"
                                       th:text="${item.dday == 0} ? 'D-DAY' : ('D-' + ${item.dday})"
                                       th:classappend="${item.dday == 0} ? ' dday-today'"></span>
                             </a>
-                            <a href="/mypage" class="bell-dd-footer">북마크 관리 →</a>
+                            <a href="/mypage" class="bell-dd-footer">遺곷쭏??愿由???/a>
                         </div>
                     </div>
-                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">관리자페이지</a>
-                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">마이페이지</a>
+                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">愿由ъ옄?섏씠吏</a>
+                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">留덉씠?섏씠吏</a>
                     <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
-                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                        <button type="submit" class="auth-link-btn">濡쒓렇?꾩썐</button>
                     </form>
-                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
-                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">濡쒓렇??/a>
+                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">?뚯썝媛??/a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 2행: 네비게이션 (항상 표시, 모바일에서 가로 스크롤) -->
+    <!-- 2?? ?ㅻ퉬寃뚯씠??(??긽 ?쒖떆, 紐⑤컮?쇱뿉??媛濡??ㅽ겕濡? -->
     <div class="header-nav-row">
         <nav class="header-nav">
-            <span class="nav-group-label">팝업</span>
-            <a href="/stores" class="nav-link">전체보기</a>
-            <a href="/stores?category=패션" class="nav-link nav-cat-item">패션</a>
-            <a href="/stores?category=뷰티" class="nav-link nav-cat-item">뷰티</a>
-            <a href="/stores?category=식음료" class="nav-link nav-cat-item">식음료</a>
-            <a href="/stores?category=라이프스타일" class="nav-link nav-cat-item">라이프스타일</a>
-            <a href="/stores?category=아트/문화" class="nav-link nav-cat-item">아트/문화</a>
-            <a href="/stores?category=엔터테인먼트" class="nav-link nav-cat-item">엔터테인먼트</a>
-            <a href="/stores?category=테크" class="nav-link nav-cat-item">테크</a>
+            <span class="nav-group-label">?앹뾽</span>
+            <a href="/stores" class="nav-link">?꾩껜蹂닿린</a>
+            <a href="/stores?category=?⑥뀡" class="nav-link nav-cat-item">?⑥뀡</a>
+            <a href="/stores?category=酉고떚" class="nav-link nav-cat-item">酉고떚</a>
+            <a href="/stores?category=?앹쓬猷? class="nav-link nav-cat-item">?앹쓬猷?/a>
+            <a href="/stores?category=?쇱씠?꾩뒪??? class="nav-link nav-cat-item">?쇱씠?꾩뒪???/a>
+            <a href="/stores?category=?꾪듃/臾명솕" class="nav-link nav-cat-item">?꾪듃/臾명솕</a>
+            <a href="/stores?category=?뷀꽣?뚯씤癒쇳듃" class="nav-link nav-cat-item">?뷀꽣?뚯씤癒쇳듃</a>
+            <a href="/stores?category=?뚰겕" class="nav-link nav-cat-item">?뚰겕</a>
             <details class="nav-dropdown">
                 <summary>
-                    카테고리
+                    移댄뀒怨좊━
                     <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
                 <div class="nav-dropdown-menu">
-                    <a href="/stores?category=패션" class="nav-dropdown-item">패션</a>
-                    <a href="/stores?category=뷰티" class="nav-dropdown-item">뷰티</a>
-                    <a href="/stores?category=식음료" class="nav-dropdown-item">식음료</a>
-                    <a href="/stores?category=라이프스타일" class="nav-dropdown-item">라이프스타일</a>
-                    <a href="/stores?category=아트/문화" class="nav-dropdown-item">아트/문화</a>
-                    <a href="/stores?category=엔터테인먼트" class="nav-dropdown-item">엔터테인먼트</a>
-                    <a href="/stores?category=테크" class="nav-dropdown-item">테크</a>
+                    <a href="/stores?category=?⑥뀡" class="nav-dropdown-item">?⑥뀡</a>
+                    <a href="/stores?category=酉고떚" class="nav-dropdown-item">酉고떚</a>
+                    <a href="/stores?category=?앹쓬猷? class="nav-dropdown-item">?앹쓬猷?/a>
+                    <a href="/stores?category=?쇱씠?꾩뒪??? class="nav-dropdown-item">?쇱씠?꾩뒪???/a>
+                    <a href="/stores?category=?꾪듃/臾명솕" class="nav-dropdown-item">?꾪듃/臾명솕</a>
+                    <a href="/stores?category=?뷀꽣?뚯씤癒쇳듃" class="nav-dropdown-item">?뷀꽣?뚯씤癒쇳듃</a>
+                    <a href="/stores?category=?뚰겕" class="nav-dropdown-item">?뚰겕</a>
                 </div>
             </details>
-            <button id="headerBmToggle" class="nav-bm-btn" title="내 북마크">
+            <button id="headerBmToggle" class="nav-bm-btn" title="??遺곷쭏??>
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                      fill="none" stroke="currentColor" stroke-width="2.2">
                     <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
                 </svg>
-                북마크
-                <span id="headerBmBadge" class="bm-badge" hidden>0</span>
+                遺곷쭏??                <span id="headerBmBadge" class="bm-badge" hidden>0</span>
             </button>
             <span class="nav-sep"></span>
-            <span class="nav-group-label">커뮤니티</span>
-            <a href="/news" class="nav-link nav-news-item">전체</a>
-            <a href="/news?tag=공지" class="nav-link nav-news-item">공지</a>
-            <a href="/news?tag=소식" class="nav-link nav-news-item">소식</a>
-            <a href="/news?tag=트렌드" class="nav-link nav-news-item">트렌드</a>
-            <a href="/news?tag=후기" class="nav-link nav-news-item">후기</a>
+            <span class="nav-group-label">而ㅻ??덊떚</span>
+            <a href="/news" class="nav-link nav-news-item">?꾩껜</a>
+            <a href="/news?tag=怨듭?" class="nav-link nav-news-item">怨듭?</a>
+            <a href="/news?tag=?뚯떇" class="nav-link nav-news-item">?뚯떇</a>
+            <a href="/news?tag=?몃젋?? class="nav-link nav-news-item">?몃젋??/a>
+            <a href="/news?tag=?꾧린" class="nav-link nav-news-item">?꾧린</a>
             <details class="nav-dropdown">
                 <summary>
-                    커뮤니티
+                    而ㅻ??덊떚
                     <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
                 <div class="nav-dropdown-menu">
-                    <a href="/news" class="nav-dropdown-item">전체</a>
-                    <a href="/news?tag=공지" class="nav-dropdown-item">공지</a>
-                    <a href="/news?tag=소식" class="nav-dropdown-item">소식</a>
-                    <a href="/news?tag=트렌드" class="nav-dropdown-item">트렌드</a>
+                    <a href="/news" class="nav-dropdown-item">?꾩껜</a>
+                    <a href="/news?tag=怨듭?" class="nav-dropdown-item">怨듭?</a>
+                    <a href="/news?tag=?뚯떇" class="nav-dropdown-item">?뚯떇</a>
+                    <a href="/news?tag=?몃젋?? class="nav-dropdown-item">?몃젋??/a>
                     <div class="nav-dropdown-divider"></div>
-                    <span class="nav-dropdown-label">후기</span>
-                    <a href="/news?tag=후기" class="nav-dropdown-item">후기</a>
+                    <span class="nav-dropdown-label">?꾧린</span>
+                    <a href="/news?tag=?꾧린" class="nav-dropdown-item">?꾧린</a>
                 </div>
             </details>
         </nav>
     </div>
 
-    <!-- 3행: 검색 (기본 숨김, 돋보기 클릭 시 표시) -->
+    <!-- 3?? 寃??(湲곕낯 ?④?, ?뗫낫湲??대┃ ???쒖떆) -->
     <div class="header-search-row" id="searchRow" hidden>
         <form th:action="@{/stores}" method="get" class="header-search-form">
             <select name="category" class="search-cat-select">
-                <option value="" th:selected="${selectedCategory == null or selectedCategory == ''}">전체</option>
-                <option th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+                <option value="" th:selected="${selectedCategory == null or selectedCategory == ''}">?꾩껜</option>
+                <option th:each="cat : ${ {'?⑥뀡','酉고떚','?앹쓬猷?,'?쇱씠?꾩뒪???,'?꾪듃/臾명솕','?뷀꽣?뚯씤癒쇳듃','?뚰겕'} }"
                         th:value="${cat}" th:text="${cat}"
-                        th:selected="${cat == selectedCategory}">카테고리</option>
+                        th:selected="${cat == selectedCategory}">移댄뀒怨좊━</option>
             </select>
             <span class="search-divider"></span>
-            <input type="text" name="keyword" class="search-input" placeholder="이름, 주소, 지하철역으로 검색..."
+            <input type="text" name="keyword" class="search-input" placeholder="?대쫫, 二쇱냼, 吏?섏쿋??쑝濡?寃??.."
                    th:value="${keyword}" autocomplete="off"/>
             <button type="submit" class="search-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
@@ -152,7 +151,7 @@
                 </svg>
             </button>
         </form>
-        <button id="searchClose" class="search-close-btn" title="닫기">
+        <button id="searchClose" class="search-close-btn" title="?リ린">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M18 6 6 18M6 6l12 12"/>
@@ -165,7 +164,7 @@
 
 <main class="page-main">
 
-    <!-- ── 롤링 배너 ────────────────────────────────── -->
+    <!-- ?? 濡ㅻ쭅 諛곕꼫 ?????????????????????????????????? -->
     <section class="banner-section">
         <div class="banner-track" id="bannerTrack">
             <div th:each="store,i : ${stores}" th:if="${i.index < 6}" class="banner-slide">
@@ -175,7 +174,7 @@
                     <div class="banner-meta">
                         <span class="banner-cat" th:text="${store.category}"></span>
                         <span class="banner-status"
-                              th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
+                              th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? '?ㅽ뵂?덉젙' : '吏꾪뻾以?}"
                               th:classappend="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
                         </span>
                     </div>
@@ -183,8 +182,8 @@
                     <p class="banner-addr" th:text="${store.address}"></p>
                     <p class="banner-date" th:text="${store.startDate} + ' ~ ' + ${store.endDate}"></p>
                     <div class="banner-actions">
-                        <a th:href="@{/store/{id}(id=${store.id})}" class="banner-link">자세히 보기 →</a>
-                        <button class="bm-btn banner-bm" th:data-id="${store.id}" title="북마크 추가">
+                        <a th:href="@{/store/{id}(id=${store.id})}" class="banner-link">?먯꽭??蹂닿린 ??/a>
+                        <button class="bm-btn banner-bm" th:data-id="${store.id}" title="遺곷쭏??異붽?">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
@@ -194,48 +193,47 @@
                 </div>
             </div>
             <div th:if="${stores.isEmpty()}" class="banner-slide banner-empty">
-                <p>현재 진행 중인 팝업스토어가 없습니다.</p>
+                <p>?꾩옱 吏꾪뻾 以묒씤 ?앹뾽?ㅽ넗?닿? ?놁뒿?덈떎.</p>
             </div>
         </div>
-        <button class="banner-arrow prev" id="bannerPrev" aria-label="이전">&#8249;</button>
-        <button class="banner-arrow next" id="bannerNext" aria-label="다음">&#8250;</button>
+        <button class="banner-arrow prev" id="bannerPrev" aria-label="?댁쟾">&#8249;</button>
+        <button class="banner-arrow next" id="bannerNext" aria-label="?ㅼ쓬">&#8250;</button>
         <div class="banner-dots" id="bannerDots"></div>
     </section>
 
-    <!-- ── 달력 + 지도 ──────────────────────────────── -->
+    <!-- ?? ?щ젰 + 吏?????????????????????????????????? -->
     <section class="mid-section">
 
-        <!-- 달력·지도 전용 필터 바 -->
+        <!-- ?щ젰쨌吏???꾩슜 ?꾪꽣 諛?-->
         <div class="mid-filter">
             <div class="mid-filter-cats">
-                <span class="mid-filter-label">카테고리</span>
-                <button class="mid-cat-btn active" data-mid-cat="">전체</button>
-                <button th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
-                        class="mid-cat-btn" th:data-mid-cat="${cat}" th:text="${cat}">카테고리</button>
+                <span class="mid-filter-label">移댄뀒怨좊━</span>
+                <button class="mid-cat-btn active" data-mid-cat="">?꾩껜</button>
+                <button th:each="cat : ${ {'?⑥뀡','酉고떚','?앹쓬猷?,'?쇱씠?꾩뒪???,'?꾪듃/臾명솕','?뷀꽣?뚯씤癒쇳듃','?뚰겕'} }"
+                        class="mid-cat-btn" th:data-mid-cat="${cat}" th:text="${cat}">移댄뀒怨좊━</button>
             </div>
             <div class="mid-filter-right">
-                <button id="bmToggle" class="bm-toggle" title="내 북마크">
+                <button id="bmToggle" class="bm-toggle" title="??遺곷쭏??>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.2">
                         <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
                     </svg>
-                    내 북마크
-                    <span id="bmBadge" class="bm-badge" hidden>0</span>
+                    ??遺곷쭏??                    <span id="bmBadge" class="bm-badge" hidden>0</span>
                 </button>
-                <button id="filterClear" class="filter-clear-btn">초기화</button>
+                <button id="filterClear" class="filter-clear-btn">珥덇린??/button>
             </div>
         </div>
 
-        <!-- 북마크 패널 -->
+        <!-- 遺곷쭏???⑤꼸 -->
         <div id="bmPanel" class="bookmark-panel" hidden>
             <div class="bm-panel-header">
-                <h3 class="bm-panel-title">내 북마크</h3>
-                <p class="bm-panel-desc">북마크한 팝업을 달력과 지도에 표시합니다.</p>
+                <h3 class="bm-panel-title">??遺곷쭏??/h3>
+                <p class="bm-panel-desc">遺곷쭏?ы븳 ?앹뾽???щ젰怨?吏?꾩뿉 ?쒖떆?⑸땲??</p>
             </div>
             <div id="bmList" class="bm-list">
                 <div class="bm-empty">
-                    <div class="bm-empty-icon">📍</div>
-                    <p>북마크한 팝업이 없습니다.<br/>카드의 북마크 아이콘을 눌러 추가해보세요.</p>
+                    <div class="bm-empty-icon">?뱧</div>
+                    <p>遺곷쭏?ы븳 ?앹뾽???놁뒿?덈떎.<br/>移대뱶??遺곷쭏???꾩씠肄섏쓣 ?뚮윭 異붽??대낫?몄슂.</p>
                 </div>
             </div>
         </div>
@@ -244,34 +242,34 @@
 
             <div class="calendar-widget">
                 <div class="widget-header">
-                    <h3 class="widget-title">팝업 일정</h3>
-                    <span id="calFilterBadge" class="widget-filter-badge" hidden>필터링됨</span>
+                    <h3 class="widget-title">?앹뾽 ?쇱젙</h3>
+                    <span id="calFilterBadge" class="widget-filter-badge" hidden>?꾪꽣留곷맖</span>
                 </div>
                 <div class="cal-nav">
                     <button class="cal-arrow" id="calPrev">&#8249;</button>
                     <span class="cal-month" id="calMonth"></span>
                     <button class="cal-arrow" id="calNext">&#8250;</button>
-                    <button class="cal-today-btn" id="calToday">오늘</button>
+                    <button class="cal-today-btn" id="calToday">?ㅻ뒛</button>
                 </div>
                 <div class="cal-grid" id="calGrid"></div>
                 <div class="cal-events" id="calEvents">
-                    <p class="cal-events-hint">날짜를 선택하면 팝업스토어 일정을 확인할 수 있어요.</p>
+                    <p class="cal-events-hint">?좎쭨瑜??좏깮?섎㈃ ?앹뾽?ㅽ넗???쇱젙???뺤씤?????덉뼱??</p>
                 </div>
             </div>
 
             <div class="map-widget">
                 <div class="widget-header">
-                    <h3 class="widget-title">팝업 지도</h3>
+                    <h3 class="widget-title">?앹뾽 吏??/h3>
                     <div class="widget-header-right">
-                        <span id="mapFilterBadge" class="widget-filter-badge" hidden>필터링됨</span>
-                        <span class="widget-count" id="mapCount" th:text="${stores.size()} + '개'"></span>
+                        <span id="mapFilterBadge" class="widget-filter-badge" hidden>?꾪꽣留곷맖</span>
+                        <span class="widget-count" id="mapCount" th:text="${stores.size()} + '媛?"></span>
                     </div>
                 </div>
                 <div class="map-container">
                     <div id="map"></div>
                     <div id="clusterPanel" class="cluster-panel" style="display:none">
                         <div class="cluster-panel-hd">
-                            <span class="cluster-panel-title">팝업 <span id="clusterCount">0</span>개</span>
+                            <span class="cluster-panel-title">?앹뾽 <span id="clusterCount">0</span>媛?/span>
                             <button class="cluster-panel-close" onclick="_hideClusterList()">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2.5">
@@ -281,7 +279,7 @@
                         </div>
                         <ul id="clusterList" class="cluster-list"></ul>
                     </div>
-                    <button class="map-locate-btn" id="mapLocate" title="현재 위치로 이동">
+                    <button class="map-locate-btn" id="mapLocate" title="?꾩옱 ?꾩튂濡??대룞">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                              fill="none" stroke="currentColor" stroke-width="2.2">
                             <circle cx="12" cy="12" r="3"/>
@@ -291,23 +289,22 @@
                     </button>
                 </div>
                 <div class="map-legend">
-                    <span class="legend-dot ongoing-dot"></span>진행중
-                    <span class="legend-dot upcoming-dot"></span>예정
+                    <span class="legend-dot ongoing-dot"></span>吏꾪뻾以?                    <span class="legend-dot upcoming-dot"></span>?덉젙
                 </div>
             </div>
 
         </div>
     </section>
 
-    <!-- ── 하단 섹션 ────────────────────────────────────── -->
+    <!-- ?? ?섎떒 ?뱀뀡 ?????????????????????????????????????? -->
     <section class="bottom-section">
         <div class="bottom-inner">
 
-            <!-- 인기 팝업 랭킹 -->
+            <!-- ?멸린 ?앹뾽 ??궧 -->
             <div class="bottom-panel">
                 <div class="panel-header">
-                    <h3 class="panel-title">🔥 인기 팝업</h3>
-                    <a href="/stores" class="panel-more">전체보기</a>
+                    <h3 class="panel-title">?뵦 ?멸린 ?앹뾽</h3>
+                    <a href="/stores" class="panel-more">?꾩껜蹂닿린</a>
                 </div>
                 <ol class="ranking-list">
                     <a th:each="store,i : ${stores}" th:if="${i.index < 5}"
@@ -317,13 +314,13 @@
                              onerror="this.onerror=null;this.src='/img/no-image.svg';"/>
                         <div class="rank-info">
                             <p class="rank-name" th:text="${store.name}"></p>
-                            <p class="rank-region" th:text="${store.region} + ' · ' + ${store.category}"></p>
+                            <p class="rank-region" th:text="${store.region} + ' 쨌 ' + ${store.category}"></p>
                         </div>
                         <span class="rank-badge"
-                              th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? 'D-' + T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), store.startDate) : '진행중'}"
+                              th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? 'D-' + T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), store.startDate) : '吏꾪뻾以?}"
                               th:classappend="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
                         </span>
-                        <button class="bm-btn rank-bm" th:data-id="${store.id}" title="북마크 추가"
+                        <button class="bm-btn rank-bm" th:data-id="${store.id}" title="遺곷쭏??異붽?"
                                 onclick="event.preventDefault(); event.stopPropagation();">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2">
@@ -334,11 +331,11 @@
                 </ol>
             </div>
 
-            <!-- 소식 -->
+            <!-- ?뚯떇 -->
             <div class="bottom-panel">
                 <div class="panel-header">
-                    <h3 class="panel-title">📢 팝업 소식</h3>
-                    <a href="/news" class="panel-more">더보기</a>
+                    <h3 class="panel-title">?뱼 ?앹뾽 ?뚯떇</h3>
+                    <a href="/news" class="panel-more">?붾낫湲?/a>
                 </div>
                 <ul class="news-list" th:if="${not #lists.isEmpty(recentNews)}">
                     <li th:each="n : ${recentNews}" class="news-item">
@@ -350,16 +347,16 @@
                     </li>
                 </ul>
                 <div th:if="${#lists.isEmpty(recentNews)}" class="news-empty">
-                    <p>등록된 소식이 없습니다.</p>
-                    <a href="/news/write" class="news-write-link">첫 소식 작성하기 →</a>
+                    <p>?깅줉???뚯떇???놁뒿?덈떎.</p>
+                    <a href="/news/write" class="news-write-link">泥??뚯떇 ?묒꽦?섍린 ??/a>
                 </div>
             </div>
 
-            <!-- 추천 팝업 -->
+            <!-- 異붿쿇 ?앹뾽 -->
             <div class="bottom-panel">
                 <div class="panel-header">
-                    <h3 class="panel-title">🎪 추천 팝업</h3>
-                    <a href="/stores" class="panel-more">전체보기</a>
+                    <h3 class="panel-title">?렕 異붿쿇 ?앹뾽</h3>
+                    <a href="/stores" class="panel-more">?꾩껜蹂닿린</a>
                 </div>
                 <div class="recommend-grid">
                     <a th:each="store,i : ${stores}" th:if="${i.index >= 5 and i.index < 9}"
@@ -370,7 +367,7 @@
                             <span class="rec-cat"
                                   th:if="${store.category != null and !store.category.isBlank()}"
                                   th:text="${store.category}"></span>
-                            <button class="bm-btn rec-bm" th:data-id="${store.id}" title="북마크 추가"
+                            <button class="bm-btn rec-bm" th:data-id="${store.id}" title="遺곷쭏??異붽?"
                                     onclick="event.preventDefault(); PopupFilter.toggleBookmark(this.dataset.id);">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2">
@@ -391,8 +388,8 @@
 
 <footer class="footer">
     <div class="footer-inner">
-        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="팝업맵"/> 팝업맵</span>
-        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/> ?앹뾽留?/span>
+        <span class="footer-copy">?꾧뎅 ?앹뾽?ㅽ넗???쇱젙 諛??꾩튂 ?뺣낫 ?쒕퉬??/span>
     </div>
 </footer>
 
@@ -410,3 +407,4 @@
 <script src="/js/map.js"></script>
 </body>
 </html>
+

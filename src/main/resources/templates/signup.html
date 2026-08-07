@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=15"/>
+    <title>?뚯썝媛??- ?앹뾽留?/title>
+    <link rel="stylesheet" href="/css/style.css?v=16"/>
     <style>
         .auth-wrap { min-height: calc(100vh - 56px); display: flex; align-items: center; justify-content: center; padding: 40px 16px; background: var(--bg); }
         .auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 40px 36px; width: 100%; max-width: 400px; }
@@ -32,8 +32,8 @@
 <div class="header-inner">
     <div class="header-top">
         <a href="/" class="header-brand">
-            <img src="/favicon.svg" class="brand-icon" alt="팝업맵"/>
-            <span class="brand-text">팝업맵</span>
+            <img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/>
+            <span class="brand-text">?앹뾽留?/span>
         </a>
     </div>
 </div>
@@ -41,42 +41,42 @@
 
 <div class="auth-wrap">
     <div class="auth-card">
-        <div class="auth-logo"><a href="/">📍 팝업맵</a></div>
-        <h1 class="auth-title">회원가입</h1>
+        <div class="auth-logo"><a href="/">?뱧 ?앹뾽留?/a></div>
+        <h1 class="auth-title">?뚯썝媛??/h1>
 
         <div th:if="${error}" class="auth-msg error" th:text="${error}"></div>
 
         <form th:action="@{/signup}" method="post">
             <div class="auth-field">
-                <label class="auth-label">아이디</label>
-                <input type="text" name="username" class="auth-input" placeholder="영문, 숫자 4~20자" required
+                <label class="auth-label">?꾩씠??/label>
+                <input type="text" name="username" class="auth-input" placeholder="?곷Ц, ?レ옄 4~20?? required
                        minlength="4" maxlength="20" pattern="[a-zA-Z0-9]+" th:value="${username}"/>
-                <p class="auth-hint">영문, 숫자만 사용 가능 (4~20자)</p>
+                <p class="auth-hint">?곷Ц, ?レ옄留??ъ슜 媛??(4~20??</p>
             </div>
             <div class="auth-field">
-                <label class="auth-label">비밀번호</label>
-                <input type="password" name="password" class="auth-input" placeholder="8자 이상" required minlength="8"/>
+                <label class="auth-label">鍮꾨?踰덊샇</label>
+                <input type="password" name="password" class="auth-input" placeholder="8???댁긽" required minlength="8"/>
             </div>
             <div class="auth-field">
-                <label class="auth-label">비밀번호 확인</label>
-                <input type="password" name="passwordConfirm" id="passwordConfirm" class="auth-input" placeholder="비밀번호 재입력" required/>
-                <p class="field-error" id="pwMatchError">비밀번호가 일치하지 않습니다.</p>
+                <label class="auth-label">鍮꾨?踰덊샇 ?뺤씤</label>
+                <input type="password" name="passwordConfirm" id="passwordConfirm" class="auth-input" placeholder="鍮꾨?踰덊샇 ?ъ엯?? required/>
+                <p class="field-error" id="pwMatchError">鍮꾨?踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎.</p>
             </div>
             <div class="auth-field">
-                <label class="auth-label">닉네임</label>
-                <input type="text" name="nickname" class="auth-input" placeholder="게시글에 표시될 이름" required
+                <label class="auth-label">?됰꽕??/label>
+                <input type="text" name="nickname" class="auth-input" placeholder="寃뚯떆湲???쒖떆???대쫫" required
                        minlength="2" maxlength="20" th:value="${nickname}"/>
-                <p class="auth-hint">2~20자, 게시글 작성자로 표시됩니다</p>
+                <p class="auth-hint">2~20?? 寃뚯떆湲 ?묒꽦?먮줈 ?쒖떆?⑸땲??/p>
             </div>
             <div class="auth-field">
-                <label class="auth-label">이메일</label>
+                <label class="auth-label">?대찓??/label>
                 <input type="email" name="email" class="auth-input" placeholder="example@email.com" required th:value="${email}"/>
             </div>
-            <button type="submit" class="auth-btn">가입하기</button>
+            <button type="submit" class="auth-btn">媛?낇븯湲?/button>
         </form>
 
         <p class="auth-footer">
-            이미 계정이 있으신가요? <a href="/login">로그인</a>
+            ?대? 怨꾩젙???덉쑝?좉??? <a href="/login">濡쒓렇??/a>
         </p>
     </div>
 </div>
@@ -106,3 +106,4 @@
 </script>
 </body>
 </html>
+

@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>소식 작성 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=15"/>
+    <title>?뚯떇 ?묒꽦 - ?앹뾽留?/title>
+    <link rel="stylesheet" href="/css/style.css?v=16"/>
     <style>
-        /* ── 별점 입력 ── */
+        /* ?? 蹂꾩젏 ?낅젰 ?? */
         .star-rating { display:flex; flex-direction:row-reverse; gap:4px; width:fit-content; }
         .star-rating input { display:none; }
         .star-rating label { font-size:34px; color:#ddd; cursor:pointer; transition:color .1s; line-height:1; }
@@ -52,14 +52,14 @@
 <div class="header-inner">
     <div class="header-top">
         <a href="/" class="header-brand">
-            <img src="/favicon.svg" class="brand-icon" alt="팝업맵"/>
-            <span class="brand-text">팝업맵</span>
+            <img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/>
+            <span class="brand-text">?앹뾽留?/span>
         </a>
         <div class="header-top-right">
             <div class="header-right">
                 <div class="header-auth">
                     <div sec:authorize="isAuthenticated()" class="bell-wrap">
-                        <button class="bell-btn" id="bellBtn" title="알림">
+                        <button class="bell-btn" id="bellBtn" title="?뚮┝">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="1.6"
                                  stroke-linecap="round" stroke-linejoin="round">
@@ -68,21 +68,21 @@
                             <span th:if="${bellCount != null and bellCount > 0}" class="bell-badge" th:text="${bellCount}"></span>
                         </button>
                         <div class="bell-dropdown" id="bellDropdown" hidden>
-                            <div class="bell-dd-hd">D-3 마감 북마크</div>
-                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">임박한 종료 팝업이 없어요</div>
+                            <div class="bell-dd-hd">D-3 留덇컧 遺곷쭏??/div>
+                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">?꾨컯??醫낅즺 ?앹뾽???놁뼱??/div>
                             <a th:each="item : ${bellItems}" th:href="@{/store/{id}(id=${item.id})}" class="bell-dd-item">
                                 <span class="bell-dd-name" th:text="${item.name}"></span>
                                 <span class="bell-dd-dday"
                                       th:text="${item.dday == 0} ? 'D-DAY' : ('D-' + ${item.dday})"
                                       th:classappend="${item.dday == 0} ? ' dday-today'"></span>
                             </a>
-                            <a href="/mypage" class="bell-dd-footer">북마크 관리 →</a>
+                            <a href="/mypage" class="bell-dd-footer">遺곷쭏??愿由???/a>
                         </div>
                     </div>
-                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">관리자페이지</a>
-                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">마이페이지</a>
+                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">愿由ъ옄?섏씠吏</a>
+                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">留덉씠?섏씠吏</a>
                     <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
-                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                        <button type="submit" class="auth-link-btn">濡쒓렇?꾩썐</button>
                     </form>
                 </div>
             </div>
@@ -90,29 +90,29 @@
     </div>
     <div class="header-nav-row">
         <nav class="header-nav">
-            <span class="nav-group-label">팝업</span>
-            <a href="/stores" class="nav-link">전체보기</a>
+            <span class="nav-group-label">?앹뾽</span>
+            <a href="/stores" class="nav-link">?꾩껜蹂닿린</a>
             <span class="nav-sep"></span>
-            <span class="nav-group-label">커뮤니티</span>
-            <a href="/news" class="nav-link nav-news-item">전체</a>
-            <a href="/news?tag=공지" class="nav-link nav-news-item">공지</a>
-            <a href="/news?tag=소식" class="nav-link nav-news-item">소식</a>
-            <a href="/news?tag=트렌드" class="nav-link nav-news-item">트렌드</a>
-            <a href="/news?tag=후기" class="nav-link nav-news-item active">후기</a>
+            <span class="nav-group-label">而ㅻ??덊떚</span>
+            <a href="/news" class="nav-link nav-news-item">?꾩껜</a>
+            <a href="/news?tag=怨듭?" class="nav-link nav-news-item">怨듭?</a>
+            <a href="/news?tag=?뚯떇" class="nav-link nav-news-item">?뚯떇</a>
+            <a href="/news?tag=?몃젋?? class="nav-link nav-news-item">?몃젋??/a>
+            <a href="/news?tag=?꾧린" class="nav-link nav-news-item active">?꾧린</a>
             <details class="nav-dropdown">
                 <summary>
-                    커뮤니티
+                    而ㅻ??덊떚
                     <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
                 <div class="nav-dropdown-menu">
-                    <a href="/news" class="nav-dropdown-item">전체</a>
-                    <a href="/news?tag=공지" class="nav-dropdown-item">공지</a>
-                    <a href="/news?tag=소식" class="nav-dropdown-item">소식</a>
-                    <a href="/news?tag=트렌드" class="nav-dropdown-item">트렌드</a>
+                    <a href="/news" class="nav-dropdown-item">?꾩껜</a>
+                    <a href="/news?tag=怨듭?" class="nav-dropdown-item">怨듭?</a>
+                    <a href="/news?tag=?뚯떇" class="nav-dropdown-item">?뚯떇</a>
+                    <a href="/news?tag=?몃젋?? class="nav-dropdown-item">?몃젋??/a>
                     <div class="nav-dropdown-divider"></div>
-                    <span class="nav-dropdown-label">후기</span>
-                    <a href="/news?tag=후기" class="nav-dropdown-item">후기</a>
+                    <span class="nav-dropdown-label">?꾧린</span>
+                    <a href="/news?tag=?꾧린" class="nav-dropdown-item">?꾧린</a>
                 </div>
             </details>
         </nav>
@@ -122,49 +122,49 @@
 
 <div class="news-write-page">
     <div class="news-write-inner">
-        <h1 class="news-write-title">소식 작성</h1>
+        <h1 class="news-write-title">?뚯떇 ?묒꽦</h1>
 
         <form th:action="@{/news/write}" method="post" enctype="multipart/form-data" class="news-write-form" id="writeForm">
 
             <div class="form-group" sec:authorize="hasRole('ADMIN')">
-                <label class="form-label">태그</label>
+                <label class="form-label">?쒓렇</label>
                 <select name="tag" class="form-select">
-                    <option value="공지"  th:selected="${defaultTag == '공지'}">공지</option>
-                    <option value="소식"  th:selected="${defaultTag == '소식'}">소식</option>
-                    <option value="트렌드" th:selected="${defaultTag == '트렌드'}">트렌드</option>
-                    <option value="후기"  th:selected="${defaultTag == '후기'}">후기</option>
+                    <option value="怨듭?"  th:selected="${defaultTag == '怨듭?'}">怨듭?</option>
+                    <option value="?뚯떇"  th:selected="${defaultTag == '?뚯떇'}">?뚯떇</option>
+                    <option value="?몃젋?? th:selected="${defaultTag == '?몃젋??}">?몃젋??/option>
+                    <option value="?꾧린"  th:selected="${defaultTag == '?꾧린'}">?꾧린</option>
                 </select>
             </div>
-            <input type="hidden" name="tag" value="후기" sec:authorize="!hasRole('ADMIN')"/>
+            <input type="hidden" name="tag" value="?꾧린" sec:authorize="!hasRole('ADMIN')"/>
 
-            <!-- 별점 (후기 태그일 때만 표시) -->
+            <!-- 蹂꾩젏 (?꾧린 ?쒓렇???뚮쭔 ?쒖떆) -->
             <div class="form-group" id="rating-group" style="display:none;">
-                <label class="form-label">별점</label>
+                <label class="form-label">蹂꾩젏</label>
                 <div class="star-rating">
                     <input type="radio" name="rating" id="s5" value="5">
-                    <label for="s5">★</label>
+                    <label for="s5">??/label>
                     <input type="radio" name="rating" id="s4" value="4">
-                    <label for="s4">★</label>
+                    <label for="s4">??/label>
                     <input type="radio" name="rating" id="s3" value="3">
-                    <label for="s3">★</label>
+                    <label for="s3">??/label>
                     <input type="radio" name="rating" id="s2" value="2">
-                    <label for="s2">★</label>
+                    <label for="s2">??/label>
                     <input type="radio" name="rating" id="s1" value="1">
-                    <label for="s1">★</label>
+                    <label for="s1">??/label>
                 </div>
-                <p class="star-hint">별을 클릭해서 점수를 선택하세요 (1~5점)</p>
+                <p class="star-hint">蹂꾩쓣 ?대┃?댁꽌 ?먯닔瑜??좏깮?섏꽭??(1~5??</p>
             </div>
 
             <div class="form-group" id="store-picker-group">
-                <label class="form-label">관련 팝업 <span class="form-label-sub" style="color:var(--primary);">*필수</span></label>
+                <label class="form-label">愿???앹뾽 <span class="form-label-sub" style="color:var(--primary);">*?꾩닔</span></label>
                 <div class="store-autocomplete">
                     <input type="text" id="store-search" class="form-input"
-                           placeholder="후기를 남길 팝업을 검색하세요..." autocomplete="off"/>
+                           placeholder="?꾧린瑜??④만 ?앹뾽??寃?됲븯?몄슂..." autocomplete="off"/>
                     <div id="store-ac-dropdown" class="store-ac-dropdown"></div>
                     <input type="hidden" name="popupStoreId" id="store-id-input"/>
                     <div id="store-ac-chip" class="store-ac-chip">
                         <span id="store-ac-chip-name"></span>
-                        <button type="button" id="store-ac-clear" title="선택 해제">
+                        <button type="button" id="store-ac-clear" title="?좏깮 ?댁젣">
                             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2.5">
                                 <path d="M18 6 6 18M6 6l12 12"/>
@@ -175,23 +175,23 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">제목</label>
-                <input type="text" name="title" class="form-input" placeholder="제목을 입력하세요" required/>
+                <label class="form-label">?쒕ぉ</label>
+                <input type="text" name="title" class="form-input" placeholder="?쒕ぉ???낅젰?섏꽭?? required/>
             </div>
 
             <div class="form-group">
-                <label class="form-label">썸네일 <span class="form-label-sub">(선택, 이미지 파일)</span></label>
+                <label class="form-label">?몃꽕??<span class="form-label-sub">(?좏깮, ?대?吏 ?뚯씪)</span></label>
                 <input type="file" name="thumbnailFile" class="form-file" accept="image/*"/>
             </div>
 
             <div class="form-group">
-                <label class="form-label">내용</label>
-                <textarea name="content" class="form-textarea" rows="12" placeholder="내용을 입력하세요" required></textarea>
+                <label class="form-label">?댁슜</label>
+                <textarea name="content" class="form-textarea" rows="12" placeholder="?댁슜???낅젰?섏꽭?? required></textarea>
             </div>
 
             <div class="form-actions">
-                <a href="/news" class="btn-secondary">취소</a>
-                <button type="submit" class="btn-primary">등록</button>
+                <a href="/news" class="btn-secondary">痍⑥냼</a>
+                <button type="submit" class="btn-primary">?깅줉</button>
             </div>
         </form>
     </div>
@@ -199,8 +199,8 @@
 
 <footer class="footer">
     <div class="footer-inner">
-        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="팝업맵"/> 팝업맵</span>
-        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/> ?앹뾽留?/span>
+        <span class="footer-copy">?꾧뎅 ?앹뾽?ㅽ넗???쇱젙 諛??꾩튂 ?뺣낫 ?쒕퉬??/span>
     </div>
 </footer>
 
@@ -222,7 +222,7 @@
     let activeIdx = -1;
 
     function syncPicker() {
-        var isReview = !tagSelect || tagSelect.value === '후기';
+        var isReview = !tagSelect || tagSelect.value === '?꾧린';
         ratingGroup.style.display  = isReview ? 'block' : 'none';
         pickerGroup.style.display  = isReview ? 'block' : 'none';
         if (!isReview) clearSelection();
@@ -255,7 +255,7 @@
         if (results.length === 0) {
             var empty = document.createElement('div');
             empty.className = 'store-ac-empty';
-            empty.textContent = '검색 결과 없음';
+            empty.textContent = '寃??寃곌낵 ?놁쓬';
             dropdown.appendChild(empty);
         } else {
             results.forEach(function (s, i) {
@@ -318,22 +318,21 @@
     if (tagSelect) tagSelect.addEventListener('change', syncPicker);
     syncPicker();
 
-    // 상세페이지에서 넘어온 경우 팝업 자동 선택
+    // ?곸꽭?섏씠吏?먯꽌 ?섏뼱??寃쎌슦 ?앹뾽 ?먮룞 ?좏깮
     var PRE = /*[[${preSelectedStore}]]*/ null;
     if (PRE) {
         selectStore(PRE.id, PRE.name);
     }
 
-    // 후기 작성 시 팝업 선택 필수 검사
-    document.getElementById('writeForm').addEventListener('submit', function (e) {
-        if (tagSelect.value === '후기' && !idInput.value) {
+    // ?꾧린 ?묒꽦 ???앹뾽 ?좏깮 ?꾩닔 寃??    document.getElementById('writeForm').addEventListener('submit', function (e) {
+        if (tagSelect.value === '?꾧린' && !idInput.value) {
             e.preventDefault();
             searchInput.focus();
             searchInput.style.borderColor = 'var(--primary)';
-            searchInput.placeholder = '관련 팝업을 선택해주세요 (필수)';
+            searchInput.placeholder = '愿???앹뾽???좏깮?댁＜?몄슂 (?꾩닔)';
             setTimeout(function () {
                 searchInput.style.borderColor = '';
-                searchInput.placeholder = '후기를 남길 팝업을 검색하세요...';
+                searchInput.placeholder = '?꾧린瑜??④만 ?앹뾽??寃?됲븯?몄슂...';
             }, 2500);
         }
     });
@@ -341,3 +340,4 @@
 </script>
 </body>
 </html>
+

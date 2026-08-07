@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시판 관리 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=15"/>
+    <title>寃뚯떆??愿由?- ?앹뾽留?/title>
+    <link rel="stylesheet" href="/css/style.css?v=16"/>
     <style>
         .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
         .admin-title { font-size: 22px; font-weight: 800; margin-bottom: 28px; }
@@ -41,12 +41,12 @@
     <div class="header-inner">
         <div class="header-top">
             <a href="/" class="header-brand">
-                <img src="/favicon.svg" class="brand-icon" alt="팝업맵"/>
-                <span class="brand-text">팝업맵</span>
+                <img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/>
+                <span class="brand-text">?앹뾽留?/span>
             </a>
             <div class="header-top-right" style="margin-left:auto;">
                 <form th:action="@{/logout}" method="post" style="display:inline;">
-                    <button type="submit" class="auth-link-btn">로그아웃</button>
+                    <button type="submit" class="auth-link-btn">濡쒓렇?꾩썐</button>
                 </form>
             </div>
         </div>
@@ -54,32 +54,32 @@
 </header>
 
 <div class="admin-wrap">
-    <div class="admin-title">게시판 관리</div>
+    <div class="admin-title">寃뚯떆??愿由?/div>
 
     <nav class="admin-nav">
-        <a href="/admin">대시보드</a>
-        <a href="/admin/stores">팝업 관리</a>
-        <a href="/admin/news" class="active">게시판 관리</a>
-        <a href="/admin/reviews">후기 관리</a>
-        <a href="/admin/users">회원 관리</a>
+        <a href="/admin">??쒕낫??/a>
+        <a href="/admin/stores">?앹뾽 愿由?/a>
+        <a href="/admin/news" class="active">寃뚯떆??愿由?/a>
+        <a href="/admin/reviews">?꾧린 愿由?/a>
+        <a href="/admin/users">?뚯썝 愿由?/a>
     </nav>
 
     <div th:if="${msg}" class="flash-msg flash-ok" th:text="${msg}"></div>
 
     <div class="admin-toolbar">
-        <span class="admin-count">총 <strong th:text="${#lists.size(newsList)}">0</strong>개</span>
+        <span class="admin-count">珥?<strong th:text="${#lists.size(newsList)}">0</strong>媛?/span>
     </div>
 
     <div class="table-scroll">
     <table class="admin-table">
         <thead>
             <tr>
-                <th>태그</th>
-                <th>제목</th>
-                <th>작성자</th>
-                <th>날짜</th>
-                <th>조회</th>
-                <th>삭제</th>
+                <th>?쒓렇</th>
+                <th>?쒕ぉ</th>
+                <th>?묒꽦??/th>
+                <th>?좎쭨</th>
+                <th>議고쉶</th>
+                <th>??젣</th>
             </tr>
         </thead>
         <tbody>
@@ -95,9 +95,9 @@
                 <td style="font-size:13px;color:var(--text-sub);" th:text="${n.viewCount}">0</td>
                 <td>
                     <form th:action="@{/admin/news/{id}/delete(id=${n.id})}" method="post"
-                          onsubmit="return confirm('삭제하시겠습니까?')">
+                          onsubmit="return confirm('??젣?섏떆寃좎뒿?덇퉴?')">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                        <button type="submit" class="btn-del">삭제</button>
+                        <button type="submit" class="btn-del">??젣</button>
                     </form>
                 </td>
             </tr>
@@ -116,3 +116,4 @@
 </script>
 </body>
 </html>
+

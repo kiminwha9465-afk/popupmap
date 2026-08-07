@@ -1,27 +1,27 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="(${selectedCategory} ?: '전체') + ' 팝업스토어 - 팝업맵'">팝업스토어 목록</title>
-    <link rel="stylesheet" href="/css/style.css?v=15"/>
+    <title th:text="(${selectedCategory} ?: '?꾩껜') + ' ?앹뾽?ㅽ넗??- ?앹뾽留?">?앹뾽?ㅽ넗??紐⑸줉</title>
+    <link rel="stylesheet" href="/css/style.css?v=16"/>
 </head>
 <body>
 
-<!-- ── 헤더 ──────────────────────────────────────────── -->
+<!-- ?? ?ㅻ뜑 ???????????????????????????????????????????? -->
 <header class="header">
 <div class="header-inner">
 
-    <!-- 1행: 로고 / 검색 / 인증 -->
+    <!-- 1?? 濡쒓퀬 / 寃??/ ?몄쬆 -->
     <div class="header-top">
         <a href="/" class="header-brand">
-            <img src="/favicon.svg" class="brand-icon" alt="팝업맵"/>
-            <span class="brand-text">팝업맵</span>
+            <img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/>
+            <span class="brand-text">?앹뾽留?/span>
         </a>
         <div class="header-top-right">
-            <button id="searchToggle" class="search-toggle-btn active" title="검색">
+            <button id="searchToggle" class="search-toggle-btn active" title="寃??>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                      fill="none" stroke="currentColor" stroke-width="2.5">
                     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -37,7 +37,7 @@
                         <span sec:authentication="name"></span>
                     </span>
                     <div sec:authorize="isAuthenticated()" class="bell-wrap">
-                        <button class="bell-btn" id="bellBtn" title="알림">
+                        <button class="bell-btn" id="bellBtn" title="?뚮┝">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="1.6"
                                  stroke-linecap="round" stroke-linejoin="round">
@@ -46,90 +46,90 @@
                             <span th:if="${bellCount != null and bellCount > 0}" class="bell-badge" th:text="${bellCount}"></span>
                         </button>
                         <div class="bell-dropdown" id="bellDropdown" hidden>
-                            <div class="bell-dd-hd">D-3 마감 북마크</div>
-                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">임박한 종료 팝업이 없어요</div>
+                            <div class="bell-dd-hd">D-3 留덇컧 遺곷쭏??/div>
+                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">?꾨컯??醫낅즺 ?앹뾽???놁뼱??/div>
                             <a th:each="item : ${bellItems}" th:href="@{/store/{id}(id=${item.id})}" class="bell-dd-item">
                                 <span class="bell-dd-name" th:text="${item.name}"></span>
                                 <span class="bell-dd-dday"
                                       th:text="${item.dday == 0} ? 'D-DAY' : ('D-' + ${item.dday})"
                                       th:classappend="${item.dday == 0} ? ' dday-today'"></span>
                             </a>
-                            <a href="/mypage" class="bell-dd-footer">북마크 관리 →</a>
+                            <a href="/mypage" class="bell-dd-footer">遺곷쭏??愿由???/a>
                         </div>
                     </div>
-                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">관리자페이지</a>
-                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">마이페이지</a>
+                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">愿由ъ옄?섏씠吏</a>
+                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn">留덉씠?섏씠吏</a>
                     <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
-                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                        <button type="submit" class="auth-link-btn">濡쒓렇?꾩썐</button>
                     </form>
-                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
-                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">濡쒓렇??/a>
+                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">?뚯썝媛??/a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 2행: 네비게이션 (항상 표시, 모바일에서 가로 스크롤) -->
+    <!-- 2?? ?ㅻ퉬寃뚯씠??(??긽 ?쒖떆, 紐⑤컮?쇱뿉??媛濡??ㅽ겕濡? -->
     <div class="header-nav-row">
         <nav class="header-nav">
-            <span class="nav-group-label">팝업</span>
-            <a href="/stores" class="nav-link">전체보기</a>
-            <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+            <span class="nav-group-label">?앹뾽</span>
+            <a href="/stores" class="nav-link">?꾩껜蹂닿린</a>
+            <a th:each="cat : ${ {'?⑥뀡','酉고떚','?앹쓬猷?,'?쇱씠?꾩뒪???,'?꾪듃/臾명솕','?뷀꽣?뚯씤癒쇳듃','?뚰겕'} }"
                th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${cat},keyword=${keyword})} : @{/stores(category=${cat})}"
                th:text="${cat}"
                th:classappend="${selectedCategory == cat} ? ' active' : ''"
-               class="nav-link nav-cat-item">카테고리</a>
+               class="nav-link nav-cat-item">移댄뀒怨좊━</a>
             <details class="nav-dropdown">
                 <summary th:classappend="${selectedCategory != null} ? ' active' : ''">
-                    <span th:text="${selectedCategory} ?: '카테고리'">카테고리</span>
+                    <span th:text="${selectedCategory} ?: '移댄뀒怨좊━'">移댄뀒怨좊━</span>
                     <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
                 <div class="nav-dropdown-menu">
-                    <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+                    <a th:each="cat : ${ {'?⑥뀡','酉고떚','?앹쓬猷?,'?쇱씠?꾩뒪???,'?꾪듃/臾명솕','?뷀꽣?뚯씤癒쇳듃','?뚰겕'} }"
                        th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${cat},keyword=${keyword})} : @{/stores(category=${cat})}"
                        th:text="${cat}"
                        th:classappend="${selectedCategory == cat} ? ' active' : ''"
-                       class="nav-dropdown-item">카테고리</a>
+                       class="nav-dropdown-item">移댄뀒怨좊━</a>
                 </div>
             </details>
             <span class="nav-sep"></span>
-            <span class="nav-group-label">커뮤니티</span>
-            <a href="/news" class="nav-link nav-news-item">전체</a>
-            <a href="/news?tag=공지" class="nav-link nav-news-item">공지</a>
-            <a href="/news?tag=소식" class="nav-link nav-news-item">소식</a>
-            <a href="/news?tag=트렌드" class="nav-link nav-news-item">트렌드</a>
-            <a href="/news?tag=후기" class="nav-link nav-news-item">후기</a>
+            <span class="nav-group-label">而ㅻ??덊떚</span>
+            <a href="/news" class="nav-link nav-news-item">?꾩껜</a>
+            <a href="/news?tag=怨듭?" class="nav-link nav-news-item">怨듭?</a>
+            <a href="/news?tag=?뚯떇" class="nav-link nav-news-item">?뚯떇</a>
+            <a href="/news?tag=?몃젋?? class="nav-link nav-news-item">?몃젋??/a>
+            <a href="/news?tag=?꾧린" class="nav-link nav-news-item">?꾧린</a>
             <details class="nav-dropdown">
                 <summary>
-                    커뮤니티
+                    而ㅻ??덊떚
                     <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
                 <div class="nav-dropdown-menu">
-                    <a href="/news" class="nav-dropdown-item">전체</a>
-                    <a href="/news?tag=공지" class="nav-dropdown-item">공지</a>
-                    <a href="/news?tag=소식" class="nav-dropdown-item">소식</a>
-                    <a href="/news?tag=트렌드" class="nav-dropdown-item">트렌드</a>
+                    <a href="/news" class="nav-dropdown-item">?꾩껜</a>
+                    <a href="/news?tag=怨듭?" class="nav-dropdown-item">怨듭?</a>
+                    <a href="/news?tag=?뚯떇" class="nav-dropdown-item">?뚯떇</a>
+                    <a href="/news?tag=?몃젋?? class="nav-dropdown-item">?몃젋??/a>
                     <div class="nav-dropdown-divider"></div>
-                    <span class="nav-dropdown-label">후기</span>
-                    <a href="/news?tag=후기" class="nav-dropdown-item">후기</a>
+                    <span class="nav-dropdown-label">?꾧린</span>
+                    <a href="/news?tag=?꾧린" class="nav-dropdown-item">?꾧린</a>
                 </div>
             </details>
         </nav>
     </div>
 
-    <!-- 3행: 검색 (stores 페이지는 기본으로 열림) -->
+    <!-- 3?? 寃??(stores ?섏씠吏??湲곕낯?쇰줈 ?대┝) -->
     <div class="header-search-row" id="searchRow">
         <form th:action="@{/stores}" method="get" class="header-search-form">
             <select name="category" class="search-cat-select">
-                <option value="" th:selected="${selectedCategory == null or selectedCategory == ''}">전체</option>
-                <option th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+                <option value="" th:selected="${selectedCategory == null or selectedCategory == ''}">?꾩껜</option>
+                <option th:each="cat : ${ {'?⑥뀡','酉고떚','?앹쓬猷?,'?쇱씠?꾩뒪???,'?꾪듃/臾명솕','?뷀꽣?뚯씤癒쇳듃','?뚰겕'} }"
                         th:value="${cat}" th:text="${cat}"
-                        th:selected="${cat == selectedCategory}">카테고리</option>
+                        th:selected="${cat == selectedCategory}">移댄뀒怨좊━</option>
             </select>
             <span class="search-divider"></span>
-            <input type="text" name="keyword" class="search-input" placeholder="팝업스토어 검색..."
+            <input type="text" name="keyword" class="search-input" placeholder="?앹뾽?ㅽ넗??寃??.."
                    th:value="${keyword}"/>
             <button type="submit" class="search-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
@@ -138,7 +138,7 @@
                 </svg>
             </button>
         </form>
-        <button id="searchClose" class="search-close-btn" title="닫기">
+        <button id="searchClose" class="search-close-btn" title="?リ린">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M18 6 6 18M6 6l12 12"/>
@@ -151,45 +151,45 @@
 
 <div class="stores-container">
 
-    <!-- ── 페이지 헤더 ────────────────────────────────── -->
+    <!-- ?? ?섏씠吏 ?ㅻ뜑 ?????????????????????????????????? -->
     <div class="stores-page-header">
         <div class="stores-page-title">
             <h1 class="stores-title">
-                <span th:text="${selectedCategory} ?: '전체 팝업스토어'"></span>
+                <span th:text="${selectedCategory} ?: '?꾩껜 ?앹뾽?ㅽ넗??"></span>
             </h1>
-            <span class="stores-count" th:text="${stores.size()} + '개'"></span>
+            <span class="stores-count" th:text="${stores.size()} + '媛?"></span>
         </div>
         <p class="stores-subtitle" th:if="${keyword != null and !keyword.isBlank()}"
-           th:text="'&quot;' + ${keyword} + '&quot; 검색 결과' + (${selectedCategory} != null ? ' · ' + ${selectedCategory} : '')"></p>
+           th:text="'&quot;' + ${keyword} + '&quot; 寃??寃곌낵' + (${selectedCategory} != null ? ' 쨌 ' + ${selectedCategory} : '')"></p>
     </div>
 
-    <!-- ── 카테고리 탭 ────────────────────────────────── -->
+    <!-- ?? 移댄뀒怨좊━ ???????????????????????????????????? -->
     <div class="stores-cats">
         <a th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(keyword=${keyword})} : @{/stores}"
            th:classappend="${selectedCategory == null ? ' active' : ''}"
-           class="stores-cat-tab">전체</a>
-        <a th:each="cat : ${ {'패션','뷰티','식음료','라이프스타일','아트/문화','엔터테인먼트','테크'} }"
+           class="stores-cat-tab">?꾩껜</a>
+        <a th:each="cat : ${ {'?⑥뀡','酉고떚','?앹쓬猷?,'?쇱씠?꾩뒪???,'?꾪듃/臾명솕','?뷀꽣?뚯씤癒쇳듃','?뚰겕'} }"
            th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${cat},keyword=${keyword})} : @{/stores(category=${cat})}"
            th:text="${cat}"
            th:classappend="${selectedCategory == cat ? ' active' : ''}"
-           class="stores-cat-tab">카테고리</a>
+           class="stores-cat-tab">移댄뀒怨좊━</a>
     </div>
 
-    <!-- ── 지역 필터 + 정렬 ──────────────────────────── -->
+    <!-- ?? 吏???꾪꽣 + ?뺣젹 ???????????????????????????? -->
     <div class="stores-toolbar">
         <div class="stores-regions">
             <a th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${selectedCategory},keyword=${keyword})} : @{/stores(category=${selectedCategory})}"
                th:classappend="${selectedRegion == null ? ' active' : ''}"
-               class="region-chip">전국</a>
-            <a th:each="reg : ${ {'서울','경기','부산','인천','대구','광주','대전','제주'} }"
+               class="region-chip">?꾧뎅</a>
+            <a th:each="reg : ${ {'?쒖슱','寃쎄린','遺??,'?몄쿇','?援?,'愿묒＜','???,'?쒖＜'} }"
                th:href="${keyword != null and !#strings.isEmpty(keyword)} ? @{/stores(category=${selectedCategory},region=${reg},keyword=${keyword})} : @{/stores(category=${selectedCategory},region=${reg})}"
                th:text="${reg}"
                th:classappend="${selectedRegion == reg ? ' active' : ''}"
-               class="region-chip">지역</a>
+               class="region-chip">吏??/a>
         </div>
     </div>
 
-    <!-- ── 카드 그리드 ───────────────────────────────── -->
+    <!-- ?? 移대뱶 洹몃━??????????????????????????????????? -->
     <div class="stores-grid" th:if="${!stores.isEmpty()}">
         <a th:each="store : ${stores}"
            th:href="@{/store/{id}(id=${store.id})}"
@@ -200,7 +200,7 @@
                       th:if="${store.category != null and !store.category.isBlank()}"
                       th:text="${store.category}"></span>
                 <span class="card-status"
-                      th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
+                      th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? '?ㅽ뵂?덉젙' : '吏꾪뻾以?}"
                       th:classappend="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
                 </span>
             </div>
@@ -229,22 +229,22 @@
         </a>
     </div>
 
-    <!-- ── 빈 상태 ──────────────────────────────────────── -->
+    <!-- ?? 鍮??곹깭 ???????????????????????????????????????? -->
     <div class="stores-empty" th:if="${stores.isEmpty()}">
-        <div class="stores-empty-icon">📍</div>
-        <p class="stores-empty-title">팝업스토어가 없습니다</p>
+        <div class="stores-empty-icon">?뱧</div>
+        <p class="stores-empty-title">?앹뾽?ㅽ넗?닿? ?놁뒿?덈떎</p>
         <p class="stores-empty-desc"
-           th:text="${selectedCategory != null ? selectedCategory + ' 카테고리의 ' : ''} + '현재 진행 중인 팝업스토어가 없습니다.'">
+           th:text="${selectedCategory != null ? selectedCategory + ' 移댄뀒怨좊━??' : ''} + '?꾩옱 吏꾪뻾 以묒씤 ?앹뾽?ㅽ넗?닿? ?놁뒿?덈떎.'">
         </p>
-        <a href="/stores" class="btn-primary" style="margin-top:20px;display:inline-block;">전체 보기</a>
+        <a href="/stores" class="btn-primary" style="margin-top:20px;display:inline-block;">?꾩껜 蹂닿린</a>
     </div>
 
 </div>
 
 <footer class="footer">
     <div class="footer-inner">
-        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="팝업맵"/> 팝업맵</span>
-        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/> ?앹뾽留?/span>
+        <span class="footer-copy">?꾧뎅 ?앹뾽?ㅽ넗???쇱젙 諛??꾩튂 ?뺣낫 ?쒕퉬??/span>
     </div>
 </footer>
 
@@ -265,3 +265,4 @@
 </script>
 </body>
 </html>
+

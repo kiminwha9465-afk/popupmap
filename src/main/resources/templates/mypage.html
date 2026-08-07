@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <title>마이페이지 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=15"/>
+    <title>留덉씠?섏씠吏 - ?앹뾽留?/title>
+    <link rel="stylesheet" href="/css/style.css?v=16"/>
 </head>
 <body>
 
@@ -16,8 +16,8 @@
 <div class="header-inner">
     <div class="header-top">
         <a href="/" class="header-brand">
-            <img src="/favicon.svg" class="brand-icon" alt="팝업맵"/>
-            <span class="brand-text">팝업맵</span>
+            <img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/>
+            <span class="brand-text">?앹뾽留?/span>
         </a>
         <div class="header-top-right">
             <div class="header-right">
@@ -30,7 +30,7 @@
                         <span sec:authentication="name"></span>
                     </span>
                     <div sec:authorize="isAuthenticated()" class="bell-wrap">
-                        <button class="bell-btn" id="bellBtn" title="알림">
+                        <button class="bell-btn" id="bellBtn" title="?뚮┝">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="1.6"
                                  stroke-linecap="round" stroke-linejoin="round">
@@ -39,64 +39,64 @@
                             <span th:if="${bellCount != null and bellCount > 0}" class="bell-badge" th:text="${bellCount}"></span>
                         </button>
                         <div class="bell-dropdown" id="bellDropdown" hidden>
-                            <div class="bell-dd-hd">D-3 마감 북마크</div>
-                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">임박한 종료 팝업이 없어요</div>
+                            <div class="bell-dd-hd">D-3 留덇컧 遺곷쭏??/div>
+                            <div th:if="${bellCount == null or bellCount == 0}" class="bell-dd-empty">?꾨컯??醫낅즺 ?앹뾽???놁뼱??/div>
                             <a th:each="item : ${bellItems}" th:href="@{/store/{id}(id=${item.id})}" class="bell-dd-item">
                                 <span class="bell-dd-name" th:text="${item.name}"></span>
                                 <span class="bell-dd-dday"
                                       th:text="${item.dday == 0} ? 'D-DAY' : ('D-' + ${item.dday})"
                                       th:classappend="${item.dday == 0} ? ' dday-today'"></span>
                             </a>
-                            <a href="/mypage" class="bell-dd-footer">북마크 관리 →</a>
+                            <a href="/mypage" class="bell-dd-footer">遺곷쭏??愿由???/a>
                         </div>
                     </div>
-                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">관리자페이지</a>
-                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn" style="color:var(--primary);font-weight:700;">마이페이지</a>
+                    <a sec:authorize="hasRole('ADMIN')" href="/admin" class="auth-link-btn admin-link-btn">愿由ъ옄?섏씠吏</a>
+                    <a sec:authorize="isAuthenticated()" href="/mypage" class="auth-link-btn" style="color:var(--primary);font-weight:700;">留덉씠?섏씠吏</a>
                     <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
-                        <button type="submit" class="auth-link-btn">로그아웃</button>
+                        <button type="submit" class="auth-link-btn">濡쒓렇?꾩썐</button>
                     </form>
-                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">로그인</a>
-                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">회원가입</a>
+                    <a sec:authorize="isAnonymous()" href="/login" class="auth-link-btn">濡쒓렇??/a>
+                    <a sec:authorize="isAnonymous()" href="/signup" class="auth-link-btn signup">?뚯썝媛??/a>
                 </div>
             </div>
         </div>
     </div>
     <div class="header-nav-row">
         <nav class="header-nav">
-            <span class="nav-group-label">팝업</span>
-            <a href="/stores" class="nav-link">전체보기</a>
+            <span class="nav-group-label">?앹뾽</span>
+            <a href="/stores" class="nav-link">?꾩껜蹂닿린</a>
             <details class="nav-dropdown">
-                <summary>카테고리
+                <summary>移댄뀒怨좊━
                     <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
                 <div class="nav-dropdown-menu">
-                    <a href="/stores?category=패션" class="nav-dropdown-item">패션</a>
-                    <a href="/stores?category=뷰티" class="nav-dropdown-item">뷰티</a>
-                    <a href="/stores?category=식음료" class="nav-dropdown-item">식음료</a>
-                    <a href="/stores?category=라이프스타일" class="nav-dropdown-item">라이프스타일</a>
-                    <a href="/stores?category=아트/문화" class="nav-dropdown-item">아트/문화</a>
-                    <a href="/stores?category=엔터테인먼트" class="nav-dropdown-item">엔터테인먼트</a>
-                    <a href="/stores?category=테크" class="nav-dropdown-item">테크</a>
+                    <a href="/stores?category=?⑥뀡" class="nav-dropdown-item">?⑥뀡</a>
+                    <a href="/stores?category=酉고떚" class="nav-dropdown-item">酉고떚</a>
+                    <a href="/stores?category=?앹쓬猷? class="nav-dropdown-item">?앹쓬猷?/a>
+                    <a href="/stores?category=?쇱씠?꾩뒪??? class="nav-dropdown-item">?쇱씠?꾩뒪???/a>
+                    <a href="/stores?category=?꾪듃/臾명솕" class="nav-dropdown-item">?꾪듃/臾명솕</a>
+                    <a href="/stores?category=?뷀꽣?뚯씤癒쇳듃" class="nav-dropdown-item">?뷀꽣?뚯씤癒쇳듃</a>
+                    <a href="/stores?category=?뚰겕" class="nav-dropdown-item">?뚰겕</a>
                 </div>
             </details>
             <span class="nav-sep"></span>
-            <span class="nav-group-label">커뮤니티</span>
-            <a href="/news" class="nav-link nav-news-item">전체</a>
-            <a href="/news?tag=후기" class="nav-link nav-news-item">후기</a>
+            <span class="nav-group-label">而ㅻ??덊떚</span>
+            <a href="/news" class="nav-link nav-news-item">?꾩껜</a>
+            <a href="/news?tag=?꾧린" class="nav-link nav-news-item">?꾧린</a>
             <details class="nav-dropdown">
-                <summary>커뮤니티
+                <summary>而ㅻ??덊떚
                     <svg class="drop-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
                 <div class="nav-dropdown-menu">
-                    <a href="/news" class="nav-dropdown-item">전체</a>
-                    <a href="/news?tag=공지" class="nav-dropdown-item">공지</a>
-                    <a href="/news?tag=소식" class="nav-dropdown-item">소식</a>
-                    <a href="/news?tag=트렌드" class="nav-dropdown-item">트렌드</a>
+                    <a href="/news" class="nav-dropdown-item">?꾩껜</a>
+                    <a href="/news?tag=怨듭?" class="nav-dropdown-item">怨듭?</a>
+                    <a href="/news?tag=?뚯떇" class="nav-dropdown-item">?뚯떇</a>
+                    <a href="/news?tag=?몃젋?? class="nav-dropdown-item">?몃젋??/a>
                     <div class="nav-dropdown-divider"></div>
-                    <span class="nav-dropdown-label">후기</span>
-                    <a href="/news?tag=후기" class="nav-dropdown-item">후기</a>
+                    <span class="nav-dropdown-label">?꾧린</span>
+                    <a href="/news?tag=?꾧린" class="nav-dropdown-item">?꾧린</a>
                 </div>
             </details>
         </nav>
@@ -107,7 +107,7 @@
 <main class="mp-wrap">
 <div class="mp-inner">
 
-    <!-- 프로필 카드 -->
+    <!-- ?꾨줈??移대뱶 -->
     <div class="mp-profile-card">
         <div class="mp-avatar" th:text="${#strings.toUpperCase(#strings.substring(username,0,1))}">U</div>
         <div class="mp-user-info">
@@ -115,83 +115,80 @@
             <div class="mp-stats">
                 <span class="mp-stat mp-stat-link" onclick="switchTabById('bookmarks')">
                     <b class="mp-stat-val" th:text="${totalCount}">0</b>
-                    <span class="mp-stat-lbl">북마크</span>
+                    <span class="mp-stat-lbl">遺곷쭏??/span>
                 </span>
                 <span class="mp-stat-sep"></span>
                 <span class="mp-stat mp-stat-link" onclick="switchTabById('status')">
                     <b class="mp-stat-val" th:text="${plannedCount}">0</b>
-                    <span class="mp-stat-lbl">방문예정</span>
+                    <span class="mp-stat-lbl">諛⑸Ц?덉젙</span>
                 </span>
                 <span class="mp-stat-sep"></span>
                 <span class="mp-stat mp-stat-link" onclick="switchTabById('status')">
                     <b class="mp-stat-val" th:text="${completedCount}">0</b>
-                    <span class="mp-stat-lbl">방문완료</span>
+                    <span class="mp-stat-lbl">諛⑸Ц?꾨즺</span>
                 </span>
                 <span class="mp-stat-sep"></span>
                 <span class="mp-stat mp-stat-link" onclick="switchTabById('reviews')">
                     <b class="mp-stat-val" th:text="${reviewCount}">0</b>
-                    <span class="mp-stat-lbl">작성리뷰</span>
+                    <span class="mp-stat-lbl">?묒꽦由щ럭</span>
                 </span>
                 <span class="mp-stat-sep"></span>
                 <span class="mp-stat mp-stat-link" onclick="switchTabById('liked')">
                     <b class="mp-stat-val" th:text="${likedCount}">0</b>
-                    <span class="mp-stat-lbl">도움줌</span>
+                    <span class="mp-stat-lbl">?꾩?以?/span>
                 </span>
             </div>
         </div>
     </div>
 
-    <!-- 북마크 지도 (고정 섹션) -->
+    <!-- 遺곷쭏??吏??(怨좎젙 ?뱀뀡) -->
     <div class="mp-map-section">
         <div class="mp-map-section-hd">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-            북마크 지도
-        </div>
+            遺곷쭏??吏??        </div>
         <div th:if="${items.isEmpty()}" class="mp-empty mp-map-empty">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                  fill="none" stroke="#ccc" stroke-width="1.5"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
-            <p>북마크한 팝업이 없습니다.</p>
+            <p>遺곷쭏?ы븳 ?앹뾽???놁뒿?덈떎.</p>
         </div>
         <div th:unless="${items.isEmpty()}" id="mypage-map" class="mp-map"></div>
     </div>
 
-    <!-- 탭 네비게이션 -->
+    <!-- ???ㅻ퉬寃뚯씠??-->
     <div class="mp-tabs" role="tablist">
         <button class="mp-tab active" id="tab-bookmarks" onclick="switchTab('bookmarks',this)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
-            북마크 관리
-        </button>
+            遺곷쭏??愿由?        </button>
         <button class="mp-tab" id="tab-dday" onclick="switchTab('dday',this)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            디데이
-        </button>
+            ?붾뜲??        </button>
         <button class="mp-tab" id="tab-status" onclick="switchTab('status',this)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            방문 현황
+            諛⑸Ц ?꾪솴
         </button>
         <button class="mp-tab" id="tab-reviews" onclick="switchTab('reviews',this)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            작성 리뷰
+            ?묒꽦 由щ럭
         </button>
         <button class="mp-tab" id="tab-liked" onclick="switchTab('liked',this)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-            도움 목록
+            ?꾩? 紐⑸줉
         </button>
     </div>
 
-    <!-- ── 탭: 북마크 관리 ──────────────────────────── -->
+    <!-- ?? ?? 遺곷쭏??愿由????????????????????????????? -->
     <div class="mp-panel" id="panel-bookmarks">
         <div th:if="${items.isEmpty()}" class="mp-empty">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
                  fill="none" stroke="#ccc" stroke-width="1.5"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
-            <p>북마크한 팝업이 없습니다.</p>
-            <a href="/stores" class="mp-empty-btn">팝업 둘러보기</a>
+            <p>遺곷쭏?ы븳 ?앹뾽???놁뒿?덈떎.</p>
+            <a href="/stores" class="mp-empty-btn">?앹뾽 ?섎윭蹂닿린</a>
         </div>
         <div th:unless="${items.isEmpty()}" class="mp-bm-list">
             <div th:each="item : ${items}" class="mp-bm-row" th:data-id="${item.store.id}">
@@ -200,11 +197,11 @@
                 <div class="mp-bm-info">
                     <span class="mp-bm-badge"
                           th:classappend="${item.storeStatus=='upcoming'} ? ' badge-upcoming' : (${item.storeStatus=='ended'} ? ' badge-ended' : ' badge-ongoing')"
-                          th:text="${item.storeStatus=='upcoming'} ? '오픈예정' : (${item.storeStatus=='ended'} ? '종료' : '진행중')"></span>
+                          th:text="${item.storeStatus=='upcoming'} ? '?ㅽ뵂?덉젙' : (${item.storeStatus=='ended'} ? '醫낅즺' : '吏꾪뻾以?)"></span>
                     <div class="mp-bm-name" th:text="${item.store.name}"></div>
                     <div class="mp-bm-meta">
                         <span th:text="${item.store.region}"></span>
-                        <span class="mp-bm-dot">·</span>
+                        <span class="mp-bm-dot">쨌</span>
                         <span>
                             <th:block th:text="${item.store.startDate != null ? #temporals.format(item.store.startDate,'yy.MM.dd') : ''}"></th:block>
                             ~
@@ -213,19 +210,19 @@
                     </div>
                 </div>
                 <div class="mp-bm-actions">
-                    <a th:href="@{/store/{id}(id=${item.store.id})}" class="mp-bm-btn mp-bm-view">보기</a>
-                    <button class="mp-bm-btn mp-bm-del" th:onclick="|removeBookmark(${item.store.id})|">삭제</button>
+                    <a th:href="@{/store/{id}(id=${item.store.id})}" class="mp-bm-btn mp-bm-view">蹂닿린</a>
+                    <button class="mp-bm-btn mp-bm-del" th:onclick="|removeBookmark(${item.store.id})|">??젣</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ── 탭: 디데이 ───────────────────────────────── -->
+    <!-- ?? ?? ?붾뜲??????????????????????????????????? -->
     <div class="mp-panel" id="panel-dday" hidden>
         <div th:if="${items.isEmpty()}" class="mp-empty">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
                  fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            <p>북마크한 팝업이 없습니다.</p>
+            <p>遺곷쭏?ы븳 ?앹뾽???놁뒿?덈떎.</p>
         </div>
         <div th:unless="${items.isEmpty()}" class="mp-dday-list">
             <a th:each="item : ${ddayItems}"
@@ -238,7 +235,7 @@
                     <div class="mp-dday-name" th:text="${item.store.name}"></div>
                     <div class="mp-dday-meta">
                         <span th:text="${item.store.region}"></span>
-                        <span class="mp-dday-dot">·</span>
+                        <span class="mp-dday-dot">쨌</span>
                         <span>
                             <th:block th:text="${item.store.startDate != null ? #temporals.format(item.store.startDate,'yy.MM.dd') : ''}"></th:block>
                             ~
@@ -257,19 +254,19 @@
         </div>
     </div>
 
-    <!-- ── 탭: 방문 현황 ────────────────────────────── -->
+    <!-- ?? ?? 諛⑸Ц ?꾪솴 ?????????????????????????????? -->
     <div class="mp-panel" id="panel-status" hidden>
         <div th:if="${items.isEmpty()}" class="mp-empty">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
                  fill="none" stroke="#ccc" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            <p>북마크한 팝업이 없습니다.</p>
+            <p>遺곷쭏?ы븳 ?앹뾽???놁뒿?덈떎.</p>
         </div>
         <div th:unless="${items.isEmpty()}" class="mp-status-cols">
-            <!-- 방문 예정 -->
+            <!-- 諛⑸Ц ?덉젙 -->
             <div class="mp-status-col">
                 <div class="mp-status-col-hd planned-hd">
-                    <span>방문 예정</span>
-                    <span class="mp-status-cnt" th:text="${plannedCount} + '개'">0개</span>
+                    <span>諛⑸Ц ?덉젙</span>
+                    <span class="mp-status-cnt" th:text="${plannedCount} + '媛?">0媛?/span>
                 </div>
                 <div class="mp-status-list">
                     <div th:each="item : ${items}" th:if="${item.visitStatus=='PLANNED'}"
@@ -285,17 +282,17 @@
                         </div>
                         <button class="mp-status-toggle planned-toggle"
                                 th:onclick="|updateStatus(${item.store.id},'COMPLETED',this)|">
-                            방문완료
+                            諛⑸Ц?꾨즺
                         </button>
                     </div>
-                    <div th:if="${plannedCount==0}" class="mp-status-empty">방문 예정 팝업이 없어요.</div>
+                    <div th:if="${plannedCount==0}" class="mp-status-empty">諛⑸Ц ?덉젙 ?앹뾽???놁뼱??</div>
                 </div>
             </div>
-            <!-- 방문 완료 -->
+            <!-- 諛⑸Ц ?꾨즺 -->
             <div class="mp-status-col">
                 <div class="mp-status-col-hd completed-hd">
-                    <span>방문 완료</span>
-                    <span class="mp-status-cnt" th:text="${completedCount} + '개'">0개</span>
+                    <span>諛⑸Ц ?꾨즺</span>
+                    <span class="mp-status-cnt" th:text="${completedCount} + '媛?">0媛?/span>
                 </div>
                 <div class="mp-status-list">
                     <div th:each="item : ${items}" th:if="${item.visitStatus=='COMPLETED'}"
@@ -311,22 +308,22 @@
                         </div>
                         <button class="mp-status-toggle completed-toggle"
                                 th:onclick="|updateStatus(${item.store.id},'PLANNED',this)|">
-                            예정으로
+                            ?덉젙?쇰줈
                         </button>
                     </div>
-                    <div th:if="${completedCount==0}" class="mp-status-empty">방문 완료한 팝업이 없어요.</div>
+                    <div th:if="${completedCount==0}" class="mp-status-empty">諛⑸Ц ?꾨즺???앹뾽???놁뼱??</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ── 탭: 작성 리뷰 ────────────────────────────── -->
+    <!-- ?? ?? ?묒꽦 由щ럭 ?????????????????????????????? -->
     <div class="mp-panel" id="panel-reviews" hidden>
         <div th:if="${userReviews.isEmpty()}" class="mp-empty">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
                  fill="none" stroke="#ccc" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <p>작성한 리뷰가 없습니다.</p>
-            <a href="/news?tag=후기" class="mp-empty-btn">후기 작성하기</a>
+            <p>?묒꽦??由щ럭媛 ?놁뒿?덈떎.</p>
+            <a href="/news?tag=?꾧린" class="mp-empty-btn">?꾧린 ?묒꽦?섍린</a>
         </div>
         <div th:unless="${userReviews.isEmpty()}" class="mp-post-list">
             <div th:each="r : ${userReviews}" class="mp-post-row" th:data-review-id="${r.id}">
@@ -342,11 +339,11 @@
                         </div>
                     </div>
                     <div class="mp-post-info">
-                        <span class="mp-post-tag">후기</span>
+                        <span class="mp-post-tag">?꾧린</span>
                         <div class="mp-post-title" th:text="${r.title}"></div>
                         <div class="mp-post-meta">
                             <span th:text="${r.publishedAt != null ? #temporals.format(r.publishedAt,'yyyy.MM.dd') : ''}"></span>
-                            <span>조회 <span th:text="${r.viewCount}"></span></span>
+                            <span>議고쉶 <span th:text="${r.viewCount}"></span></span>
                         </div>
                     </div>
                     <svg class="mp-post-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -354,17 +351,17 @@
                         <path d="m9 18 6-6-6-6"/>
                     </svg>
                 </a>
-                <button class="mp-review-del" th:onclick="|deleteReview(${r.id})|">삭제</button>
+                <button class="mp-review-del" th:onclick="|deleteReview(${r.id})|">??젣</button>
             </div>
         </div>
     </div>
 
-    <!-- ── 탭: 도움 목록 ────────────────────────────── -->
+    <!-- ?? ?? ?꾩? 紐⑸줉 ?????????????????????????????? -->
     <div class="mp-panel" id="panel-liked" hidden>
         <div th:if="${likedPosts.isEmpty()}" class="mp-empty">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
                  fill="none" stroke="#ccc" stroke-width="1.5"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg>
-            <p>도움이 되었어요를 누른 게시물이 없습니다.</p>
+            <p>?꾩????섏뿀?댁슂瑜??꾨Ⅸ 寃뚯떆臾쇱씠 ?놁뒿?덈떎.</p>
         </div>
         <div th:unless="${likedPosts.isEmpty()}" class="mp-post-list">
             <a th:each="p : ${likedPosts}"
@@ -401,8 +398,8 @@
 
 <footer class="footer">
     <div class="footer-inner">
-        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="팝업맵"/> 팝업맵</span>
-        <span class="footer-copy">전국 팝업스토어 일정 및 위치 정보 서비스</span>
+        <span class="footer-logo"><img src="/favicon.svg" class="brand-icon" alt="?앹뾽留?/> ?앹뾽留?/span>
+        <span class="footer-copy">?꾧뎅 ?앹뾽?ㅽ넗???쇱젙 諛??꾩튂 ?뺣낫 ?쒕퉬??/span>
     </div>
 </footer>
 
@@ -412,7 +409,7 @@
 </script>
 <script src="/js/nav.js"></script>
 <script>
-    /* ── 탭 전환 ───────────────────────────────────── */
+    /* ?? ???꾪솚 ????????????????????????????????????? */
     function switchTab(name, btn) {
         document.querySelectorAll('.mp-tab').forEach(function(t){ t.classList.remove('active'); });
         btn.classList.add('active');
@@ -425,7 +422,7 @@
         if (btn) switchTab(name, btn);
     }
 
-    /* ── CSRF 헤더 ─────────────────────────────────── */
+    /* ?? CSRF ?ㅻ뜑 ??????????????????????????????????? */
     function csrfHeaders(json) {
         var csrf = document.querySelector('meta[name="_csrf"]')?.content;
         var hdr  = document.querySelector('meta[name="_csrf_header"]')?.content;
@@ -434,9 +431,9 @@
         return h;
     }
 
-    /* ── 북마크 제거 ────────────────────────────────── */
+    /* ?? 遺곷쭏???쒓굅 ?????????????????????????????????? */
     function removeBookmark(storeId) {
-        if (!confirm('북마크를 제거하시겠습니까?')) return;
+        if (!confirm('遺곷쭏?щ? ?쒓굅?섏떆寃좎뒿?덇퉴?')) return;
         fetch('/api/bookmarks/' + storeId, { method: 'DELETE', headers: csrfHeaders(false) })
             .then(function(r) {
                 if (!r.ok) return;
@@ -448,7 +445,7 @@
             });
     }
 
-    /* ── 방문 상태 변경 ─────────────────────────────── */
+    /* ?? 諛⑸Ц ?곹깭 蹂寃???????????????????????????????? */
     function updateStatus(storeId, newStatus, btn) {
         btn.disabled = true;
         fetch('/api/bookmarks/' + storeId + '/status', {
@@ -461,7 +458,7 @@
         });
     }
 
-    /* ── 북마크 지도 ────────────────────────────────── */
+    /* ?? 遺곷쭏??吏???????????????????????????????????? */
     function initMypageMap() {
         var container = document.getElementById('mypage-map');
         if (!container || typeof naver === 'undefined') return;
@@ -499,7 +496,7 @@
                 ? '<img src="' + item.imageUrl + '" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px;" onerror="this.style.display=\'none\'"/>'
                 : '';
             var visitBadge = item.visitStatus === 'COMPLETED'
-                ? '<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;background:#DCFCE7;color:#16A34A;margin-bottom:6px;">방문완료</span><br/>'
+                ? '<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;background:#DCFCE7;color:#16A34A;margin-bottom:6px;">諛⑸Ц?꾨즺</span><br/>'
                 : '';
 
             var iw = new naver.maps.InfoWindow({
@@ -508,7 +505,7 @@
                     + '<div style="font-size:11px;color:#6E6E73;margin-bottom:4px;">' + item.ddayLabel + '</div>'
                     + '<div style="font-size:14px;font-weight:700;color:#1A1A1A;margin-bottom:4px;">' + item.name + '</div>'
                     + '<div style="font-size:12px;color:#6E6E73;margin-bottom:8px;">' + sd + ' ~ ' + ed + '</div>'
-                    + '<a href="/store/' + item.id + '" style="font-size:12px;color:#FF4B4B;font-weight:700;text-decoration:none;">자세히 보기 →</a>'
+                    + '<a href="/store/' + item.id + '" style="font-size:12px;color:#FF4B4B;font-weight:700;text-decoration:none;">?먯꽭??蹂닿린 ??/a>'
                     + '</div>',
                 borderWidth: 0, disableAnchor: true, backgroundColor: 'white',
                 pixelOffset: new naver.maps.Point(0, -10)
@@ -533,9 +530,9 @@
         }
     }
 
-    /* ── 리뷰 삭제 ─────────────────────────────────── */
+    /* ?? 由щ럭 ??젣 ??????????????????????????????????? */
     function deleteReview(newsId) {
-        if (!confirm('리뷰를 삭제하시겠습니까?')) return;
+        if (!confirm('由щ럭瑜???젣?섏떆寃좎뒿?덇퉴?')) return;
         fetch('/api/news/' + newsId, { method: 'DELETE', headers: csrfHeaders(false) })
             .then(function(r) {
                 if (!r.ok) return;
@@ -546,10 +543,11 @@
             });
     }
 
-    /* 페이지 로드 시 지도 초기화 */
+    /* ?섏씠吏 濡쒕뱶 ??吏??珥덇린??*/
     if (document.getElementById('mypage-map')) {
         initMypageMap();
     }
 </script>
 </body>
 </html>
+
