@@ -78,6 +78,10 @@ public class PopupNewsService {
         return repository.count();
     }
 
+    public long countByTag(String tag) {
+        return repository.countByTag(tag);
+    }
+
     public long countReviewsByUser(String username) {
         return repository.countByAuthorUsernameAndTag(username, "후기");
     }

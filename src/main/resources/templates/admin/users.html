@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원 관리 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=8"/>
+    <link rel="stylesheet" href="/css/style.css?v=12"/>
     <style>
         .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
         .admin-title { font-size: 22px; font-weight: 800; margin-bottom: 28px; }
@@ -30,7 +30,15 @@
         .flash-msg { padding: 12px 18px; border-radius: var(--radius-sm); margin-bottom: 18px; font-size: 14px; font-weight: 600; }
         .flash-ok { background: #e8f8f0; color: #1a8a4a; border: 1px solid #b2dfc5; }
         .action-cell { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
         @media(max-width: 700px) { .admin-table th:nth-child(3), .admin-table td:nth-child(3) { display: none; } }
+        @media(max-width: 600px) {
+            .admin-wrap { padding: 16px 12px; }
+            .admin-title { font-size: 18px; margin-bottom: 16px; }
+            .admin-nav { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; -webkit-overflow-scrolling: touch; gap: 6px; }
+            .admin-nav a { white-space: nowrap; flex-shrink: 0; padding: 7px 13px; font-size: 13px; }
+            .admin-table th, .admin-table td { padding: 9px 10px; font-size: 13px; }
+        }
     </style>
 </head>
 <body>
@@ -67,6 +75,7 @@
         <span class="admin-count">총 <strong th:text="${#lists.size(users)}">0</strong>명</span>
     </div>
 
+    <div class="table-scroll">
     <table class="admin-table">
         <thead>
             <tr>
@@ -109,6 +118,16 @@
             </tr>
         </tbody>
     </table>
+    </div>
 </div>
+<script>
+(function(){
+    var msgs = document.querySelectorAll('.flash-msg');
+    msgs.forEach(function(el){
+        setTimeout(function(){ el.style.transition='opacity .6s'; el.style.opacity='0'; }, 5000);
+        setTimeout(function(){ el.style.display='none'; }, 5600);
+    });
+})();
+</script>
 </body>
 </html>

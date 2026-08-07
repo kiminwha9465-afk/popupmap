@@ -6,7 +6,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>소식 작성 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=11"/>
+    <link rel="stylesheet" href="/css/style.css?v=12"/>
     <style>
         /* ── 별점 입력 ── */
         .star-rating { display:flex; flex-direction:row-reverse; gap:4px; width:fit-content; }
@@ -126,7 +126,7 @@
 
         <form th:action="@{/news/write}" method="post" enctype="multipart/form-data" class="news-write-form" id="writeForm">
 
-            <div class="form-group">
+            <div class="form-group" sec:authorize="hasRole('ADMIN')">
                 <label class="form-label">태그</label>
                 <select name="tag" class="form-select">
                     <option value="공지"  th:selected="${defaultTag == '공지'}">공지</option>
@@ -135,6 +135,7 @@
                     <option value="후기"  th:selected="${defaultTag == '후기'}">후기</option>
                 </select>
             </div>
+            <input type="hidden" name="tag" value="후기" sec:authorize="!hasRole('ADMIN')"/>
 
             <!-- 별점 (후기 태그일 때만 표시) -->
             <div class="form-group" id="rating-group" style="display:none;">
@@ -221,7 +222,7 @@
     let activeIdx = -1;
 
     function syncPicker() {
-        var isReview = tagSelect.value === '후기';
+        var isReview = !tagSelect || tagSelect.value === '후기';
         ratingGroup.style.display  = isReview ? 'block' : 'none';
         pickerGroup.style.display  = isReview ? 'block' : 'none';
         if (!isReview) clearSelection();
@@ -314,7 +315,7 @@
         searchInput.focus();
     });
 
-    tagSelect.addEventListener('change', syncPicker);
+    if (tagSelect) tagSelect.addEventListener('change', syncPicker);
     syncPicker();
 
     // 상세페이지에서 넘어온 경우 팝업 자동 선택

@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입 - 팝업맵</title>
-    <link rel="stylesheet" href="/css/style.css?v=8"/>
+    <link rel="stylesheet" href="/css/style.css?v=12"/>
     <style>
         .auth-wrap { min-height: calc(100vh - 56px); display: flex; align-items: center; justify-content: center; padding: 40px 16px; background: var(--bg); }
         .auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 40px 36px; width: 100%; max-width: 400px; }
@@ -23,6 +23,8 @@
         .auth-msg.error { background: #FFF0F0; color: var(--primary); border: 1px solid #FFD9D9; }
         .auth-footer { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-sub); }
         .auth-footer a { color: var(--primary); font-weight: 600; }
+        .field-error { font-size: 11px; color: #e53935; margin-top: 4px; display: none; }
+        .auth-input.input-error { border-color: #e53935; }
     </style>
 </head>
 <body>
@@ -48,18 +50,8 @@
             <div class="auth-field">
                 <label class="auth-label">아이디</label>
                 <input type="text" name="username" class="auth-input" placeholder="영문, 숫자 4~20자" required
-                       minlength="4" maxlength="20" pattern="[a-zA-Z0-9]+"/>
+                       minlength="4" maxlength="20" pattern="[a-zA-Z0-9]+" th:value="${username}"/>
                 <p class="auth-hint">영문, 숫자만 사용 가능 (4~20자)</p>
-            </div>
-            <div class="auth-field">
-                <label class="auth-label">닉네임</label>
-                <input type="text" name="nickname" class="auth-input" placeholder="게시글에 표시될 이름" required
-                       minlength="2" maxlength="20"/>
-                <p class="auth-hint">2~20자, 게시글 작성자로 표시됩니다</p>
-            </div>
-            <div class="auth-field">
-                <label class="auth-label">이메일</label>
-                <input type="email" name="email" class="auth-input" placeholder="example@email.com" required/>
             </div>
             <div class="auth-field">
                 <label class="auth-label">비밀번호</label>
@@ -67,7 +59,18 @@
             </div>
             <div class="auth-field">
                 <label class="auth-label">비밀번호 확인</label>
-                <input type="password" name="passwordConfirm" class="auth-input" placeholder="비밀번호 재입력" required/>
+                <input type="password" name="passwordConfirm" id="passwordConfirm" class="auth-input" placeholder="비밀번호 재입력" required/>
+                <p class="field-error" id="pwMatchError">비밀번호가 일치하지 않습니다.</p>
+            </div>
+            <div class="auth-field">
+                <label class="auth-label">닉네임</label>
+                <input type="text" name="nickname" class="auth-input" placeholder="게시글에 표시될 이름" required
+                       minlength="2" maxlength="20" th:value="${nickname}"/>
+                <p class="auth-hint">2~20자, 게시글 작성자로 표시됩니다</p>
+            </div>
+            <div class="auth-field">
+                <label class="auth-label">이메일</label>
+                <input type="email" name="email" class="auth-input" placeholder="example@email.com" required th:value="${email}"/>
             </div>
             <button type="submit" class="auth-btn">가입하기</button>
         </form>
@@ -77,5 +80,29 @@
         </p>
     </div>
 </div>
+<script>
+    const form = document.querySelector('form');
+    const pwInput = document.querySelector('input[name="password"]');
+    const confirmInput = document.getElementById('passwordConfirm');
+    const errorEl = document.getElementById('pwMatchError');
+
+    function checkMatch() {
+        const mismatch = pwInput.value && confirmInput.value && pwInput.value !== confirmInput.value;
+        errorEl.style.display = mismatch ? 'block' : 'none';
+        confirmInput.classList.toggle('input-error', mismatch);
+    }
+
+    pwInput.addEventListener('input', checkMatch);
+    confirmInput.addEventListener('input', checkMatch);
+
+    form.addEventListener('submit', function(e) {
+        if (pwInput.value !== confirmInput.value) {
+            e.preventDefault();
+            errorEl.style.display = 'block';
+            confirmInput.classList.add('input-error');
+            confirmInput.focus();
+        }
+    });
+</script>
 </body>
 </html>

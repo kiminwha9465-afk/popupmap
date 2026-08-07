@@ -30,6 +30,7 @@ public class AdminController {
     public String dashboard(Model model) {
         model.addAttribute("storeCount", storeService.count());
         model.addAttribute("newsCount", newsService.count());
+        model.addAttribute("reviewCount", newsService.countByTag("후기"));
         model.addAttribute("userCount", userService.count());
         return "admin/dashboard";
     }
@@ -71,6 +72,52 @@ public class AdminController {
                 .build();
         storeService.save(store);
         ra.addFlashAttribute("msg", "팝업스토어가 등록되었습니다.");
+        return "redirect:/admin/stores";
+    }
+
+    @GetMapping("/stores/{id}/edit")
+    public String editStoreForm(@PathVariable Long id, Model model) {
+        PopupStore store = storeService.getById(id)
+                .orElseThrow(() -> new IllegalArgumentException("팝업스토어를 찾을 수 없습니다: " + id));
+        model.addAttribute("store", store);
+        return "admin/store-form";
+    }
+
+    @PostMapping("/stores/{id}/edit")
+    public String updateStore(
+            @PathVariable Long id,
+            @RequestParam String name,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String imageUrl,
+            @RequestParam(required = false) String website,
+            @RequestParam(required = false) String hours,
+            @RequestParam(required = false) String description,
+            RedirectAttributes ra) {
+
+        PopupStore store = storeService.getById(id)
+                .orElseThrow(() -> new IllegalArgumentException("팝업스토어를 찾을 수 없습니다: " + id));
+        store.setName(name);
+        store.setBrand(brand);
+        store.setCategory(category);
+        store.setRegion(region);
+        store.setAddress(address);
+        if (latitude != null) store.setLatitude(latitude);
+        if (longitude != null) store.setLongitude(longitude);
+        store.setStartDate(startDate);
+        store.setEndDate(endDate);
+        store.setImageUrl(imageUrl);
+        store.setWebsite(website);
+        store.setHours(hours);
+        store.setDescription(description);
+        storeService.save(store);
+        ra.addFlashAttribute("msg", "팝업스토어가 수정되었습니다.");
         return "redirect:/admin/stores";
     }
 

@@ -6,7 +6,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="(${selectedCategory} ?: '전체') + ' 팝업스토어 - 팝업맵'">팝업스토어 목록</title>
-    <link rel="stylesheet" href="/css/style.css?v=11"/>
+    <link rel="stylesheet" href="/css/style.css?v=12"/>
 </head>
 <body>
 
@@ -196,10 +196,12 @@
            class="store-card">
             <div class="card-image">
                 <img th:src="${store.imageUrl}" th:alt="${store.name}" loading="lazy"/>
-                <span class="card-category" th:text="${store.category}"></span>
+                <span class="card-category"
+                      th:if="${store.category != null and !store.category.isBlank()}"
+                      th:text="${store.category}"></span>
                 <span class="card-status"
-                      th:text="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
-                      th:classappend="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
+                      th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
+                      th:classappend="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
                 </span>
             </div>
             <div class="card-body">

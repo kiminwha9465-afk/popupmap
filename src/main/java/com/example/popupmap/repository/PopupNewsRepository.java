@@ -11,6 +11,7 @@ public interface PopupNewsRepository extends JpaRepository<PopupNews, Long> {
     List<PopupNews> findByTagOrderByIdDesc(String tag);
     List<PopupNews> findByPopupStoreIdOrderByPublishedAtDesc(Long popupStoreId);
     List<PopupNews> findByPopupStoreIdAndTagOrderByIdDesc(Long popupStoreId, String tag);
+    long countByTag(String tag);
     long countByAuthorUsernameAndTag(String authorUsername, String tag);
     List<PopupNews> findByAuthorUsernameAndTagOrderByIdDesc(String authorUsername, String tag);
 }

@@ -45,18 +45,25 @@ public class AuthController {
                          @RequestParam String email,
                          @RequestParam String password,
                          @RequestParam String passwordConfirm,
+                         Model model,
                          RedirectAttributes ra) {
         if (!password.equals(passwordConfirm)) {
-            ra.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
-            return "redirect:/signup";
+            model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
+            model.addAttribute("username", username);
+            model.addAttribute("nickname", nickname);
+            model.addAttribute("email", email);
+            return "signup";
         }
         try {
             userService.register(username, nickname, email, password);
             ra.addFlashAttribute("success", "회원가입이 완료됐습니다. 로그인해주세요.");
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
-            ra.addFlashAttribute("error", e.getMessage());
-            return "redirect:/signup";
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("username", username);
+            model.addAttribute("nickname", nickname);
+            model.addAttribute("email", email);
+            return "signup";
         }
     }
 }

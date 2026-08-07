@@ -8,7 +8,7 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>팝업맵 - 전국 팝업스토어 일정 & 위치</title>
-    <link rel="stylesheet" href="/css/style.css?v=11"/>
+    <link rel="stylesheet" href="/css/style.css?v=12"/>
 </head>
 <body>
 
@@ -175,8 +175,8 @@
                     <div class="banner-meta">
                         <span class="banner-cat" th:text="${store.category}"></span>
                         <span class="banner-status"
-                              th:text="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
-                              th:classappend="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
+                              th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
+                              th:classappend="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
                         </span>
                     </div>
                     <h2 class="banner-name" th:text="${store.name}"></h2>
@@ -320,8 +320,8 @@
                             <p class="rank-region" th:text="${store.region} + ' · ' + ${store.category}"></p>
                         </div>
                         <span class="rank-badge"
-                              th:text="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? 'D-' + T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), store.startDate) : '진행중'}"
-                              th:classappend="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
+                              th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? 'D-' + T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), store.startDate) : '진행중'}"
+                              th:classappend="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
                         </span>
                         <button class="bm-btn rank-bm" th:data-id="${store.id}" title="북마크 추가"
                                 onclick="event.preventDefault(); event.stopPropagation();">
@@ -367,7 +367,9 @@
                         <div class="rec-img-wrap">
                             <img th:src="${store.imageUrl}" th:alt="${store.name}" class="rec-img"
                              onerror="this.onerror=null;this.src='/img/no-image.svg';"/>
-                            <span class="rec-cat" th:text="${store.category}"></span>
+                            <span class="rec-cat"
+                                  th:if="${store.category != null and !store.category.isBlank()}"
+                                  th:text="${store.category}"></span>
                             <button class="bm-btn rec-bm" th:data-id="${store.id}" title="북마크 추가"
                                     onclick="event.preventDefault(); PopupFilter.toggleBookmark(this.dataset.id);">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"

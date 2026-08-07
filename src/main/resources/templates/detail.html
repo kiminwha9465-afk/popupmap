@@ -8,7 +8,7 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${store.name} + ' - 팝업맵'">팝업스토어 상세</title>
-    <link rel="stylesheet" href="/css/style.css?v=11"/>
+    <link rel="stylesheet" href="/css/style.css?v=12"/>
 </head>
 <body>
 
@@ -129,10 +129,12 @@
     <div class="detail-hero" style="margin-top:0">
         <img th:src="${store.imageUrl}" th:alt="${store.name}" class="detail-hero-img"/>
         <div class="detail-hero-overlay">
-            <span class="card-category" th:text="${store.category}"></span>
+            <span class="detail-cat"
+                  th:if="${store.category != null and !store.category.isBlank()}"
+                  th:text="${store.category}"></span>
             <span class="card-status"
-                  th:text="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
-                  th:classappend="${store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
+                  th:text="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? '오픈예정' : '진행중'}"
+                  th:classappend="${store.startDate != null and store.startDate.isAfter(T(java.time.LocalDate).now()) ? ' upcoming' : ' ongoing'}">
             </span>
         </div>
     </div>
@@ -148,7 +150,7 @@
                     <div class="info-icon">📅</div>
                     <div>
                         <div class="info-label">운영 기간</div>
-                        <div class="info-value" th:text="${store.startDate} + ' ~ ' + ${store.endDate}"></div>
+                        <div class="info-value" th:text="${store.startDate != null ? store.startDate : '-'} + ' ~ ' + ${store.endDate != null ? store.endDate : '-'}"></div>
                     </div>
                 </div>
                 <div class="info-item">

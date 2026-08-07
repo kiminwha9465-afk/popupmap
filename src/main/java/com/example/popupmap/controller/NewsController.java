@@ -21,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -121,8 +123,10 @@ public class NewsController {
     @GetMapping("/news/write")
     public String writeForm(@RequestParam(required = false) String tag,
                             @RequestParam(required = false) Long storeId,
+                            Authentication auth,
                             Model model) {
-        model.addAttribute("defaultTag", tag != null ? tag : "공지");
+        boolean isAdmin = auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        model.addAttribute("defaultTag", isAdmin ? (tag != null ? tag : "공지") : "후기");
         model.addAttribute("stores", storeService.getAll());
         if (storeId != null) {
             storeService.getById(storeId).ifPresent(s -> model.addAttribute("preSelectedStore", s));
@@ -138,7 +142,10 @@ public class NewsController {
                         @RequestParam(required = false) MultipartFile thumbnailFile,
                         @RequestParam(required = false) Long popupStoreId,
                         @RequestParam(required = false) Integer rating,
-                        Principal principal) throws IOException {
+                        Principal principal,
+                        Authentication auth) throws IOException {
+        boolean isAdmin = auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if (!isAdmin) tag = "후기";
         String thumbnailUrl = null;
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
             String original = thumbnailFile.getOriginalFilename();
